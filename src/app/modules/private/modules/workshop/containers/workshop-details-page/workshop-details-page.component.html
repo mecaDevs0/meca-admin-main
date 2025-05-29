@@ -1,0 +1,12 @@
+<app-details
+  [controller]="controller"
+  [buttonsHidden]="[
+    controller.EButtonsHidden.export,
+    controller.EButtonsHidden.delete,
+    controller.EButtonsHidden.edit
+  ]"
+  [blockedName]="controller.EBlockedName.dataBlocked"
+  [customSubtitle]="controller.formData.id"
+>
+  <app-workshop-details [controller]="controller"></app-workshop-details>
+</app-details>

@@ -1,0 +1,18 @@
+main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background-color: #eff2f8;
+
+  .box {
+    display: flex;
+    flex-direction: column;
+    padding: 60px;
+    width: 600px;
+    height: 500px;
+    background: #ffffff;
+    border-radius: 20px;
+  }
+}

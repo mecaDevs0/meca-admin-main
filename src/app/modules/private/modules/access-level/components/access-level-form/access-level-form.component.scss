@@ -1,0 +1,62 @@
+.permissions-container {
+  display: flex;
+  gap: 30px;
+}
+
+.permissions-content {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.permissions-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  min-width: 400px;
+  max-width: 416px;
+
+  >label {
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+    height: 50px;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.6);
+    background: linear-gradient(0deg, rgba(242, 244, 246, 0.5), rgba(242, 244, 246, 0.5)), #FFFFFF;
+
+    &:hover {
+      background: var(--secondaryColorLight);
+      color: #000000;
+    }
+  }
+
+  input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  fieldset {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    label {
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 130%;
+      display: flex;
+      align-items: center;
+      color: rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+    }
+  }
+}

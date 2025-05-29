@@ -1,0 +1,124 @@
+<div class="menu-container">
+  <h1 [attr.aria-label]="title" class="cursor">
+    <img
+      routerLink="/app/dashboard"
+      [title]="title"
+      alt="Logo"
+      src="assets/logos/logo.png"
+    />
+  </h1>
+
+  <div class="user-info">
+    <app-notifications
+      [quantityNotifications]="
+        sessionService.userLogged.totalNotificationNoRead || 0
+      "
+    ></app-notifications>
+
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM5.07 16.28C5.5 15.38 8.12 14.5 10 14.5C11.88 14.5 14.51 15.38 14.93 16.28C13.57 17.36 11.86 18 10 18C8.14 18 6.43 17.36 5.07 16.28ZM16.36 14.83C14.93 13.09 11.46 12.5 10 12.5C8.54 12.5 5.07 13.09 3.64 14.83C2.62 13.49 2 11.82 2 10C2 5.59 5.59 2 10 2C14.41 2 18 5.59 18 10C18 11.82 17.38 13.49 16.36 14.83ZM10 4C8.06 4 6.5 5.56 6.5 7.5C6.5 9.44 8.06 11 10 11C11.94 11 13.5 9.44 13.5 7.5C13.5 5.56 11.94 4 10 4ZM10 9C9.17 9 8.5 8.33 8.5 7.5C8.5 6.67 9.17 6 10 6C10.83 6 11.5 6.67 11.5 7.5C11.5 8.33 10.83 9 10 9Z"
+        fill="black"
+        fill-opacity="0.6"
+      />
+    </svg>
+
+    <p class="user-name" *ngIf="asideMenuService.user?.name">
+      {{ asideMenuService.user.name }}
+    </p>
+
+    <div>
+      <button class="btn-dropdown" (click)="handleDropdown()">
+        <svg
+          width="12"
+          height="8"
+          viewBox="0 0 12 8"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M10.59 0.590088L6 5.17009L1.41 0.590088L0 2.00009L6 8.00009L12 2.00009L10.59 0.590088Z"
+            fill="black"
+            fill-opacity="0.2"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  (mouseleave)="dropdownIsOpen = false"
+  class="menu-dropdown"
+  [ngClass]="{ dropdownInactive: !dropdownIsOpen }"
+>
+  <nav>
+    <ul>
+      <li (click)="dropdownIsOpen = false" [routerLink]="['/app/profile/list']">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 5.9C13.16 5.9 14.1 6.84 14.1 8C14.1 9.16 13.16 10.1 12 10.1C10.84 10.1 9.9 9.16 9.9 8C9.9 6.84 10.84 5.9 12 5.9ZM12 14.9C14.97 14.9 18.1 16.36 18.1 17V18.1H5.9V17C5.9 16.36 9.03 14.9 12 14.9ZM12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4ZM12 13C9.33 13 4 14.34 4 17V19C4 19.55 4.45 20 5 20H19C19.55 20 20 19.55 20 19V17C20 14.34 14.67 13 12 13Z"
+            fill="black"
+            fill-opacity="0.6"
+          />
+        </svg>
+
+        <a routerLinkActive="link-active">Meus dados</a>
+      </li>
+
+      <li
+        tabindex="0"
+        (click)="dropdownIsOpen = false"
+        (click)="handleLogout()"
+        (keypress)="handleLogout()"
+      >
+        <svg
+          class="icon-logout"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M16 17L21 12L16 7"
+            stroke="black"
+            stroke-opacity="0.6"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M21 12H9"
+            stroke="black"
+            stroke-opacity="0.6"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
+            stroke="black"
+            stroke-opacity="0.6"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+
+        <a>Sair</a>
+      </li>
+    </ul>
+  </nav>
+</div>

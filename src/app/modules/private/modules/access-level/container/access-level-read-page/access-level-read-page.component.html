@@ -1,0 +1,10 @@
+<app-read
+  [controller]="controller"
+  [buttonsHidden]="[controller.EButtonsHidden.export]"
+>
+  <app-access-level-filter
+    filter
+    [controller]="controller"
+  ></app-access-level-filter>
+  <app-access-level-list list [controller]="controller"></app-access-level-list>
+</app-read>

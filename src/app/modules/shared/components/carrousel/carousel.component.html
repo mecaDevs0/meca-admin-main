@@ -1,0 +1,118 @@
+<section
+  class="container"
+  [ngStyle]="{
+    'max-width': celWidth + 'px',
+    'min-width': celWidth + 'px',
+    'max-height': celHeight + 'px',
+    'min-height': celHeight + 'px'
+  }"
+>
+  <section class="carousel-container">
+    <label>Foto(s) <abbr class="input-required">*</abbr></label>
+    <div class="carousel-content">
+      <ng-container *ngIf="images?.length">
+        <ng-container *ngFor="let img of images; index as position">
+          <img
+            loading="lazy"
+            [src]="
+              img?.toString()?.includes('http')
+                ? img
+                : baseUrl + '/content/upload/' + img
+            "
+            onerror="src = 'assets/images/blank-image.jpg'"
+            style.transform="translateX(-{{ currentIndex * celWidth }}px)"
+            [alt]="'imagem do carousel' + (position + 1)"
+            [ngStyle]="{
+              'max-width': celWidth + 'px',
+              'min-width': celWidth + 'px',
+              'max-height': celHeight + 'px',
+              'min-height': celHeight + 'px'
+            }"
+          />
+          <button
+            type="button"
+            class="btn-delete"
+            *ngIf="images?.length"
+            (click)="handleRemove()"
+          >
+            <svg
+              width="14"
+              height="18"
+              viewBox="0 0 14 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4H1V16ZM3 6H11V16H3V6ZM10.5 1L9.5 0H4.5L3.5 1H0V3H14V1H10.5Z"
+                fill="#F8334C"
+              />
+            </svg>
+          </button>
+        </ng-container>
+      </ng-container>
+      <img
+        *ngIf="!images?.length"
+        src="assets/images/blank-image.jpg"
+        alt="Imagem em branco"
+      />
+    </div>
+
+    <div class="add-images-container">
+      <p class="text-center mt-2">
+        Total( {{ images.length }} / {{ maxImages }} )
+      </p>
+      <div *ngIf="images.length < maxImages">
+        <label for="fileImage" class="label-add-image cursor">
+          Adicionar imagem
+        </label>
+        <input
+          hidden
+          accept="image/png, image/jpeg"
+          multiple
+          (change)="handleFileImage($event)"
+          type="file"
+          id="fileImage"
+        />
+      </div>
+    </div>
+
+    <button
+      [hidden]="currentIndex === 0"
+      type="button"
+      class="carousel-button previous"
+      (click)="previous()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        height="26px"
+        viewBox="0 0 24 24"
+        width="26px"
+        fill="#000000"
+      >
+        <path d="M0 0h24v24H0V0z" fill="none" opacity=".87" />
+        <path
+          d="M16.62 2.99c-.49-.49-1.28-.49-1.77 0L6.54 11.3c-.39.39-.39 1.02 0 1.41l8.31 8.31c.49.49 1.28.49 1.77 0s.49-1.28 0-1.77L9.38 12l7.25-7.25c.48-.48.48-1.28-.01-1.76z"
+        />
+      </svg>
+    </button>
+    <button
+      [hidden]="currentIndex === images.length - 1"
+      type="button"
+      class="carousel-button next"
+      (click)="next()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        height="26px"
+        viewBox="0 0 24 24"
+        width="26px"
+        fill="#000000"
+      >
+        <path d="M24 24H0V0h24v24z" fill="none" opacity=".87" />
+        <path
+          d="M7.38 21.01c.49.49 1.28.49 1.77 0l8.31-8.31c.39-.39.39-1.02 0-1.41L9.15 2.98c-.49-.49-1.28-.49-1.77 0s-.49 1.28 0 1.77L14.62 12l-7.25 7.25c-.48.48-.48 1.28.01 1.76z"
+        />
+      </svg>
+    </button>
+  </section>
+</section>

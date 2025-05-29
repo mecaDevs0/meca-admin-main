@@ -1,0 +1,88 @@
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 0 0 8px 8px;
+}
+
+.d-flex {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  width: max-content;
+}
+
+.gap20 {
+  gap: 20px;
+}
+
+.btn-per-page {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.6);
+  height: 50px;
+}
+
+.text-per-page {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.btn-previous {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px 0px 0px 8px;
+  padding: 10px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  a {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.btn-next {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0px 8px 8px 0px;
+  padding: 10px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  a {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.pagination-items {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  a {
+    color: var(--secondaryColor);
+  }
+}
+
+.active {
+  background-color: var(--secondaryColor);
+
+  a {
+    color: #000000;
+  }
+}

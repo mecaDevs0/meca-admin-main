@@ -1,0 +1,33 @@
+button {
+  padding: 16px;
+  width: 100%;
+  background: var(--secondaryColor);
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 18px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+
+  p {
+    color: #ffffff !important;
+  }
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

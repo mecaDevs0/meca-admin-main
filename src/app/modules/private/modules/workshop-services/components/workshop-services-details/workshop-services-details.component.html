@@ -1,0 +1,18 @@
+<div class="view-card-content">
+  <div>
+    <p><b>Serviço</b></p>
+    <p>{{ controller.formData.name }}</p>
+  </div>
+  <div>
+    <p><b>Descrição</b></p>
+    <p>{{ controller.formData.description }}</p>
+  </div>
+  <div>
+    <p><b>Serviço rápido?</b></p>
+    <p>{{ controller.formData.quickService ? "Sim" : "Não" }}</p>
+  </div>
+  <div>
+    <p><b>Antecedência mínima para agendamento (em horas)</b></p>
+    <p>{{ controller.formData.minTimeScheduling }}</p>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="breadcrumb-content">
+  <div>
+    <h2>{{ controller.breadCrumbTitle }}</h2>
+  </div>
+  <form
+    [formGroup]="controller.listSearchForm"
+    class="search-container"
+    [style.alignItems]="alignItems"
+  >
+    <ng-content></ng-content>
+
+    <div class="search" *ngIf="withSearch" [style.width]="width">
+      <ng-content select="[label]"></ng-content>
+
+      <div class="search-input">
+        <input
+          type="search"
+          id="search"
+          [placeholder]="'Pesquisar por ' + placeholder"
+          formControlName="search"
+        />
+
+        <img
+          [hidden]="controller.listSearchForm.value?.search"
+          class="search-icon"
+          src="assets/icons/search-icon.svg"
+          alt="Iconê de pesquisa"
+        />
+      </div>
+    </div>
+  </form>
+</div>

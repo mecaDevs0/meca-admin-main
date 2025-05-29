@@ -1,0 +1,15 @@
+<app-filter [controller]="controller" [placeholder]="'Nome ou E-mail'">
+  <form [formGroup]="controller.listSearchForm" class="search-container">
+    <div>
+      <select id="accessLevelId" formControlName="accessLevelId">
+        <option value="">Perfil de acesso (todos)</option>
+        <option
+          *ngFor="let item of controller?.accessLevels"
+          [value]="item?.id"
+        >
+          {{ item?.name }}
+        </option>
+      </select>
+    </div>
+  </form>
+</app-filter>

@@ -1,0 +1,92 @@
+<app-form [controller]="controller">
+  <form [formGroup]="controller.form">
+    <div class="form-content">
+      <div class="form-content-item image-content">
+        <label>Foto do serviço</label>
+        <app-files-upload
+          [accept]="'image/png, image/jpeg, image/jpg'"
+          [label]="'foto'"
+          [control]="controller.form.controls.photo"
+          [widthContainer]="200"
+          [heightContainer]="200"
+        ></app-files-upload>
+      </div>
+    </div>
+
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('name')"
+      >
+        <label for="name">Serviço <abbr class="input-required">*</abbr></label>
+        <input formControlName="name" type="text" name="Nome" id="name" />
+        <app-form-error
+          [control]="controller.form.get('name')"
+        ></app-form-error>
+      </div>
+
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('minTimeScheduling')"
+      >
+        <label for="minTimeScheduling"
+          >Antecedência mínima para agendamento (em horas)
+          <abbr class="input-required">*</abbr></label
+        >
+        <input
+          formControlName="minTimeScheduling"
+          type="number"
+          name="minTimeScheduling"
+          id="minTimeScheduling"
+        />
+        <app-form-error
+          [control]="controller.form.get('minTimeScheduling')"
+        ></app-form-error>
+      </div>
+    </div>
+
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('quickService')"
+        [style.maxWidth]="'170px'"
+      >
+        <div class="checkbox-content">
+          <input
+            formControlName="quickService"
+            type="checkbox"
+            name="quickService"
+            id="quickService"
+          />
+          <label for="quickService"
+            >Serviço Rápido <abbr class="input-required">*</abbr></label
+          >
+        </div>
+        <app-form-error
+          [control]="controller.form.get('quickService')"
+        ></app-form-error>
+      </div>
+    </div>
+
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('description')"
+      >
+        <label for="description"
+          >Descrição <abbr class="input-required">*</abbr></label
+        >
+        <textarea
+          formControlName="description"
+          type="text"
+          name="description"
+          id="description"
+          rows="5"
+        ></textarea>
+        <app-form-error
+          [control]="controller.form.get('description')"
+        ></app-form-error>
+      </div>
+    </div>
+  </form>
+</app-form>

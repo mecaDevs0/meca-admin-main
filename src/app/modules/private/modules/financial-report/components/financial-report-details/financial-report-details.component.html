@@ -1,0 +1,137 @@
+<div class="view-card-content">
+  <div>
+    <p><b>Código</b></p>
+    <p>{{ controller.formData?.id }}</p>
+  </div>
+
+  <div *ngIf="controller.formData?.codeSale">
+    <p><b>Código da venda</b></p>
+    <p>{{ controller.formData?.codeSale }}</p>
+  </div>
+
+  <div>
+    <p><b>Status de pagamento</b></p>
+    <p
+      [class]="
+        controller.formData?.paymentStatus || null | paymentStatus : true
+      "
+    >
+      {{ controller.formData?.paymentStatus || null | paymentStatus }}
+    </p>
+  </div>
+
+  <div
+    *ngIf="
+      controller.formData?.paymentMethod === 0 &&
+      controller.formData?.paymentStatus === 0 &&
+      controller.formData?.qrCodeImage
+    "
+  >
+    <p><b>PIX QRCODE</b></p>
+    <p>
+      <img
+        class="qrcode"
+        src="{{ controller.formData?.qrCodeImage }}"
+        alt="QRCODE"
+      />
+      <button
+        title="Copiar copia e cola do PIX"
+        class="btn-paid"
+        (click)="copyQrCodeToClipboard()"
+      >
+        Copiar copia e cola
+      </button>
+    </p>
+  </div>
+
+  <div>
+    <p><b>Comprovante</b></p>
+    <a
+      *ngIf="controller.formData?.paymentVoucher"
+      [href]="controller.baseRef + controller.formData?.paymentVoucher"
+      target="_blank"
+      >Ver comprovante</a
+    >
+    <p *ngIf="!controller.formData?.paymentVoucher">N/A</p>
+  </div>
+
+  <div
+    *ngIf="
+      controller.formData?.paymentStatus === 0 ||
+      controller.formData?.paymentStatus === 2 ||
+      controller.formData?.paymentStatus === 4
+    "
+  >
+    <p><b>Motivo recusa (Getway)</b></p>
+    <p>{{ controller.formData?.aquirerMessage || "N/A" }}</p>
+  </div>
+
+  <div>
+    <p><b>Data e Hora</b></p>
+    <p>
+      {{
+        controller.formData?.created || null
+          | customDate : "dd/MM/yyyy - HH:mm:ss"
+      }}
+    </p>
+  </div>
+
+  <div>
+    <p><b>Cliente</b></p>
+    <p>{{ controller.formData?.profile?.fullName }}</p>
+  </div>
+
+  <div>
+    <p><b>CPF</b></p>
+    <p>{{ controller.formData?.profile?.cpf || "" | cpfOrCnpj }}</p>
+  </div>
+
+  <div>
+    <p><b>Forma de pagamento</b></p>
+    <p>
+      {{ controller.formData?.paymentMethod || null | paymentMethods
+      }}{{
+        controller.formData?.paymentMethod === 2
+          ? " (" + controller.formData?.installment + "x)"
+          : ""
+      }}
+    </p>
+  </div>
+
+  <div>
+    <p><b>Parcelamento sem juros</b></p>
+    <p>{{ controller.formData?.withoutInterest ? "Sim" : "Não" }}</p>
+  </div>
+
+  <div>
+    <p><b>Data da venda</b></p>
+    <p>
+      {{
+        (controller.formData?.created || null
+          | customDate : "dd/MM/YYYY HH:mm") || "N/A"
+      }}
+    </p>
+  </div>
+
+  <div>
+    <p><b>Valor bruto pago em R$</b></p>
+    <p>
+      {{
+        (controller.formData?.valuesBrl?.grossValue
+          | currency : "BRL" : true : "" : "pt") || "N/A"
+      }}
+    </p>
+  </div>
+
+  <div>
+    <p><b>IOF</b></p>
+    <p>
+      {{ controller.formData?.iof | currency : "BRL" : true : "" : "pt" }}
+    </p>
+  </div>
+
+  <div>
+    <p><b>Identificador do link de pagamento</b></p>
+    <p>{{ controller.formData?.baseChargeId || "N/A" }}</p>
+  </div>
+</div>

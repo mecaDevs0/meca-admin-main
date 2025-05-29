@@ -1,0 +1,106 @@
+<div class="view-card-content">
+  <div>
+    <p><b>Status atual</b></p>
+    <p>{{ controller.formData.status | schedulingStatus }}</p>
+  </div>
+  <div>
+    <p><b>Data da solicitação</b></p>
+    <p>
+      {{ controller.formData.created | customDate : "dd/MM/yyyy HH:mm" }}
+    </p>
+  </div>
+  <div>
+    <p><b>Data do agendamento</b></p>
+    <p>
+      {{ controller.formData.date | customDate : "dd/MM/yyyy HH:mm" }}
+    </p>
+  </div>
+  <div>
+    <p><b>Data da última atualização</b></p>
+    <p>
+      {{ controller.formData.lastUpdate | customDate : "dd/MM/yyyy HH:mm" }}
+    </p>
+  </div>
+
+  <h4>Dados do cliente</h4>
+  <div>
+    <p><b>Nome do cliente</b></p>
+    <p>{{ controller.formData.profile.fullName }}</p>
+  </div>
+  <div>
+    <p><b>E-mail</b></p>
+    <p>{{ controller.formData.profile.email || "N/A" }}</p>
+  </div>
+  <div>
+    <p><b>Telefone</b></p>
+    <p>{{ controller.formData.profile.phone | phone }}</p>
+  </div>
+  <div>
+    <p><b>Placa do veículo</b></p>
+    <p>{{ controller.formData.vehicle.plate }}</p>
+  </div>
+  <div>
+    <p><b>Observações</b></p>
+    <p>{{ controller.formData.observations || "N/A" }}</p>
+  </div>
+
+  <p>
+    <b
+      >Serviços solicitados ({{
+        controller.formData.workshopServices.length
+      }})</b
+    >
+  </p>
+
+  <ng-container *ngFor="let item of controller.formData.workshopServices">
+    <div class="service-card">
+      <div class="service-image">
+        <img
+          [src]="item.photo"
+          onerror="src = 'assets/images/blank-image.jpg'"
+          alt=""
+        />
+      </div>
+      <div class="service-info">
+        <div>
+          <p><b>Nome do serviço</b></p>
+          <p>{{ item.service.name }}</p>
+        </div>
+        <div>
+          <p><b>Descrição</b></p>
+          <p>{{ item.description || "N/A" }}</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <hr />
+
+  <h4>Dados da oficina</h4>
+  <div>
+    <p><b>Nome da empresa</b></p>
+    <p>{{ controller.formData.workshop.companyName }}</p>
+  </div>
+  <div>
+    <p><b>CNPJ</b></p>
+    <p>{{ controller.formData.workshop.cnpj | cpfOrCnpj }}</p>
+  </div>
+  <div>
+    <p><b>Nome do responsável</b></p>
+    <p>{{ controller.formData.workshop.fullName }}</p>
+  </div>
+  <div>
+    <p><b>E-mail do responsável</b></p>
+    <p>{{ controller.formData.workshop.email }}</p>
+  </div>
+  <div>
+    <p><b>Telefone do responsável</b></p>
+    <p>{{ controller.formData.workshop.phone | phone }}</p>
+  </div>
+
+  <hr />
+
+  <h4 class="history-title">Histórico</h4>
+
+  <app-history [controller]="controller"></app-history>
+</div>

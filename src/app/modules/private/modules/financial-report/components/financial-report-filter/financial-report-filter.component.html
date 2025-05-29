@@ -1,0 +1,36 @@
+<app-filter [controller]="controller" [placeholder]="'Código'">
+  <form [formGroup]="controller.listSearchForm" class="search-container">
+    <app-range-date
+      [form]="controller.listSearchForm"
+      [title]="''"
+    ></app-range-date>
+
+    <div>
+      <select id="paymentStatus" formControlName="paymentStatus">
+        <option value="paymentStatus" value="">
+          Status de pagamento (todos)
+        </option>
+        <option
+          *ngFor="let item of controller?.paymentStatusList; index as i"
+          [value]="i"
+        >
+          {{ item }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <select id="paymentMethod" formControlName="paymentMethod">
+        <option value="paymentMethod" value="">
+          Forma de pagamento (todos)
+        </option>
+        <option
+          *ngFor="let item of controller?.paymentMethodList; index as i"
+          [value]="i"
+        >
+          {{ item }}
+        </option>
+      </select>
+    </div>
+  </form>
+</app-filter>

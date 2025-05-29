@@ -1,0 +1,39 @@
+<ng-container
+  *ngIf="
+    item?.isDefault === undefined || item?.isDefault === false;
+    else userDefault
+  "
+>
+  <ng-template
+    [ngIf]="
+      controller.accessLevelName | accessLevel : EFunctionalities.enableDisable
+    "
+  >
+    <div>
+      <input
+        type="checkbox"
+        class="toggle mr-2"
+        [id]="'blocked-' + item.id"
+        [name]="item.name"
+        [value]="item.id"
+        [checked]="
+          item[blockedName === EBlockedName.blocked ? 'blocked' : 'dataBlocked']
+            ? false
+            : true
+        "
+        (click)="controller.handleBlockUnblock($event, index)"
+      />
+      <p>
+        {{
+          item[blockedName === EBlockedName.blocked ? "blocked" : "dataBlocked"]
+            ? "Inativo"
+            : "Ativo"
+        }}
+      </p>
+    </div>
+  </ng-template>
+</ng-container>
+
+<ng-template #userDefault>
+  <p class="text-danger">Este perfil não pode ser editado</p>
+</ng-template>

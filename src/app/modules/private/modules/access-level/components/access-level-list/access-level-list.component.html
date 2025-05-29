@@ -1,0 +1,24 @@
+<app-list [controller]="controller">
+  <ng-container header>
+    <th>Tipo de perfil</th>
+  </ng-container>
+
+  <ng-container body *ngFor="let item of controller.list; index as i">
+    <tr class="select-item">
+      <td>{{ item?.name }}</td>
+      <td class="status">
+        <app-list-status-button
+          [controller]="controller"
+          [item]="item"
+          [index]="i"
+        ></app-list-status-button>
+      </td>
+      <td class="actions">
+        <app-list-actions-button
+          [controller]="controller"
+          [item]="item"
+        ></app-list-actions-button>
+      </td>
+    </tr>
+  </ng-container>
+</app-list>

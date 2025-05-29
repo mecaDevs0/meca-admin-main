@@ -1,0 +1,141 @@
+@import 'colors';
+
+textarea {
+  height: auto;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  max-width: 900px;
+  margin: 0 auto !important;
+  gap: 30px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  h3 {
+    font-weight: 700 !important;
+    font-size: 20px !important;
+    line-height: 23px;
+    color: #002D47;
+  }
+
+  h4 {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+    color: #002D47;
+    margin-top: 10px;
+  }
+
+  .btn-content {
+    width: 335px;
+    margin: 0 auto !important;
+  }
+}
+
+.form-content {
+  display: flex;
+  gap: 30px;
+}
+
+.form-content-box {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 30px;
+}
+
+.form-content-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  label {
+    color: #00000099;
+  }
+}
+
+.input-required {
+  color: #e65252;
+  font-size: 1.4em;
+  vertical-align: bottom;
+}
+
+.message-required {
+  color: #e65252;
+  text-align: center;
+  font-size: 14px;
+}
+
+.message-error {
+  color: #e65252;
+  font-size: 12px;
+}
+
+.fields-invalid {
+  color: #e65252;
+  text-align: center;
+}
+
+.has-error {
+  label {
+    color: #e65252;
+  }
+
+  input,
+  select,
+  textarea,
+  fieldset {
+    border-color: #e65252 !important;
+  }
+}
+
+.btn-add-form-item {
+  background: transparent;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+}
+
+.btn-delete-form-item {
+  background: transparent;
+  padding: 5px;
+  color: #e65252;
+  text-transform: none !important;
+  font-size: 16px !important;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-add-option {
+  background: transparent;
+  font-weight: 400;
+  font-size: 16px !important;
+  line-height: 19px !important;
+  text-align: center;
+  color: var(--secondaryColor);
+  text-transform: none !important;
+  padding: 0;
+  width: 150px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+@media screen and (max-width: 840px) {
+  .form-content {
+    flex-direction: column;
+    align-items: normal;
+  }
+}

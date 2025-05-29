@@ -1,0 +1,185 @@
+<label class="label">
+  <ng-container *ngIf="labelDimensions">
+    Dimensões recomendada (Largura {{ widthImage }} X Altura {{ heightImage }})
+  </ng-container>
+  <br />
+  <ng-container *ngIf="labelExtension">
+    Extensão ({{ handleTypesAccept() }})
+  </ng-container>
+</label>
+
+<ng-container *ngIf="isMultiple">
+  <div
+    draggable="true"
+    class="file-content"
+    [ngClass]="{ inline: cssInline }"
+    [ngStyle]="{
+      width: cssInline ? '100%' : widthContainer + 'px',
+      height: cssInline ? 'auto' : heightContainer + 'px',
+      'justify-content':
+        control.value && cssInline === true ? 'flex-start' : 'center'
+    }"
+    (drop)="dropHandler($event)"
+    (dragover)="dragOverHandler($event)"
+  >
+    <ng-container *ngIf="!readOnly">
+      <img
+        [style.height]="cssInline ? '30px' : '50px'"
+        src="assets/icons/files-upload/cloud-upload.png"
+        alt=""
+      />
+      <div>
+        <p>Arraste e solte {{ label }} para fazer upload.</p>
+      </div>
+      <p class="line-middle">ou</p>
+      <div>
+        <app-button
+          type="button"
+          (click)="fileButton.nativeElement?.click()"
+          label="Procurar"
+          [buttonLoading]="buttonLoading"
+          [height]="'30px'"
+        >
+        </app-button>
+      </div>
+    </ng-container>
+  </div>
+
+  <ng-container *ngIf="control?.value">
+    <div class="images-content">
+      <ng-container *ngFor="let item of control?.value; index as i">
+        <div>
+          <ng-container
+            *ngIf="
+              item.includes('png') ||
+              item.includes('jpeg') ||
+              item.includes('jpg')
+            "
+          >
+            <img
+              [src]="item.includes('http') ? item : baseRef + item"
+              [alt]="'Imagem ' + (i + 1)"
+          /></ng-container>
+
+          <ng-container *ngIf="item.includes('pdf')">
+            <img
+              [src]="'assets/icons/files-upload/pdf.png'"
+              [alt]="'PDF ' + (i + 1)"
+            />
+            <p>
+              {{ item.split("upload/")[1] }}
+            </p>
+          </ng-container>
+
+          <ng-container *ngIf="item.includes('xls') || item.includes('xlsx')">
+            <img
+              [src]="'assets/icons/files-upload/xls.png'"
+              [alt]="'XLS ' + (i + 1)"
+            />
+            <p>
+              {{ item.split("upload/")[1] }}
+            </p>
+          </ng-container>
+
+          <button
+            *ngIf="!readOnly"
+            type="button"
+            class="btn-remove-file"
+            (click)="handleRemoveFile(i)"
+          >
+            <img
+              src="assets/icons/files-upload/delete.svg"
+              [alt]="'Remover arquivo' + (i + 1)"
+            />
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</ng-container>
+
+<ng-container *ngIf="!isMultiple">
+  <div
+    draggable="true"
+    class="file-content"
+    [ngClass]="{ inline: cssInline }"
+    [ngStyle]="{
+      width: cssInline ? '100%' : widthContainer + 'px',
+      height: cssInline ? 'auto' : heightContainer + 'px',
+      'justify-content':
+        control.value && cssInline === true ? 'flex-start' : 'center'
+    }"
+    (drop)="dropHandler($event)"
+    (dragover)="dragOverHandler($event)"
+  >
+    <img
+      class="image-selected"
+      *ngIf="control?.value && cssInline === false"
+      [src]="
+        control.value.includes('http') ? control.value : baseRef + control.value
+      "
+      [alt]="label + 'selecionada'"
+    />
+    <ng-container *ngIf="control?.value && cssInline === true">
+      <img
+        [style.height]="cssInline ? '30px' : '50px'"
+        src="assets/icons/files-upload/cloud-upload.png"
+        alt=""
+      />
+      <p>
+        {{ control.value.split("upload/")[1] }}
+      </p>
+    </ng-container>
+
+    <ng-container *ngIf="!control?.value && !readOnly">
+      <img
+        [style.height]="cssInline ? '30px' : '50px'"
+        src="assets/icons/files-upload/cloud-upload.png"
+        alt=""
+      />
+      <div>
+        <p *ngIf="!control?.value">
+          Arraste e solte {{ label }} para fazer upload.
+        </p>
+        <p>{{ control.value }}</p>
+      </div>
+      <p class="line-middle">ou</p>
+      <div>
+        <app-button
+          type="button"
+          (click)="fileButton.nativeElement.click()"
+          label="Procurar"
+          [buttonLoading]="buttonLoading"
+          [height]="'30px'"
+        >
+        </app-button>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="control?.value && !readOnly">
+      <button
+        type="button"
+        class="btn-remove-file"
+        (click)="handleRemoveFile()"
+        [ngStyle]="{ top: '10px', right: '10px' }"
+      >
+        <img
+          src="assets/icons/files-upload/delete.svg"
+          [alt]="'Remover' + label"
+        />
+      </button>
+    </ng-container>
+  </div>
+</ng-container>
+
+<input
+  hidden
+  [disabled]="buttonLoading"
+  type="file"
+  #file
+  (change)="handleSetFile($event)"
+  [accept]="accept"
+  [multiple]="isMultiple"
+/>
+
+<app-form-error [control]="control"></app-form-error>

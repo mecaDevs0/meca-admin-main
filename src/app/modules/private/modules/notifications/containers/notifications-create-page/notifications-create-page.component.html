@@ -1,0 +1,67 @@
+<app-notifications-filter [controller]="controller"></app-notifications-filter>
+
+<div class="btn-content">
+  <ng-template
+    [ngIf]="controller.accessLevelName | accessLevel : EFunctionalities.write"
+  >
+    <app-button
+      (click)="controller.openModalNotification()"
+      [label]="
+        controller.listSelected.length
+          ? 'Enviar para todos os selecionados (' +
+            controller.listSelected.length +
+            ')'
+          : 'Enviar para todos'
+      "
+      height="40px"
+      buttonType="button"
+    ></app-button>
+  </ng-template>
+</div>
+
+<app-modal [config]="controller.configModalNotification">
+  <app-notifications-form [controller]="controller"></app-notifications-form>
+</app-modal>
+
+<app-loading [loading]="controller.listLoading"></app-loading>
+
+<ng-container *ngIf="!controller.listLoading && !controller.list?.length">
+  <h2 class="text-align-center">Nenhum registro encontrado</h2>
+</ng-container>
+
+<ng-container *ngIf="!controller.listLoading && controller.list?.length">
+  <div class="read-list">
+    <app-list [controller]="controller" [actions]="false" [status]="false">
+      <ng-container header>
+        <th></th>
+        <th>Nome</th>
+        <th>E-mail</th>
+      </ng-container>
+
+      <ng-container body *ngFor="let item of controller.list; index as i">
+        <tr class="select-item">
+          <td [style.width]="'60px'">
+            <input
+              class="checkbox-select"
+              type="checkbox"
+              [id]="'select-' + item?.id"
+              [checked]="controller.isChecked(item)"
+              (change)="controller.handleListItemSelected(item)"
+            />
+          </td>
+          <td>{{ item["companyName"] || item["fullName"] }}</td>
+          <td>{{ item.email }}</td>
+        </tr>
+      </ng-container>
+    </app-list>
+
+    <app-list-pagination
+      [page]="controller.formDataModel.page"
+      [pageSize]="controller.formDataModel.pageSize"
+      [listSize]="controller.listSize"
+      [listSizeFiltered]="controller.listSizeFiltered"
+      (pageChange)="controller.handleListPageChange($event)"
+    >
+    </app-list-pagination>
+  </div>
+</ng-container>

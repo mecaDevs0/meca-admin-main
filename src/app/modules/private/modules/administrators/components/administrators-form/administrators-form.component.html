@@ -1,0 +1,56 @@
+<app-form [controller]="controller">
+  <form [formGroup]="controller.form">
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('name')"
+      >
+        <label for="name">Nome <abbr class="input-required">*</abbr></label>
+        <input formControlName="name" type="text" name="name" id="name" />
+        <app-form-error
+          [control]="controller.form.get('name')"
+        ></app-form-error>
+      </div>
+    </div>
+
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('email')"
+      >
+        <label for="email">E-mail <abbr class="input-required">*</abbr></label>
+        <input formControlName="email" type="email" name="email" id="email" />
+        <app-form-error
+          [control]="controller.form.get('email')"
+        ></app-form-error>
+      </div>
+    </div>
+
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('accessLevel')"
+      >
+        <label for="accessLevel"
+          >Perfil de acesso <abbr class="input-required">*</abbr></label
+        >
+        <select
+          formControlName="accessLevel"
+          id="accessLevel"
+          [compareWith]="controller.compareItem"
+        >
+          <option selected disabled value="null">Selecionar</option>
+          <option
+            *ngFor="let access of controller.accessLevels"
+            [ngValue]="access"
+          >
+            {{ access.name }}
+          </option>
+        </select>
+        <app-form-error
+          [control]="controller.form.get('accessLevel')"
+        ></app-form-error>
+      </div>
+    </div>
+  </form>
+</app-form>

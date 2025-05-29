@@ -1,0 +1,10 @@
+<app-read
+  [controller]="controller"
+  [buttonsHidden]="[
+    controller.EButtonsHidden.export,
+    controller.EButtonsHidden.write
+  ]"
+>
+  <app-app-users-filter filter [controller]="controller"></app-app-users-filter>
+  <app-app-users-list list [controller]="controller"></app-app-users-list>
+</app-read>

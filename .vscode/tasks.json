@@ -1,0 +1,72 @@
+// .vscode/tasks.json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Serve Dev",
+      "type": "npm",
+      "script": "start-dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": ["relative", "${cwd}"],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Angular CLI server",
+          "endsPattern": "Compiled successfully."
+        }
+      },
+      "group": "build"
+    },
+    {
+      "label": "Serve Hml",
+      "type": "npm",
+      "script": "start-hml",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": ["relative", "${cwd}"],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Angular CLI server",
+          "endsPattern": "Compiled successfully."
+        }
+      },
+      "group": "build"
+    },
+    {
+      "label": "Serve Prod",
+      "type": "npm",
+      "script": "start-prod",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": ["relative", "${cwd}"],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Angular CLI server",
+          "endsPattern": "Compiled successfully."
+        }
+      },
+      "group": "build"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "environment",
+      "type": "pickString",
+      "description": "Select environment",
+      "options": ["Serve Dev", "Serve Hml", "Serve Prod"],
+      "default": "Serve Dev"
+    }
+  ]
+}

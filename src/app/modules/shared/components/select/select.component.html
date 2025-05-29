@@ -1,0 +1,83 @@
+<div
+  class="select-content flex12"
+  (mouseleave)="handleMouseLeave()"
+  [ngClass]="displayFieldCss(formControlName)"
+>
+  <label class="input-label"
+    >{{ label }} <abbr *ngIf="isRequired" class="input-required">*</abbr>
+  </label>
+  <form [formGroup]="formGroup">
+    <input
+      [disabled]="formGroup.get(formControlName)?.disabled"
+      placeholder="Selecionar"
+      [value]="handleValues()"
+      (click)="selectDropdownHidden = !selectDropdownHidden"
+      readonly
+      type="text"
+      id="select"
+      name="select"
+    />
+
+    <img
+      [hidden]="formGroup.get(formControlName)?.disabled"
+      (click)="selectDropdownHidden = !selectDropdownHidden"
+      class="arrow-expand"
+      src="assets/icons/arrow-expand.svg"
+      alt="Expandir"
+    />
+
+    <div *ngIf="!selectDropdownHidden" class="select-dropdown">
+      <div class="search-container" *ngIf="showSearch">
+        <form [formGroup]="listSearchForm">
+          <div class="search">
+            <input
+              type="search"
+              id="search"
+              placeholder="Pesquisar"
+              formControlName="search"
+            />
+
+            <img
+              [hidden]="listSearchForm.value?.search"
+              class="search-icon"
+              src="assets/icons/search-icon.svg"
+              alt="Iconê de pesquisa"
+            />
+          </div>
+        </form>
+      </div>
+
+      <div *ngFor="let item of list; index as i">
+        <input
+          [checked]="handleChecked(item)"
+          (change)="handleSelect($event, item)"
+          [type]="multiple ? 'checkbox' : 'radio'"
+          [id]="'check' + i"
+          [name]="multiple ? 'check' + i : 'check'"
+        />
+        <label [for]="'check' + i">{{ item?.name }}</label>
+      </div>
+
+      <div *ngIf="!list.length">
+        <p>{{ labelNoItems }}</p>
+      </div>
+    </div>
+  </form>
+  <app-form-error
+    [control]="formGroup.get(formControlName)"
+    [label]="'um item'"
+  >
+  </app-form-error>
+</div>
+
+<!-- Example -->
+<!-- <app-select
+[formGroup]="form"
+formControlName="formControlName"
+[listOrEnum]="list"
+[isEnum]="false"
+[multiple]="false"
+[disabled]="false"
+[label]="'label'"
+[isRequired]="true"
+></app-select> -->

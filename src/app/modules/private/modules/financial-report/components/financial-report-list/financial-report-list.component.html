@@ -1,0 +1,40 @@
+<app-list [controller]="controller" [actions]="false" [status]="false">
+  <ng-container header>
+    <th>Código</th>
+    <th>Status de pagamento</th>
+    <th>Data da venda</th>
+    <th>Cliente</th>
+    <th>CPF</th>
+    <th>Forma de pagamento</th>
+    <th>Valor pago</th>
+  </ng-container>
+
+  <ng-container body *ngFor="let item of controller.list; index as i">
+    <tr class="select-item cursor">
+      <td [routerLink]="['view', item?.id]">{{ item?.id }}</td>
+      <td [routerLink]="['view', item?.id]">
+        <span [class]="item.paymentStatus | paymentStatus : true">
+          {{ item.paymentStatus | paymentStatus }}
+        </span>
+      </td>
+      <td [routerLink]="['view', item?.id]">
+        {{ (item.created | customDate : "dd/MM/YYYY HH:mm") || "N/A" }}
+      </td>
+      <td [routerLink]="['view', item?.id]">{{ item?.profile?.fullName }}</td>
+      <td [routerLink]="['view', item?.id]">
+        {{ item?.profile?.cpf | cpfOrCnpj }}
+      </td>
+      <td [routerLink]="['view', item?.id]">
+        {{ item.paymentMethod | paymentMethods
+        }}{{ item?.paymentMethod === 2 ? " (" + item?.installment + "x)" : "" }}
+      </td>
+
+      <td [routerLink]="['view', item?.id]">
+        {{
+          (item?.valuesBrl?.grossValue | currency : "BRL" : true : "" : "pt") ||
+            "N/A"
+        }}
+      </td>
+    </tr>
+  </ng-container>
+</app-list>

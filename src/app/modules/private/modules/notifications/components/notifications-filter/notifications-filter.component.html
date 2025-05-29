@@ -1,0 +1,36 @@
+<div class="breadcrumb-content">
+  <div>
+    <h2 class="cursor" [routerLink]="controller.baseRoute">
+      {{ controller.breadCrumbTitle }}
+    </h2>
+  </div>
+
+  <form [formGroup]="controller.listSearchForm" class="search-container">
+    <div>
+      <select id="profile" formControlName="profile">
+        <option
+          *ngFor="let item of controller.profiles; index as i"
+          [value]="item.id"
+        >
+          {{ item.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="search">
+      <input
+        type="search"
+        id="search"
+        placeholder="Pesquisar por Nome ou E-mail"
+        formControlName="search"
+      />
+
+      <img
+        [hidden]="controller.listSearchForm.value?.search"
+        class="search-icon"
+        src="assets/icons/search-icon.svg"
+        alt="Iconê de pesquisa"
+      />
+    </div>
+  </form>
+</div>

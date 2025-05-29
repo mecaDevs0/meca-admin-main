@@ -1,0 +1,107 @@
+.total-content {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 40px;
+
+  > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.graph-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.graph-content {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+
+  > div {
+    flex: 1;
+    min-width: 350px;
+  }
+}
+
+.graph-card {
+  flex: 1;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  justify-content: center;
+
+  p {
+    color: #000;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 0.15px;
+  }
+}
+
+.value {
+  font-size: 22px !important;
+  font-weight: 700;
+}
+
+.card-bg {
+  background-color: var(--secondaryColor) !important;
+  .icon-content {
+    background-color: #fff;
+  }
+}
+
+.graph-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  > div {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+}
+
+.icon-content {
+  background-color: var(--secondaryColor);
+  height: 56px;
+  max-width: 56px;
+  border-radius: 50%;
+  align-items: center !important;
+  justify-content: center !important;
+
+  img {
+    height: 24px;
+  }
+}
+
+.graph-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 150%;
+    color: rgba(0, 0, 0, 0.4);
+  }
+}

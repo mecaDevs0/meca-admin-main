@@ -1,0 +1,65 @@
+@import '../../../../../../../stylus/colors';
+
+p {
+  margin: 0;
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  width: 706px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  gap: 30px;
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  >div {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  p {
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  p:first-child {
+    width: 170px;
+  }
+}
+
+.btn-change-password {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px !important;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+  max-width: 161px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 39px;
+  text-transform: none !important;
+}

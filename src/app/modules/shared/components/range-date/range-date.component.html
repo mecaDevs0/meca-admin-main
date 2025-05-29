@@ -1,0 +1,24 @@
+<p class="title">{{ title }}</p>
+<div class="range-date-container">
+  <form class="dFlex" [formGroup]="form">
+    <div class="date start">
+      <input
+        [max]="form.get('endDate')?.value"
+        type="date"
+        placeholder="dd/mm/aaaa"
+        id="startDate"
+        formControlName="startDate"
+      />
+    </div>
+    <div class="date end">
+      <input
+        [min]="form.get('startDate')?.value"
+        [max]="maxDateDefault"
+        type="date"
+        placeholder="dd/mm/aaaa"
+        id="endDate"
+        formControlName="endDate"
+      />
+    </div>
+  </form>
+</div>

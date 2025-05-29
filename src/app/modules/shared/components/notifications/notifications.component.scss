@@ -1,0 +1,28 @@
+.notifications-count {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+
+  svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  p {
+    background: red;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    position: absolute;
+    top: -4px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+}

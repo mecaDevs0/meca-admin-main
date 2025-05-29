@@ -1,0 +1,60 @@
+:host {
+  text-align: center;
+  background-color: #dbdbdb;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+  height: 340px;
+  left: 0;
+  bottom: -440px;
+  padding: 20px 0;
+  transition: all 250ms ease-in-out;
+}
+
+:host(.shown) {
+  bottom: -1px;
+}
+
+button {
+  width: 60px;
+  height: 60px;
+  margin: 8px;
+  font-size: 19px;
+  vertical-align: top;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #333;
+  background-color: #fff;
+}
+
+button:active {
+  background-color: #ccc;
+}
+
+button.special {
+  width: 60px;
+  background-color: #ccc;
+}
+
+button.special {
+  font-size: 13px;
+}
+
+button.special:active {
+  background-color: #999;
+}
+
+button.toggled {
+  background-color: #555;
+  color: #fff;
+}
+
+button.wide {
+  width: 80px;
+}
+
+button.spacebar {
+  width: 400px;
+}

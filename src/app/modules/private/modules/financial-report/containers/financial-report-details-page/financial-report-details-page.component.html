@@ -1,0 +1,14 @@
+<app-details
+  [controller]="controller"
+  [customSubtitle]="controller.formData?.id || null"
+  [buttonsHidden]="[
+    controller.EButtonsHidden['export'],
+    controller.EButtonsHidden['edit'],
+    controller.EButtonsHidden['delete'],
+    controller.EButtonsHidden['enableDisable']
+  ]"
+>
+  <app-financial-report-details
+    [controller]="controller"
+  ></app-financial-report-details>
+</app-details>

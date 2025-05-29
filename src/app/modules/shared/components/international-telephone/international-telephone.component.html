@@ -1,0 +1,69 @@
+<div class="phone-code-select-container">
+  <form [formGroup]="formGroup">
+    <div class="phone-code-select" (click)="open()">
+      <ng-container *ngFor="let phoneCode of countriesCodes">
+        <ng-container
+          *ngIf="formGroup.get(codeFormControlName)?.value === phoneCode.code"
+        >
+          <img
+            class="phone-code-flags"
+            [src]="phoneCode.flag"
+            [alt]="phoneCode.native"
+          />
+          <span>{{ phoneCode.phone }}</span>
+        </ng-container>
+      </ng-container>
+      <img
+        class="phone-code-show-more"
+        src="assets/icons/expand_more.svg"
+        alt="Show more"
+      />
+    </div>
+    <fieldset>
+      <input
+        type="text"
+        id="phone"
+        [formControlName]="formControlName"
+        [mask]="mask"
+      />
+    </fieldset>
+  </form>
+
+  <div
+    (mouseleave)="close()"
+    class="phone-code-select-modal"
+    *ngIf="isOpenModal"
+  >
+    <div class="search-container">
+      <form [formGroup]="listSearchForm">
+        <div class="search">
+          <input
+            type="search"
+            id="search"
+            placeholder="Pesquisar"
+            formControlName="search"
+          />
+
+          <img
+            [hidden]="listSearchForm.value?.search"
+            class="search-icon"
+            src="assets/icons/search-icon.svg"
+            alt="Iconê de pesquisa"
+          />
+        </div>
+      </form>
+    </div>
+
+    <ng-container *ngFor="let phoneCode of countriesCodes">
+      <div (click)="handleEmitterPhoneCode(phoneCode)">
+        <img
+          class="phone-code-flags"
+          [src]="phoneCode.flag"
+          [alt]="phoneCode.native"
+        />
+        <p>{{ phoneCode.native }}</p>
+        <p class="phone-code">{{ phoneCode.phone }}</p>
+      </div>
+    </ng-container>
+  </div>
+</div>

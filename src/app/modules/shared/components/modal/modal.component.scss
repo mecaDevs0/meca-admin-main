@@ -1,0 +1,23 @@
+.bg-span {
+  width: 100%;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #0505056c;
+  z-index: 8000;
+}
+
+.modal-container {
+  background-color: #ffffff;
+  position: fixed;
+
+  z-index: 9000;
+  border-radius: 4px;
+
+  header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+  }
+}

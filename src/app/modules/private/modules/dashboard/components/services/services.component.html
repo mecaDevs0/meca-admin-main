@@ -1,0 +1,96 @@
+<div class="graph-card">
+  <header class="graph-card-header">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.0"
+      width="512.000000pt"
+      height="512.000000pt"
+      viewBox="0 0 512.000000 512.000000"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <g
+        transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+        stroke="none"
+      >
+        <path
+          d="M895 5109 c-122 -18 -291 -78 -335 -119 -15 -14 -34 -45 -41 -68 -23 -80 -15 -92 271 -377 l260 -260 -107 -107 -108 -108 -265 264 c-295 294 -297 295 -385 261 -52 -19 -73 -45 -108 -133 -55 -134 -71 -225 -71 -392 0 -177 18 -269 83 -421 170 -395 589 -653 1015 -625 56 3 121 11 145 17 l45 10 385 -385 386 -386 -112 -112 -112 -112 -49 46 c-143 134 -364 156 -534 55 -64 -38 -1181 -1162 -1207 -1215 -74 -147 -63 -325 29 -463 50 -76 378 -393 437 -423 147 -74 305 -73 437 4 68 39 1186 1158 1214 1215 89 180 62 378 -71 522 l-41 44 112 112 112 112 386 -386 385 -385 -11 -45 c-5 -24 -13 -93 -16 -154 -16 -293 93 -572 306 -785 141 -141 296 -229 495 -281 77 -20 114 -23 250 -23 172 1 242 14 389 71 83 33 120 66 137 121 23 80 15 92 -271 377 l-260 260 107 107 108 108 265 -264 c295 -294 296 -295 386 -261 56 21 81 58 123 179 132 376 39 791 -239 1076 -226 232 -531 345 -843 312 -61 -6 -121 -14 -132 -17 -16 -5 -96 70 -405 380 l-385 385 565 565 565 565 195 0 c166 0 200 3 230 18 47 23 497 618 506 670 13 70 -5 97 -188 279 -183 181 -203 194 -276 178 -16 -3 -169 -110 -338 -238 -231 -173 -313 -241 -326 -267 -15 -30 -18 -64 -18 -230 l0 -195 -565 -565 -565 -565 -385 385 c-309 308 -385 389 -380 405 20 75 28 235 16 339 -65 590 -609 1010 -1196 925z m340 -312 c187 -53 340 -163 440 -317 119 -183 152 -396 94 -610 -38 -141 -132 -30 964 -1128 778 -778 979 -975 1009 -984 30 -9 51 -7 122 11 225 58 432 26 616 -93 193 -126 321 -346 337 -579 11 -179 24 -183 -230 71 -122 121 -235 226 -250 232 -40 14 -83 12 -120 -6 -44 -22 -464 -440 -488 -486 -23 -44 -24 -87 -5 -131 8 -18 111 -129 230 -247 144 -144 211 -217 203 -222 -7 -4 -41 -8 -77 -8 -347 0 -644 227 -737 564 -26 95 -23 278 6 389 20 74 22 95 13 125 -9 30 -206 231 -984 1009 -838 836 -978 973 -1008 978 -23 4 -65 -2 -120 -16 -102 -28 -282 -32 -370 -10 -275 70 -487 277 -555 542 -19 73 -31 224 -21 265 7 27 14 21 229 -194 122 -121 235 -226 250 -232 48 -17 91 -12 138 19 57 37 452 436 473 478 20 39 20 83 2 126 -8 18 -111 129 -230 247 -150 149 -212 217 -203 223 17 12 213 0 272 -16z m3489 -76 l48 -49 -151 -201 -151 -201 -100 0 -100 0 0 100 0 100 198 149 c108 82 199 150 202 150 3 1 27 -21 54 -48z m-3169 -2816 c18 -9 104 -89 193 -178 172 -175 182 -192 167 -274 -6 -33 -55 -86 -383 -416 l-377 -377 -247 247 -248 248 367 368 c203 203 382 375 398 383 40 18 90 17 130 -1z m-855 -1210 l245 -245 -65 -65 c-72 -72 -115 -92 -177 -80 -32 6 -64 33 -211 178 -185 184 -201 209 -188 283 6 28 25 55 73 106 37 37 69 68 72 68 3 0 116 -110 251 -245z"
+        />
+      </g>
+    </svg>
+
+    <div>
+      <h3>Total de serviços</h3>
+      <p>{{ dashboardData.totalServices }}</p>
+    </div>
+  </header>
+
+  <div class="graph-card-content">
+    <div>
+      <p>Em aberto</p>
+      <p>{{ dashboardData.totalOpenServices }}</p>
+    </div>
+    <app-graphic-line
+      [color]="'#55967540'"
+      [percentage]="
+        getPercentage(
+          dashboardData.totalOpenServices,
+          dashboardData.totalServices
+        )
+      "
+      [tooltip]="{
+        percentage: getPercentage(
+          dashboardData.totalOpenServices,
+          dashboardData.totalServices
+        ),
+        info: dashboardData.totalOpenServices + ' Em aberto'
+      }"
+    >
+    </app-graphic-line>
+  </div>
+  <div class="graph-card-content">
+    <div>
+      <p>Agendados</p>
+      <p>{{ dashboardData.totalServicesScheduled }}</p>
+    </div>
+    <app-graphic-line
+      [color]="'#00c977'"
+      [percentage]="
+        getPercentage(
+          dashboardData.totalServicesScheduled,
+          dashboardData.totalServices
+        )
+      "
+      [tooltip]="{
+        percentage: getPercentage(
+          dashboardData.totalServicesScheduled,
+          dashboardData.totalServices
+        ),
+        info: dashboardData.totalServicesScheduled + ' Agendados'
+      }"
+    >
+    </app-graphic-line>
+  </div>
+  <div class="graph-card-content">
+    <div>
+      <p>Finalizados</p>
+      <p>{{ dashboardData.totalServicesCompleted }}</p>
+    </div>
+    <app-graphic-line
+      [color]="'#64af7d60'"
+      [percentage]="
+        getPercentage(
+          dashboardData.totalServicesCompleted,
+          dashboardData.totalServices
+        )
+      "
+      [tooltip]="{
+        percentage: getPercentage(
+          dashboardData.totalServicesCompleted,
+          dashboardData.totalServices
+        ),
+        info: dashboardData.totalServicesCompleted + ' Finalizados'
+      }"
+    >
+    </app-graphic-line>
+  </div>
+</div>

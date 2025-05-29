@@ -1,0 +1,44 @@
+import { IBudgetServices } from './IBudgetServices';
+import { IProfile } from './IProfile';
+import { IVehicle } from './IVehicle';
+import { IWorkshop } from './IWorkshop';
+import { IWorkshopServices } from './IWorkshopServices';
+
+export interface IScheduling {
+  workshopServices: IWorkshopServices[];
+  vehicle: IVehicle;
+  observations: string;
+  date: number;
+  suggestedDate: any;
+  status: number;
+  profile: IProfile;
+  workshop: IWorkshop;
+  budgetApprovalDate: number;
+  estimatedTimeForCompletion: number;
+  diagnosticValue: number;
+  budgetImages: string[];
+  totalValue: number;
+  budgetServices: IBudgetServices[];
+  maintainedBudgetServices: IBudgetServices[];
+  excludedBudgetServices: IBudgetServices[];
+  paymentDate: number;
+  paymentStatus: number;
+  serviceStartDate: number;
+  serviceEndDate: number;
+  reasonDisapproval: any;
+  imagesDisapproval: any[];
+  dispute: any;
+  imagesDispute: any[];
+  freeRepair: boolean;
+  awaitFreeRepairScheduling: boolean;
+  hasEvaluated: boolean;
+  serviceFinishedByAdmin: any;
+  userAdministrator: any;
+  budgetServicesApprovedByAdmin: IBudgetServices[];
+  lastUpdate: number;
+  dataTransfer: any;
+  dataBlocked: any;
+  disabled: any;
+  created: number;
+  id: string;
+}

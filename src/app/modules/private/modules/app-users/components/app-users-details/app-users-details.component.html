@@ -1,0 +1,104 @@
+<div class="view-card-content">
+  <div>
+    <p><b>Nome completo</b></p>
+    <p>{{ controller.formData.fullName }}</p>
+  </div>
+
+  <div>
+    <p><b>CPF</b></p>
+    <p>{{ controller.formData.cpf | cpfOrCnpj }}</p>
+  </div>
+
+  <div>
+    <p><b>E-mail</b></p>
+    <p>{{ controller.formData.email }}</p>
+  </div>
+
+  <div>
+    <p><b>Telefone</b></p>
+    <p>
+      <a
+        [href]="'https://wa.me/' + controller.formData.phone"
+        target="_blank"
+        >{{ controller.formData.phone | phone }}</a
+      >
+    </p>
+  </div>
+
+  <hr />
+
+  <h4>Informações do(s) veículo(s)</h4>
+
+  <ng-container *ngFor="let item of controller.vehicles; index as i">
+    <h5>Veículo {{ i + 1 }}</h5>
+
+    <div>
+      <p><b>Placa</b></p>
+      <p>{{ item.plate }}</p>
+    </div>
+
+    <div>
+      <p><b>Modelo</b></p>
+      <p>{{ item.model }}</p>
+    </div>
+
+    <div>
+      <p><b>Fabricante</b></p>
+      <p>{{ item.manufacturer }}</p>
+    </div>
+
+    <div>
+      <p><b>Ano</b></p>
+      <p>{{ item.year }}</p>
+    </div>
+
+    <div>
+      <p><b>Cor</b></p>
+      <p>{{ item.color }}</p>
+    </div>
+
+    <div>
+      <p><b>KM</b></p>
+      <p>{{ item.km }}</p>
+    </div>
+
+    <hr />
+  </ng-container>
+
+  <h4>Endereço</h4>
+
+  <div>
+    <p><b>CEP</b></p>
+    <p>{{ (controller.formData.zipCode | mask : "00000-000") || "N/A" }}</p>
+  </div>
+
+  <div>
+    <p><b>Rua</b></p>
+    <p>{{ controller.formData.streetAddress || "N/A" }}</p>
+  </div>
+
+  <div>
+    <p><b>Número</b></p>
+    <p>{{ controller.formData.number || "N/A" }}</p>
+  </div>
+
+  <div>
+    <p><b>Complemento</b></p>
+    <p>{{ controller.formData.complement || "N/A" }}</p>
+  </div>
+
+  <div>
+    <p><b>Bairro</b></p>
+    <p>{{ controller.formData.neighborhood || "N/A" }}</p>
+  </div>
+
+  <div>
+    <p><b>Estado</b></p>
+    <p>{{ controller.formData.stateName || "N/A" }}</p>
+  </div>
+
+  <div>
+    <p><b>Cidade</b></p>
+    <p>{{ controller.formData.cityName || "N/A" }}</p>
+  </div>
+</div>

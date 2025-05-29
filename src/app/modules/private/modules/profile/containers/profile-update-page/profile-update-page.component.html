@@ -1,0 +1,63 @@
+<div class="breadcrumb-content">
+  <div>
+    <h2 class="cursor" (click)="handleBack()">Meus dados</h2>
+    <span>></span>
+    <h2>Editar dados</h2>
+  </div>
+</div>
+
+<section class="profile-container">
+  <div class="profile-card">
+    <div>
+      <h3>Editar dados</h3>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="handleSubmit()">
+      <div class="profile-card-content">
+        <div [ngClass]="displayFieldCss('name')">
+          <label for="name">Nome <abbr class="input-required">*</abbr></label>
+          <input
+            formControlName="name"
+            type="text"
+            id="name"
+            placeholder="Nome"
+          />
+          <app-form-error [control]="form.get('name')"></app-form-error>
+        </div>
+
+        <div [ngClass]="displayFieldCss('email')">
+          <label for="email"
+            >E-mail <abbr class="input-required">*</abbr></label
+          >
+          <input
+            formControlName="email"
+            type="email"
+            id="email"
+            placeholder="E-mail"
+          />
+          <app-form-error [control]="form.get('email')"></app-form-error>
+        </div>
+
+        <div>
+          <label for="access-profile">Perfil de acesso</label>
+
+          <input
+            type="text"
+            id="access-profile"
+            disabled
+            [value]="asideMenuService.user.accessLevel.name"
+          />
+        </div>
+
+        <div class="btn-content">
+          <app-button
+            buttonType="submit"
+            [buttonLoading]="formLoading"
+            label="Salvar"
+          >
+          </app-button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>

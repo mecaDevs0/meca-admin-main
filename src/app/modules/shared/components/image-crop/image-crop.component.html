@@ -1,0 +1,55 @@
+<div>
+  <div>
+    <img
+      class="final-image"
+      [src]="control.value || 'assets/images/blank-image.jpg'"
+      alt="Imagem da vida"
+    />
+    <input id="file" hidden #file type="file" [accept]="acceptedExtensions" />
+    <label
+      *ngIf="!progress"
+      [title]="control.value ? 'Alterar imagem' : 'Selecionar imagem'"
+      for="file"
+    >
+      <img src="assets/icons/cloud-upload.png" alt="changeFile" />
+    </label>
+    <progress *ngIf="progress" [value]="progress" max="100"></progress>
+  </div>
+
+  <dialog #modal>
+    <div>
+      <div class="header">
+        <h5>Recortar imagem</h5>
+        <img
+          (click)="closeModal()"
+          title="Fechar"
+          src="assets/icons/close-modal.png"
+          alt="Fechar"
+        />
+      </div>
+      <div class="content">
+        <div class="box-cropper">
+          <image-cropper
+            [imageFile]="imageFile"
+            [imageChangedEvent]="imgChangeEvt"
+            [maintainAspectRatio]="true"
+            [format]="outputTypeExtension"
+            [aspectRatio]="aspectRatio"
+            [resizeToWidth]="100"
+            (imageCropped)="cropImg($event)"
+            (imageLoaded)="imgLoad()"
+            (cropperReady)="initCropper()"
+            (loadImageFailed)="imgFailed()"
+          >
+          </image-cropper>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="" (click)="uploadFile()">
+          Recortar e salvar
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>

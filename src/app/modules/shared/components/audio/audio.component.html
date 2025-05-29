@@ -1,0 +1,429 @@
+<div class="audio-container">
+  <div *ngIf="loader">
+    <app-loader
+      [borderWidth]="'1px'"
+      [height]="'22px'"
+      [width]="'22px'"
+    ></app-loader>
+  </div>
+
+  <ng-container *ngIf="!loader">
+    <svg
+      [ngStyle]="{ left: targetPosition + '%' }"
+      class="target"
+      *ngIf="!isPlaying"
+      (click)="play()"
+      class="cursor"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="25"
+      viewBox="0 0 24 25"
+      fill="none"
+    >
+      <path d="M8 5.03284V19.0328L19 12.0328L8 5.03284Z" fill="black" />
+    </svg>
+
+    <svg
+      *ngIf="isPlaying"
+      (click)="pause()"
+      class="cursor"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="black" />
+    </svg>
+
+    <div class="audio-player">
+      <svg
+        [ngStyle]="{ left: targetPosition + '%' }"
+        class="target"
+        xmlns="http://www.w3.org/2000/svg"
+        width="13"
+        height="14"
+        viewBox="0 0 13 14"
+        fill="none"
+      >
+        <circle cx="6.5" cy="7.1886" r="6.5" fill="#009265" />
+      </svg>
+
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="100%"
+        height="28"
+        viewBox="0 0 185 28"
+        fill="none"
+      >
+        <mask
+          id="mask0_1949_6353"
+          style="mask-type: alpha"
+          maskUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width="185"
+          height="28"
+        >
+          <rect
+            x="185"
+            y="19.4919"
+            width="3.03279"
+            height="10.918"
+            rx="1.51639"
+            transform="rotate(180 185 19.4919)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="164.188"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 164.188 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="143.375"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 143.375 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="122.562"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 122.562 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="101.75"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 101.75 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="80.9375"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 80.9375 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="60.125"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 60.125 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="39.3125"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 39.3125 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="18.5"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 18.5 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="179.797"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 179.797 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="158.984"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 158.984 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="138.172"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 138.172 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="117.359"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 117.359 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="96.5469"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 96.5469 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="75.7344"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 75.7344 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="54.9219"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 54.9219 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="34.1094"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 34.1094 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="13.2969"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 13.2969 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="174.594"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 174.594 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="153.781"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 153.781 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="132.969"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 132.969 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="112.156"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 112.156 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="91.3438"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 91.3438 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="70.5312"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 70.5312 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="49.7188"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 49.7188 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="28.9062"
+            y="27.3772"
+            width="2.89062"
+            height="26.6885"
+            rx="1.44531"
+            transform="rotate(180 28.9062 27.3772)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="7.88477"
+            y="20.0985"
+            width="2.42623"
+            height="13.3443"
+            rx="1.21311"
+            transform="rotate(180 7.88477 20.0985)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="169.391"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 169.391 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="148.578"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 148.578 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="127.766"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 127.766 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="106.953"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 106.953 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="86.1406"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 86.1406 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="65.3281"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 65.3281 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="44.5156"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 44.5156 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="23.7031"
+            y="23.4716"
+            width="2.89062"
+            height="19.5282"
+            rx="1.44531"
+            transform="rotate(180 23.7031 23.4716)"
+            fill="#C4C4C4"
+          />
+          <rect
+            x="3.0332"
+            y="17.0657"
+            width="3.03279"
+            height="7.88525"
+            rx="1.51639"
+            transform="rotate(180 3.0332 17.0657)"
+            fill="#C4C4C4"
+          />
+        </mask>
+        <g mask="url(#mask0_1949_6353)">
+          <rect
+            y="0.688599"
+            width="3"
+            height="27"
+            fill="black"
+            fill-opacity="0.6"
+          />
+          <rect
+            x="3"
+            y="0.688599"
+            width="182"
+            height="27"
+            fill="black"
+            fill-opacity="0.2"
+          />
+
+          <rect
+            y="0.688599"
+            [attr.width]="targetPosition + 1 + '%'"
+            height="27"
+            fill="black"
+            fill-opacity="0.6"
+          />
+        </g>
+      </svg>
+    </div>
+
+    <p>
+      {{
+        !isPlaying && duration
+          ? (duration * 1000 | date: "mm:ss")
+          : (currentTime * 1000 | date: "mm:ss")
+      }}
+    </p>
+  </ng-container>
+</div>

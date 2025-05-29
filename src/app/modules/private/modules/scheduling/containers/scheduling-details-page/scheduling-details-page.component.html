@@ -1,0 +1,13 @@
+<app-details
+  [controller]="controller"
+  [customSubtitle]="controller.formData.id"
+  [buttonsHidden]="[
+    controller.EButtonsHidden.export,
+    controller.EButtonsHidden.delete,
+    controller.EButtonsHidden.edit,
+    controller.EButtonsHidden.enableDisable
+  ]"
+  [blockedName]="controller.EBlockedName.blocked"
+>
+  <app-scheduling-details [controller]="controller"></app-scheduling-details>
+</app-details>

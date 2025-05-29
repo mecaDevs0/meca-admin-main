@@ -1,0 +1,155 @@
+<form [formGroup]="form">
+  <h4>Dados bancários</h4>
+
+  <!-- Tipo da conta -->
+  <div class="form-content">
+    <div class="form-content-item" [ngClass]="displayFieldCss('bank')">
+      <label for="personType">Tipo de perfil</label>
+      <select formControlName="personType" name="personType" id="personType">
+        <option [ngValue]="0">Pessoa jurídica</option>
+        <option [ngValue]="1">Pessoa física</option>
+      </select>
+    </div>
+
+    <!-- Nome do responsável -->
+    <div
+      class="form-content-item"
+      [ngClass]="displayFieldCss('accountableName')"
+    >
+      <div class="status-box">
+        <label for="accountableName">Nome do responsável</label>
+        <!-- <span [class]="form?.value?.dataBankStatus | dataBankStatus: true">
+          {{ form?.value?.dataBankStatus | dataBankStatus }}
+        </span> -->
+      </div>
+      <input
+        type="text"
+        name="accountableName"
+        id="accountableName"
+        formControlName="accountableName"
+      />
+      <app-form-error
+        [control]="form.get('accountableName')"
+        [label]="'Nome do responsável'"
+      >
+      </app-form-error>
+    </div>
+  </div>
+
+  <div class="form-content">
+    <!-- CPF do responsável -->
+    <div
+      class="form-content-item"
+      *ngIf="form.get('accountableCpf')?.enabled"
+      [ngClass]="displayFieldCss('accountableCpf')"
+    >
+      <label for="accountableCpf">CPF do responsável</label>
+      <input
+        type="text"
+        mask="000.000.000-00"
+        name="accountableCpf"
+        id="accountableCpf"
+        formControlName="accountableCpf"
+      />
+      <app-form-error
+        [control]="form.get('accountableCpf')"
+        [label]="'CPF do responsável'"
+      >
+      </app-form-error>
+    </div>
+
+    <!-- CNPJ da conta -->
+    <div
+      class="form-content-item"
+      *ngIf="form.get('personType')?.value == 0"
+      [ngClass]="displayFieldCss('bankCnpj')"
+    >
+      <label for="bankCnpj">CNPJ da conta</label>
+      <input
+        type="text"
+        mask="00.000.000/0000-00"
+        name="bankCnpj"
+        id="bankCnpj"
+        formControlName="bankCnpj"
+      />
+      <app-form-error
+        [control]="form.get('bankCnpj')"
+        [label]="'CNPJ da conta'"
+      >
+      </app-form-error>
+    </div>
+
+    <!-- Banco -->
+    <div class="form-content-item" [ngClass]="displayFieldCss('bankName')">
+      <label for="bankName">Banco</label>
+      <select
+        (change)="resetAccountAndAgency()"
+        formControlName="bankName"
+        name="bankName"
+        id="bankName"
+      >
+        <option value="null">Selecione um banco</option>
+        <option *ngFor="let bank of banks" [value]="bank.name">
+          {{ bank.name + " - " + bank.code }}
+        </option>
+      </select>
+
+      <app-form-error
+        [control]="form.get('bankName')"
+        [label]="'Banco do responsável'"
+      >
+      </app-form-error>
+    </div>
+  </div>
+
+  <div class="form-content">
+    <!-- Tipo de conta -->
+    <div class="form-content-item" [ngClass]="displayFieldCss('typeAccount')">
+      <label for="typeAccount">Tipo de conta</label>
+      <select formControlName="typeAccount" name="typeAccount" id="typeAccount">
+        <option value="null">Selecione um tipo de conta</option>
+        <option [ngValue]="0">Corrente</option>
+        <option [ngValue]="1">Poupança</option>
+      </select>
+
+      <app-form-error
+        [control]="form.get('typeAccount')"
+        [label]="'Tipo de conta'"
+      >
+      </app-form-error>
+    </div>
+
+    <!-- Agência -->
+    <div class="form-content-item" [ngClass]="displayFieldCss('bankAgency')">
+      <label for="bankAgency">Agência</label>
+      <input
+        [mask]="agencyMask"
+        [dropSpecialCharacters]="false"
+        [placeholder]="agencyMask"
+        type="text"
+        name="bankAgency"
+        id="bankAgency"
+        formControlName="bankAgency"
+      />
+      <app-form-error [control]="form.get('bankAgency')" [label]="'Agência'">
+      </app-form-error>
+    </div>
+
+    <!-- Conta -->
+    <div class="form-content-item" [ngClass]="displayFieldCss('bankAccount')">
+      <label for="bankAccount">Conta</label>
+      <input
+        [mask]="accountMask"
+        [dropSpecialCharacters]="false"
+        [placeholder]="accountMask"
+        type="text"
+        name="bankAccount"
+        id="bankAccount"
+        placeholder="Conta"
+        formControlName="bankAccount"
+      />
+      <app-form-error [control]="form.get('bankAccount')" [label]="'Conta'">
+      </app-form-error>
+    </div>
+  </div>
+</form>

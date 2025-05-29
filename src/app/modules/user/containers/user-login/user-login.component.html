@@ -1,0 +1,49 @@
+<main>
+  <div class="box">
+    <section>
+      <div class="logo">
+        <img src="assets/logos/logo.png" alt="Logo" />
+      </div>
+      <p>Acesso ao painel do usuário</p>
+      <form [formGroup]="form" (ngSubmit)="handleSubmit()">
+        <div [ngClass]="displayFieldCss('email')">
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="E-mail"
+            formControlName="email"
+          />
+          <app-form-error [control]="form.get('email')" [label]="'email'">
+          </app-form-error>
+        </div>
+        <div class="position-relative" [ngClass]="displayFieldCss('password')">
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Senha"
+            formControlName="password"
+            appTogglePasswordDisplay
+            [top]="'13px'"
+          />
+
+          <app-form-error [control]="form.get('password')" [label]="'Senha'">
+          </app-form-error>
+        </div>
+        <div class="text-recover-password">
+          <a routerLink="/user/recover-password">Esqueceu a senha?</a>
+        </div>
+        <div class="btn-content">
+          <app-button
+            buttonType="submit"
+            [buttonDisabled]="form.invalid"
+            [buttonLoading]="formLoading"
+            label="Entrar"
+          >
+          </app-button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>

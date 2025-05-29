@@ -1,0 +1,5 @@
+<button [class]="class">
+  <ng-content class="image-icon"></ng-content>
+  <p *ngIf="!loading">{{label}}</p>
+  <p class="loading" *ngIf="loading">{{labelLoading}}</p>
+</button>

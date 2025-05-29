@@ -1,0 +1,13 @@
+<app-read
+  [controller]="controller"
+  [buttonsHidden]="[controller.EButtonsHidden.write]"
+>
+  <app-financial-report-filter
+    filter
+    [controller]="controller"
+  ></app-financial-report-filter>
+  <app-financial-report-list
+    list
+    [controller]="controller"
+  ></app-financial-report-list>
+</app-read>

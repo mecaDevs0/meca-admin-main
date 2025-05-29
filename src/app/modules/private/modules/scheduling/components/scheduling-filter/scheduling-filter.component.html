@@ -1,0 +1,24 @@
+<app-filter
+  [controller]="controller"
+  [placeholder]="'Placa do carro, Nome do cliente ou Oficina'"
+  [width]="'440px'"
+>
+  <form [formGroup]="controller.listSearchForm" class="search-container">
+    <app-range-date
+      [form]="controller.listSearchForm"
+      [title]="''"
+    ></app-range-date>
+
+    <div>
+      <select id="status" formControlName="status">
+        <option value="status" value="">Status (todos)</option>
+        <option
+          *ngFor="let item of controller?.schedulingStatusOptions; index as i"
+          [value]="item.id"
+        >
+          {{ item.name }}
+        </option>
+      </select>
+    </div>
+  </form>
+</app-filter>

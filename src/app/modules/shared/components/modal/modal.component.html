@@ -1,0 +1,25 @@
+<ng-template [ngIf]="config.open">
+  <section class="bg-span" (click)="onClose()"></section>
+  <section
+    class="modal-container"
+    [ngStyle]="{
+      top: 'calc(50% - ' + config.height + '/ 2)',
+      left: 'calc(50% - ' + config.width + '/ 2)',
+      width: config.width,
+      height: config.height
+    }"
+  >
+    <header>
+      <img
+        class="cursor"
+        src="assets/icons/close.svg"
+        alt=""
+        (click)="onClose()"
+      />
+    </header>
+
+    <main>
+      <ng-content></ng-content>
+    </main>
+  </section>
+</ng-template>

@@ -1,0 +1,108 @@
+a {
+  color: #00000060;
+}
+
+h1 {
+  width: 150px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+
+  img {
+    max-height: 100%;
+    max-width: 100%;
+  }
+}
+
+section {
+  height: 100vh;
+}
+
+.menu-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: space-between;
+  padding: 15px 30px;
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 1px 1px 5px 0px #dfdfdfde;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  gap: 15px;
+
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+  }
+}
+
+.user-name {
+  margin: 0 5px;
+}
+
+.link-active {
+  text-decoration: underline;
+}
+
+.icon-logout {
+  fill: none;
+  width: 16px;
+  height: 16px;
+}
+
+.home-container {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100% - 70px);
+}
+
+.btn-content {
+  width: 200px;
+  margin: 30px auto 0;
+}
+
+.profile-container {
+  min-width: 350px;
+  width: 40%;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+.profile-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+form div {
+  position: relative;
+}
+
+.m60px {
+  margin-bottom: 120px;
+}
+
+button {
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}

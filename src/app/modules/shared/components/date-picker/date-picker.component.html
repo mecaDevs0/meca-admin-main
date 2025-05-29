@@ -1,0 +1,79 @@
+<div class="date-picker-header">
+  <div
+    class="row align-items-center d-flex-align-center justify-content-between"
+  >
+    <div class="col">
+      <div class="month-year">
+        {{ dateTime | date : "MMMM, yyyy" }}
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="form-row d-flex-align-center">
+        <div class="col-auto">
+          <button
+            type="button"
+            class="month-year-button month-year-button-previous"
+            (click)="previousMonth()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="24"
+              viewBox="0 0 25 24"
+              fill="none"
+            >
+              <path
+                d="M15.1071 6.71C14.7171 6.32 14.0871 6.32 13.6971 6.71L9.10706 11.3C8.71706 11.69 8.71706 12.32 9.10706 12.71L13.6971 17.3C14.0871 17.69 14.7171 17.69 15.1071 17.3C15.4971 16.91 15.4971 16.28 15.1071 15.89L11.2271 12L15.1071 8.12C15.4971 7.73 15.4871 7.09 15.1071 6.71Z"
+                fill="black"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="col-auto">
+          <button
+            type="button"
+            class="month-year-button month-year-button-next"
+            (click)="nextMonth()"
+          >
+            <svg
+              width="25"
+              height="24"
+              viewBox="0 0 25 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9.68706 6.71C9.29706 7.1 9.29706 7.73 9.68706 8.12L13.5671 12L9.68706 15.88C9.29706 16.27 9.29706 16.9 9.68706 17.29C10.0771 17.68 10.7071 17.68 11.0971 17.29L15.6871 12.7C16.0771 12.31 16.0771 11.68 15.6871 11.29L11.0971 6.7C10.7171 6.32 10.0771 6.32 9.68706 6.71Z"
+                fill="black"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="week-days">
+  <span i18n>dom</span>
+  <span i18n>seg</span>
+  <span i18n>ter</span>
+  <span i18n>qua</span>
+  <span i18n>qui</span>
+  <span i18n>sex</span>
+  <span i18n>sab</span>
+</div>
+<div class="month-days">
+  <button
+    *ngFor="let monthDay of monthDays; let i = index"
+    type="button"
+    class="month-day"
+    [ngClass]="{
+      'month-day-info': isMonthDayInfo(monthDay),
+      'month-day-selected': monthDay !== null && monthDay === monthDaySelected
+    }"
+    [disabled]="!handleDisabled(i, (monthDay | date : 'YYYY-MM-dd') || '')"
+    (click)="handleMonthDayClick(monthDay, i)"
+  >
+    {{ monthDay | date : "dd" }}
+  </button>
+</div>

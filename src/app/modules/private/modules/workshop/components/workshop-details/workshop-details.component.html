@@ -1,0 +1,271 @@
+<div class="view-card-content">
+  <div
+    class="buttons-content"
+    *ngIf="
+      controller.formData.status ===
+      controller.EWorkshopStatus['Aguardando aprovação']
+    "
+  >
+    <app-button
+      label="Aprovar"
+      [buttonLoading]="controller.approveOrReproveLoading"
+      [buttonDisabled]="controller.approveOrReproveLoading"
+      (click)="
+        controller.handleApproveOrReprove(controller.EWorkshopStatus.Aprovada)
+      "
+    ></app-button>
+    <app-button
+      label="Reprovar"
+      [buttonLoading]="controller.approveOrReproveLoading"
+      [buttonDisabled]="controller.approveOrReproveLoading"
+      (click)="
+        controller.handleApproveOrReprove(controller.EWorkshopStatus.Reprovada)
+      "
+      [backgroundColor]="'#e65252'"
+    ></app-button>
+  </div>
+
+  <div class="logo">
+    <img
+      [src]="controller.formData.photo"
+      onerror="src = 'assets/images/blank-image.jpg'"
+      alt="Logo da Oficina"
+    />
+  </div>
+
+  <div>
+    <p><b>Status da Oficina</b></p>
+    <p [class]="controller.formData.status | workshopStatus : true">
+      {{ controller.formData.status | workshopStatus }}
+    </p>
+  </div>
+  <div>
+    <p><b>Nome da empresa</b></p>
+    <p>{{ controller.formData.companyName }}</p>
+  </div>
+  <div>
+    <p><b>CNPJ</b></p>
+    <p>{{ controller.formData.cnpj | cpfOrCnpj }}</p>
+  </div>
+  <div>
+    <p><b>Nome do responsável</b></p>
+    <p>{{ controller.formData.fullName }}</p>
+  </div>
+  <div>
+    <p><b>E-mail do responsável</b></p>
+    <p>{{ controller.formData.email }}</p>
+  </div>
+  <div>
+    <p><b>Telefone do responsável</b></p>
+    <p>{{ controller.formData.phone | phone }}</p>
+  </div>
+  <div class="document">
+    <p><b>Documento da Oficina</b></p>
+    <app-view-image [config]="controller.configViewWorkshopDocument">
+    </app-view-image>
+    <img
+      [src]="controller.formData.meiCard"
+      onerror="src = 'assets/images/blank-image.jpg'"
+      alt="Documento da Oficina"
+      (click)="controller.handleConfigViewWorkshopDocument()"
+    />
+  </div>
+  <h4>Endereço</h4>
+
+  <div>
+    <p><b>Cep</b></p>
+    <p>{{ controller.formData.zipCode }}</p>
+  </div>
+  <div>
+    <p><b>Nome rua/avenida</b></p>
+    <p>{{ controller.formData.streetAddress }}</p>
+  </div>
+  <div>
+    <p><b>Número</b></p>
+    <p>{{ controller.formData.number }}</p>
+  </div>
+  <div>
+    <p><b>Complemento</b></p>
+    <p>{{ controller.formData.complement || "N/A" }}</p>
+  </div>
+  <div>
+    <p><b>Bairro</b></p>
+    <p>{{ controller.formData.neighborhood }}</p>
+  </div>
+  <div>
+    <p><b>Estado</b></p>
+    <p>{{ controller.formData.stateName }}</p>
+  </div>
+  <div>
+    <p><b>Cidade</b></p>
+    <p>{{ controller.formData.cityName }}</p>
+  </div>
+
+  <h4>Dados bancários</h4>
+
+  <ng-container *ngIf="controller.formData.dataBank?.bank !== null">
+    <div>
+      <p><b>Banco</b></p>
+      <p>{{ controller.formData.dataBank.bank }}</p>
+    </div>
+    <div>
+      <p><b>Agência</b></p>
+      <p>{{ controller.formData.dataBank.bankAgency }}</p>
+    </div>
+    <div>
+      <p><b>Conta</b></p>
+      <p>{{ controller.formData.dataBank.bankAccount }}</p>
+    </div>
+    <div>
+      <p><b>Tipo de Conta</b></p>
+      <p>{{ controller.formData.dataBank.typeAccount | typeAccount }}</p>
+    </div>
+    <div>
+      <p><b>Nome do titular</b></p>
+      <p>{{ controller.formData.dataBank.accountableName }}</p>
+    </div>
+    <div>
+      <p><b>CPF do titular</b></p>
+      <p>{{ controller.formData.dataBank.accountableCpf | cpfOrCnpj }}</p>
+    </div>
+  </ng-container>
+
+  <h4>Horário de funcionamento</h4>
+
+  <ng-container *ngIf="controller.workshopAgenda === null">
+    <p>Agenda não configurada</p>
+  </ng-container>
+
+  <ng-container *ngIf="controller.workshopAgenda !== null">
+    <div>
+      <p><b>Domingo</b></p>
+
+      <ng-container *ngIf="controller.workshopAgenda.sunday.open">
+        <p>
+          Aberto entre: {{ controller.workshopAgenda.sunday.startTime }} -
+          {{ controller.workshopAgenda.sunday.startOfBreak }} e
+          {{ controller.workshopAgenda.sunday.endOfBreak }} -
+          {{ controller.workshopAgenda.sunday.closingTime }}
+        </p>
+      </ng-container>
+
+      <p *ngIf="!controller.workshopAgenda.sunday.open">Fechado</p>
+    </div>
+    <div>
+      <p><b>Segunda</b></p>
+
+      <ng-container *ngIf="controller.workshopAgenda.monday.open">
+        <p>
+          Aberto entre: {{ controller.workshopAgenda.monday.startTime }} -
+          {{ controller.workshopAgenda.monday.startOfBreak }} e
+          {{ controller.workshopAgenda.monday.endOfBreak }} -
+          {{ controller.workshopAgenda.monday.closingTime }}
+        </p>
+      </ng-container>
+
+      <p *ngIf="!controller.workshopAgenda.monday.open">Fechado</p>
+    </div>
+    <div>
+      <p><b>Terça-feira</b></p>
+
+      <ng-container *ngIf="controller.workshopAgenda.tuesday.open">
+        <p>
+          Aberto entre: {{ controller.workshopAgenda.tuesday.startTime }} -
+          {{ controller.workshopAgenda.tuesday.startOfBreak }} e
+          {{ controller.workshopAgenda.tuesday.endOfBreak }} -
+          {{ controller.workshopAgenda.tuesday.closingTime }}
+        </p>
+      </ng-container>
+
+      <p *ngIf="!controller.workshopAgenda.tuesday.open">Fechado</p>
+    </div>
+    <div>
+      <p><b>Quarta-feira</b></p>
+
+      <ng-container *ngIf="controller.workshopAgenda.wednesday.open">
+        <p>
+          Aberto entre: {{ controller.workshopAgenda.wednesday.startTime }} -
+          {{ controller.workshopAgenda.wednesday.startOfBreak }} e
+          {{ controller.workshopAgenda.wednesday.endOfBreak }} -
+          {{ controller.workshopAgenda.wednesday.closingTime }}
+        </p>
+      </ng-container>
+
+      <p *ngIf="!controller.workshopAgenda.wednesday.open">Fechado</p>
+    </div>
+    <div>
+      <p><b>Quinta-feira</b></p>
+
+      <ng-container *ngIf="controller.workshopAgenda.thursday.open">
+        <p>
+          Aberto entre: {{ controller.workshopAgenda.thursday.startTime }} -
+          {{ controller.workshopAgenda.thursday.startOfBreak }} e
+          {{ controller.workshopAgenda.thursday.endOfBreak }} -
+          {{ controller.workshopAgenda.thursday.closingTime }}
+        </p>
+      </ng-container>
+
+      <p *ngIf="!controller.workshopAgenda.thursday.open">Fechado</p>
+    </div>
+    <div>
+      <p><b>Sexta-feira</b></p>
+
+      <ng-container *ngIf="controller.workshopAgenda.friday.open">
+        <p>
+          Aberto entre: {{ controller.workshopAgenda.friday.startTime }} -
+          {{ controller.workshopAgenda.friday.startOfBreak }} e
+          {{ controller.workshopAgenda.friday.endOfBreak }} -
+          {{ controller.workshopAgenda.friday.closingTime }}
+        </p>
+      </ng-container>
+
+      <p *ngIf="!controller.workshopAgenda.friday.open">Fechado</p>
+    </div>
+    <div>
+      <p><b>Sábado</b></p>
+
+      <ng-container *ngIf="controller.workshopAgenda.saturday">
+        <p>
+          Aberto entre: {{ controller.workshopAgenda.saturday.startTime }} -
+          {{ controller.workshopAgenda.saturday.startOfBreak }} e
+          {{ controller.workshopAgenda.saturday.endOfBreak }} -
+          {{ controller.workshopAgenda.saturday.closingTime }}
+        </p>
+      </ng-container>
+
+      <p *ngIf="!controller.workshopAgenda.saturday">Fechado</p>
+    </div>
+  </ng-container>
+
+  <h4>Serviços oferecidos ({{ controller.workshopServices.length }})</h4>
+
+  <ng-container *ngIf="controller.workshopServices.length === 0">
+    <p>Nenhum serviço cadastrado</p>
+  </ng-container>
+
+  <ng-container *ngFor="let item of controller.workshopServices">
+    <div class="service-card">
+      <div class="service-image">
+        <img
+          [src]="item.photo"
+          onerror="src = 'assets/images/blank-image.jpg'"
+          alt=""
+        />
+      </div>
+      <div class="service-info">
+        <div>
+          <p><b>Nome do serviço</b></p>
+          <p>{{ item.service.name }}</p>
+        </div>
+        <div>
+          <p><b>Serviço rápido?</b></p>
+          <p>{{ item.quickService ? "Sim" : "Não" }}</p>
+        </div>
+        <div>
+          <p><b>Descrição</b></p>
+          <p>{{ item.description || "N/A" }}</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

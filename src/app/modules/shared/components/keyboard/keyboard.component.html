@@ -1,0 +1,43 @@
+<div>
+  <button appKeyboardKey="q 1 ["></button>
+  <button appKeyboardKey="w 2 ]"></button>
+  <button appKeyboardKey="e 3 {"></button>
+  <button appKeyboardKey="r 4 }"></button>
+  <button appKeyboardKey="t 5 #"></button>
+  <button appKeyboardKey="y 6 %"></button>
+  <button appKeyboardKey="u 7 ^"></button>
+  <button appKeyboardKey="i 8 *"></button>
+  <button appKeyboardKey="o 9 +"></button>
+  <button appKeyboardKey="p 0 ="></button>
+</div>
+<div>
+  <button appKeyboardKey="a - _"></button>
+  <button appKeyboardKey="s / \"></button>
+  <button appKeyboardKey="d : |"></button>
+  <button appKeyboardKey="f ; ~"></button>
+  <button appKeyboardKey="g ( &lt;"></button>
+  <button appKeyboardKey="h ) &gt;"></button>
+  <button appKeyboardKey="j $ &euro;"></button>
+  <button appKeyboardKey="k & &pound;"></button>
+  <button appKeyboardKey="l @ &yen;"></button>
+</div>
+<div>
+  <button class="special" (click)="onShift()" [class.toggled]="keyboard.shift">
+    {{ keyboard.alt ? "#+=" : "Shift" }}
+  </button>
+  <button appKeyboardKey='z " "'></button>
+  <button appKeyboardKey="x . ."></button>
+  <button appKeyboardKey="c , ,"></button>
+  <button appKeyboardKey="v ? ?"></button>
+  <button appKeyboardKey="b ! !"></button>
+  <button appKeyboardKey="n ' '"></button>
+  <button appKeyboardKey="m ` `"></button>
+  <button class="special" (click)="onBackspace()">Del</button>
+</div>
+<div>
+  <button class="special" (click)="onAlt()">
+    {{ keyboard.alt ? "ABC" : "123" }}
+  </button>
+  <button class="spacebar" appKeyboardKey="&nbsp; &nbsp; &nbsp;"></button>
+  <button class="special wide" (click)="onEnter()">Enter</button>
+</div>

@@ -1,0 +1,18 @@
+<button
+  [style.height]="height"
+  [style.backgroundColor]="backgroundColor"
+  [type]="buttonType"
+  [disabled]="buttonDisabled || buttonLoading ? true : false"
+  [class]="buttonClass"
+>
+  <div class="content">
+    <app-loader
+      [width]="'20px'"
+      [height]="'20px'"
+      [borderWidth]="'3px'"
+      [borderColor]="buttonLoadingColor"
+      *ngIf="buttonLoading"
+    ></app-loader>
+    <p>{{ label }}</p>
+  </div>
+</button>

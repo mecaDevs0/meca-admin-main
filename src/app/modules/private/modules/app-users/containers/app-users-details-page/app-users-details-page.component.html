@@ -1,0 +1,12 @@
+<app-details
+  [controller]="controller"
+  [customSubtitle]="controller.formData['fullName'] || ''"
+  [buttonsHidden]="[
+    controller.EButtonsHidden.export,
+    controller.EButtonsHidden.delete,
+    controller.EButtonsHidden.edit
+  ]"
+  [blockedName]="controller.EBlockedName.blocked"
+>
+  <app-app-users-details [controller]="controller"></app-app-users-details>
+</app-details>

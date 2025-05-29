@@ -1,0 +1,92 @@
+input,
+select,
+textarea {
+  padding: 12px 10px;
+  border-radius: 8px;
+  outline: none;
+  border: 1px solid transparent;
+  background-color: #ebebeb;
+  width: 100%;
+  height: 50px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  color: rgba(0, 0, 0, 0.6);
+
+  &:focus,
+  &:hover {
+    border: 1px solid var(--secondaryColor) !important;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+.toggle {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  height: 20px;
+  min-width: 40px;
+  border-radius: 16px;
+  display: inline-block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 35px;
+  border: 2px solid #8f8f8f;
+  background: #8f8f8f;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 2px;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 2px var(--secondaryColor);
+    transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
+  }
+
+  &:checked {
+    border-color: var(--secondaryColor);
+    background: var(--secondaryColor);
+
+    &:after {
+      transform: translatex(14px);
+    }
+  }
+}
+
+.input-icon {
+  position: absolute;
+  right: 17px;
+  top: 17px;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  input {
+    width: 25px;
+    height: 25px;
+  }
+}

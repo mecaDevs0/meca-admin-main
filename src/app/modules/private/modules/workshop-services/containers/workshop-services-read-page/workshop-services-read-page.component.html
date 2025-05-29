@@ -1,0 +1,13 @@
+<app-read
+  [controller]="controller"
+  [buttonsHidden]="[controller.EButtonsHidden.export]"
+>
+  <app-workshop-services-filter
+    filter
+    [controller]="controller"
+  ></app-workshop-services-filter>
+  <app-workshop-services-list
+    list
+    [controller]="controller"
+  ></app-workshop-services-list>
+</app-read>

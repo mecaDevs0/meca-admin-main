@@ -1,0 +1,13 @@
+<app-read
+  [controller]="controller"
+  [buttonsHidden]="[
+    controller.EButtonsHidden.export,
+    controller.EButtonsHidden.write
+  ]"
+>
+  <app-scheduling-filter
+    filter
+    [controller]="controller"
+  ></app-scheduling-filter>
+  <app-scheduling-list list [controller]="controller"></app-scheduling-list>
+</app-read>

@@ -1,0 +1,29 @@
+// .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Angular",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://localhost:4200",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "${input:environment}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${webRoot}/*",
+        "webpack:///src/*": "${webRoot}/src/*",
+        "webpack:///*": "*"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "environment",
+      "type": "pickString",
+      "description": "Select environment",
+      "options": ["Serve Dev", "Serve Hml", "Serve Prod"],
+      "default": "Serve Dev"
+    }
+  ]
+}

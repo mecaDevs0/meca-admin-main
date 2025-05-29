@@ -1,0 +1,28 @@
+<div class="form-container">
+  <p class="message-required">
+    O preenchimento dos campos com '*' é obrigatório.
+  </p>
+
+  <h3>
+    {{
+      customTitle ? customTitle : controller.formData ? "Editar" : "Cadastrar"
+    }}
+  </h3>
+
+  <ng-content></ng-content>
+
+  <p class="fields-invalid" *ngIf="controller?.formErrors">
+    Verifique os campos do seu formulário!
+  </p>
+
+  <div class="btn-content">
+    <app-button
+      *ngIf="!controller.form.disabled"
+      (click)="controller.handleSubmit()"
+      buttonType="button"
+      [buttonLoading]="controller.formLoading"
+      [label]="controller.formData ? 'Salvar Alterações' : 'Salvar'"
+    >
+    </app-button>
+  </div>
+</div>

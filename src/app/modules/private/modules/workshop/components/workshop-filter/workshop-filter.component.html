@@ -1,0 +1,15 @@
+<app-filter [controller]="controller" [placeholder]="'Nome da empresa ou CNPJ'">
+  <form [formGroup]="controller.listSearchForm" class="search-container">
+    <div>
+      <select id="status" formControlName="status">
+        <option value="">Situação (todos)</option>
+        <option
+          *ngFor="let item of controller?.workshopStatusList"
+          [value]="item?.id"
+        >
+          {{ item?.name }}
+        </option>
+      </select>
+    </div>
+  </form></app-filter
+>

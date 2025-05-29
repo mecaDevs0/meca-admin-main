@@ -1,0 +1,14 @@
+<div class="graphic-line" [style.backgroundColor]="backgroundColor">
+  <span
+    class="graphic-total-line"
+    [style.backgroundColor]="color"
+    [style.width]="percentage + '%'"
+  >
+    <span class="tooltip">
+      <p>
+        <b>{{ tooltip.percentage }}%</b>
+      </p>
+      <p>{{ tooltip.info }}</p>
+    </span>
+  </span>
+</div>

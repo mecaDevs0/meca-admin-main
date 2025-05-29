@@ -1,0 +1,13 @@
+<app-read
+  [controller]="controller"
+  [buttonsHidden]="[controller.EButtonsHidden.export]"
+>
+  <app-administrators-filter
+    filter
+    [controller]="controller"
+  ></app-administrators-filter>
+  <app-administrators-list
+    list
+    [controller]="controller"
+  ></app-administrators-list>
+</app-read>

@@ -1,0 +1,31 @@
+.container-access-denied {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+}
+
+.container-access-denied h1 {
+  font-size: 16em;
+  font-weight: bold;
+  color: var(--secondaryColor);
+}
+
+.container-access-denied h2 {
+  font-size: 2.6em;
+  color: #002D;
+}
+
+.container-access-denied h5 {
+  font-size: 1.4em;
+  color: #002D;
+}
+
+.btn-content {
+  margin-top: 40px;
+  width: 90%;
+  max-width: 300px;
+}

@@ -1,0 +1,26 @@
+p {
+  margin: 0;
+}
+
+svg {
+  vertical-align: middle;
+  width: auto;
+}
+
+.audio-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  max-width: 285px;
+  margin: 0 auto;
+}
+
+.audio-player {
+  position: relative;
+}
+
+.target {
+  position: absolute;
+  top: calc(50% - 8px);
+  transition: left 0.1s linear;
+}

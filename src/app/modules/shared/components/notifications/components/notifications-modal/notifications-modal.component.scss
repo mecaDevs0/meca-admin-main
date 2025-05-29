@@ -1,0 +1,68 @@
+h3 {
+  color: #000 !important;
+}
+
+.bg-span {
+  width: 100%;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #0505056c;
+  z-index: 8000;
+}
+
+.modal-container {
+  background-color: #ffffff;
+  position: absolute;
+  z-index: 9000;
+  width: 600px;
+  max-height: 450px;
+  overflow: auto;
+  top: 45px;
+  right: -40px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px 1px #535353a3;
+
+  main {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+}
+
+.modal-span {
+  content: "";
+  width: 23px;
+  height: 23px;
+  position: absolute;
+  top: 35px;
+  background-color: #fff;
+  right: 0;
+  transform: rotate(45deg);
+  z-index: 800000;
+}
+
+.notifications-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 10px 0;
+  border-bottom: 1px solid #cfcfcf8f;
+
+  >div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .date {
+    font-size: 12px;
+    color: #a9a9a9;
+  }
+
+  button {
+    background: transparent;
+  }
+}

@@ -1,0 +1,25 @@
+<app-form [controller]="controller">
+  <form [formGroup]="controller.form">
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('platformFee')"
+      >
+        <label for="platformFee"
+          >Taxa da plataforma <abbr class="input-required">*</abbr></label
+        >
+        <input
+          formControlName="platformFee"
+          type="text"
+          name="platformFee"
+          id="platformFee"
+          mask="percent"
+          suffix="%"
+        />
+        <app-form-error
+          [control]="controller.form.get('platformFee')"
+        ></app-form-error>
+      </div>
+    </div>
+  </form>
+</app-form>

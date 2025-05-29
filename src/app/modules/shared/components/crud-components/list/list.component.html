@@ -1,0 +1,44 @@
+<div class="table-container">
+  <button
+    *ngIf="btnAllSelect"
+    class="btn-select-all"
+    (click)="controller.handleSelectAll()"
+  >
+    {{
+      controller.listSelected.length === controller.list.length
+        ? "Desmarcar todos"
+        : "Marcar todos"
+    }}
+  </button>
+
+  <table class="table">
+    <thead class="table-thead">
+      <tr>
+        <ng-content select="[header]"></ng-content>
+        <th
+          *ngIf="
+            (controller.accessLevelName
+              | accessLevel : EFunctionalities.enableDisable) && status
+          "
+        >
+          Status
+        </th>
+        <th
+          *ngIf="
+            ((controller.accessLevelName
+              | accessLevel : EFunctionalities.edit) ||
+              (controller.accessLevelName
+                | accessLevel : EFunctionalities.delete)) &&
+            actions
+          "
+        >
+          Ações
+        </th>
+      </tr>
+    </thead>
+
+    <tbody class="table-tbody">
+      <ng-content select="[body]"></ng-content>
+    </tbody>
+  </table>
+</div>

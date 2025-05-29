@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+  min-width: 100%;
+  position: relative;
+}
+
+.top-menu-content {
+  width: 100%;
+  position: relative;
+  z-index: 8000;
+}
+
+.aside-menu-content {
+  width: 280px;
+}
+
+.navigation-container {
+  flex: 1;
+  background-color: #ececec;
+  position: relative;
+  display: flex;
+}
+
+.navigation-content {
+  height: 100vh;
+  padding: 90px 30px;
+  overflow: auto;
+  overflow-x: hidden;
+  position: relative;
+  background-color: #ececec;
+  flex: 1;
+}
+
+@media screen and (max-width: 840px) {
+  .aside-menu-content {
+    width: 0;
+  }
+
+  .navigation-content {
+    padding: 60px 10px;
+  }
+}

@@ -1,0 +1,77 @@
+<app-form [controller]="controller">
+  <form [formGroup]="controller.form">
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('name')"
+      >
+        <label for="name"
+          >Nome do tipo do perfil <abbr class="input-required">*</abbr></label
+        >
+        <input type="text" formControlName="name" id="name" />
+        <app-form-error
+          [control]="controller.form.get('name')"
+        ></app-form-error>
+      </div>
+    </div>
+
+    <h4>Permissões de acesso</h4>
+
+    <div class="permissions-container">
+      <div class="permissions-content">
+        <ng-container
+          *ngFor="let accessLevel of controller?.accessLevels; index as i"
+        >
+          <ng-container *ngIf="!accessLevel.hidden">
+            <div class="permissions-item">
+              <label [for]="accessLevel?.name + 'Access'"
+                >{{ accessLevel?.nameShownInMenu }}
+                <input
+                  type="checkbox"
+                  [name]="accessLevel?.name"
+                  [id]="accessLevel?.name + 'Access'"
+                  #accessLevelAccess
+                  value="access"
+                  (change)="controller.handleSetAccessLevel($event)"
+                  [checked]="
+                    controller.form.value?.rules[accessLevel.name]['access']
+                  "
+              /></label>
+
+              <ng-container
+                *ngIf="controller.handleShowOrHide(accessLevel.name)"
+              >
+                <ng-container
+                  *ngFor="let functionality of accessLevel?.functionalities"
+                >
+                  <fieldset
+                    *ngIf="
+                      functionality !== 'access' &&
+                      accessLevel?.functionalities?.includes(functionality)
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      [name]="accessLevel?.name"
+                      [id]="accessLevel?.name + functionality"
+                      [value]="functionality"
+                      (change)="controller.handleSetAccessLevel($event)"
+                      [checked]="
+                        controller.form.value?.rules[accessLevel.name][
+                          functionality
+                        ]
+                      "
+                    />
+                    <label [for]="accessLevel?.name + functionality">{{
+                      functionality | crudPipe
+                    }}</label>
+                  </fieldset>
+                </ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </form>
+</app-form>

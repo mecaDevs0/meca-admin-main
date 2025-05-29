@@ -1,0 +1,519 @@
+<ng-container *ngIf="controller.schedulingHistory.scheduling.length">
+  <h5>Agendamento ({{ controller.schedulingHistory.scheduling.length }})</h5>
+
+  <div class="history-container">
+    <ng-container *ngFor="let item of controller.schedulingHistory.scheduling">
+      <div class="history-content">
+        <div class="history-item">
+          <div>
+            <p><b>Status</b></p>
+            <p>{{ item.description }}</p>
+          </div>
+          <div>
+            <p>{{ item.created | customDate : "dd/MM/yyyy HH:mm" }}</p>
+          </div>
+        </div>
+
+        <ng-container
+          *ngIf="
+            item.status ===
+            controller.ESchedulingStatus['Horário sugerido pela Oficina']
+          "
+        >
+          <div>
+            <p><b>Data sugerida pela Oficina</b></p>
+            <p>
+              {{
+                controller.formData.suggestedDate
+                  | customDate : "dd/MM/yyyy HH:mm"
+              }}
+            </p>
+          </div>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            item.status ===
+            controller.ESchedulingStatus['Agendamento confirmado']
+          "
+        >
+          <div>
+            <p><b>Data do agendamento</b></p>
+            <p>
+              {{ controller.formData.date | customDate : "dd/MM/yyyy HH:mm" }}
+            </p>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="controller.schedulingHistory.budget.length">
+  <h5>Orçamento ({{ controller.schedulingHistory.budget.length }})</h5>
+
+  <div class="history-container">
+    <ng-container *ngFor="let item of controller.schedulingHistory.budget">
+      <div class="history-content">
+        <div class="history-item">
+          <div>
+            <p><b>Status</b></p>
+            <p>{{ item.description }}</p>
+          </div>
+          <div>
+            <p>{{ item.created | customDate : "dd/MM/yyyy HH:mm" }}</p>
+          </div>
+        </div>
+
+        <ng-container
+          *ngIf="
+            item.status === controller.ESchedulingStatus['Orçamento enviado']
+          "
+        >
+          <div>
+            <p><b>Lista de serviços e preços incluídos no orçamento</b></p>
+            <div>
+              <div
+                class="services"
+                *ngFor="let service of controller.formData.budgetServices"
+              >
+                <p>{{ service.title }} - {{ service.value | currency }}</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p><b>Valor do diagnóstico</b></p>
+            <p>
+              {{ controller.formData.diagnosticValue | currency }}
+            </p>
+          </div>
+          <div>
+            <p><b>Valor total</b></p>
+            <p>
+              {{
+                controller.handleTotalValue(controller.formData.budgetServices)
+                  | currency
+              }}
+            </p>
+          </div>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            item.status === controller.ESchedulingStatus['Orçamento aprovado']
+          "
+        >
+          <div>
+            <p><b>Data</b></p>
+            <p>
+              {{
+                controller.formData.budgetApprovalDate
+                  | customDate : "dd/MM/yyyy HH:mm"
+              }}
+            </p>
+          </div>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            item.status ===
+            controller.ESchedulingStatus['Orçamento aprovado parcialmente']
+          "
+        >
+          <div>
+            <p><b>Valor parcial</b></p>
+            <p>
+              {{ controller.formData.totalValue | currency }}
+            </p>
+          </div>
+          <div>
+            <p><b>Lista de serviços e preços incluídos no orçamento</b></p>
+            <div>
+              <div
+                class="services"
+                *ngFor="
+                  let service of controller.formData.maintainedBudgetServices
+                "
+              >
+                <p>{{ service.title }} - {{ service.value | currency }}</p>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="controller.schedulingHistory.payment.length">
+  <h5>Pagamento ({{ controller.schedulingHistory.payment.length }})</h5>
+
+  <div class="history-container">
+    <ng-container *ngFor="let item of controller.schedulingHistory.payment">
+      <div class="history-content">
+        <div class="history-item">
+          <div>
+            <p><b>Status</b></p>
+            <p>{{ item.description }}</p>
+          </div>
+          <div>
+            <p>{{ item.created | customDate : "dd/MM/yyyy HH:mm" }}</p>
+          </div>
+        </div>
+
+        <div>
+          <p><b>Lista de serviços com os valores individuais</b></p>
+          <div>
+            <div
+              class="services"
+              *ngFor="
+                let service of controller.formData.maintainedBudgetServices
+              "
+            >
+              <p>{{ service.title }} - {{ service.value | currency }}</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p><b>Valor do diagnóstico</b></p>
+          <p>{{ controller.formData.diagnosticValue | currency }}</p>
+        </div>
+        <div>
+          <p><b>Valor total</b></p>
+          <p>
+            {{
+              controller.handleTotalValue(
+                controller.formData.maintainedBudgetServices
+              ) | currency
+            }}
+          </p>
+        </div>
+
+        <ng-container
+          *ngIf="
+            item.status === controller.ESchedulingStatus['Pagamento aprovado']
+          "
+        >
+          <div>
+            <p><b>Data do pagamento</b></p>
+            <p>
+              {{
+                controller.formData.paymentDate
+                  | customDate : "dd/MM/yyyy HH:mm"
+              }}
+            </p>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="controller.schedulingHistory.service.length">
+  <h5>Serviço ({{ controller.schedulingHistory.service.length }})</h5>
+
+  <div class="history-container">
+    <ng-container *ngFor="let item of controller.schedulingHistory.service">
+      <div class="history-content">
+        <div class="history-item">
+          <div>
+            <p><b>Status</b></p>
+            <p>{{ item.description }}</p>
+          </div>
+          <div>
+            <p>{{ item.created | customDate : "dd/MM/yyyy HH:mm" }}</p>
+          </div>
+        </div>
+
+        <ng-container
+          *ngIf="
+            item.status === controller.ESchedulingStatus['Aguardando início']
+          "
+        >
+          <div>
+            <p><b>Prazo estimado para conclusão</b></p>
+            <p>
+              {{
+                controller.formData.estimatedTimeForCompletion
+                  | customDate : "dd/MM/yyyy HH:mm"
+              }}
+            </p>
+          </div>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            item.status === controller.ESchedulingStatus['Serviço em andamento']
+          "
+        >
+          <div>
+            <p><b>Data de início do serviço</b></p>
+            <p>
+              {{
+                controller.formData.serviceStartDate
+                  | customDate : "dd/MM/yyyy HH:mm"
+              }}
+            </p>
+          </div>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            item.status === controller.ESchedulingStatus['Serviço concluído']
+          "
+        >
+          <div>
+            <p><b>Data de término do serviço</b></p>
+            <p>
+              {{
+                controller.formData.serviceEndDate
+                  | customDate : "dd/MM/yyyy HH:mm"
+              }}
+            </p>
+          </div>
+          <div>
+            <p><b>Serviços realizados</b></p>
+            <div>
+              <div
+                *ngFor="
+                  let service of controller.formData.maintainedBudgetServices
+                "
+              >
+                <p><b>Serviço:</b> {{ service.title }}</p>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="controller.schedulingHistory.approval.length">
+  <h5>Aprovação ({{ controller.schedulingHistory.approval.length }})</h5>
+
+  <div class="history-container">
+    <ng-container *ngFor="let item of controller.schedulingHistory.approval">
+      <div
+        class="history-content"
+        [ngClass]="{
+          'dispute-bg':
+            item.status ===
+              controller.ESchedulingStatus['Contestação da Oficina'] &&
+            controller.formData.status ===
+              controller.ESchedulingStatus['Contestação da Oficina']
+        }"
+      >
+        <div class="history-item">
+          <div>
+            <p><b>Status</b></p>
+            <p>{{ item.description }}</p>
+          </div>
+          <div>
+            <p>{{ item.created | customDate : "dd/MM/yyyy HH:mm" }}</p>
+          </div>
+        </div>
+
+        <ng-container
+          *ngIf="
+            item.status ===
+            controller.ESchedulingStatus['Serviço reprovado pelo cliente']
+          "
+        >
+          <div>
+            <p><b>Motivo da reprovação</b></p>
+            <p>
+              {{ controller.formData.reasonDisapproval }}
+            </p>
+          </div>
+          <div>
+            <p><b>Imagens</b></p>
+            <div>
+              <div class="images-content">
+                <button
+                  *ngFor="
+                    let img of controller.formData.imagesDisapproval;
+                    index as i
+                  "
+                  (click)="handleModal(img)"
+                >
+                  <img
+                    [src]="img"
+                    [alt]="'Imagem' + i"
+                    onerror="src = 'assets/images/blank-image.jpg'"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            item.status ===
+            controller.ESchedulingStatus['Contestação da Oficina']
+          "
+        >
+          <div>
+            <p><b>Contestação</b></p>
+            <p>
+              {{ controller.formData.dispute }}
+            </p>
+          </div>
+          <div>
+            <p><b>Imagens</b></p>
+            <div>
+              <div class="images-content">
+                <button
+                  *ngFor="
+                    let img of controller.formData.imagesDispute;
+                    index as i
+                  "
+                  (click)="handleModal(img)"
+                >
+                  <img
+                    [src]="img"
+                    [alt]="'Imagem' + i"
+                    onerror="src = 'assets/images/blank-image.jpg'"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              controller.formData.status ===
+              controller.ESchedulingStatus['Contestação da Oficina']
+            "
+          >
+            <hr />
+            <form
+              [formGroup]="controller.formApprovalOrReprove"
+              class="form-dispute"
+            >
+              <div>
+                <label for="confirmStatus">Selecione uma ação</label>
+                <select
+                  formControlName="confirmStatus"
+                  name="confirmStatus"
+                  id="confirmStatus"
+                >
+                  <option disabled selected value="">Selecione</option>
+                  <option [ngValue]="controller.EConfirmStatus.approval">
+                    Aprovar
+                  </option>
+                  <option [ngValue]="controller.EConfirmStatus.reprove">
+                    Reprovar
+                  </option>
+                  <option
+                    [ngValue]="controller.EConfirmStatus['partially approve']"
+                  >
+                    Aprovar parcialmente
+                  </option>
+                </select>
+              </div>
+
+              <ng-container
+                *ngIf="
+                  controller.formApprovalOrReprove.get('confirmStatus')
+                    ?.value !== null
+                "
+              >
+                <ng-container
+                  *ngIf="
+                    controller.formApprovalOrReprove.get('confirmStatus')
+                      ?.value !== controller.EConfirmStatus['partially approve']
+                  "
+                >
+                </ng-container>
+
+                <ng-container
+                  *ngIf="
+                    controller.formApprovalOrReprove.get('confirmStatus')
+                      ?.value === controller.EConfirmStatus['partially approve']
+                  "
+                >
+                  <app-select
+                    [formGroup]="controller.formApprovalOrReprove"
+                    formControlName="workshopServices"
+                    [listOrEnum]="controller.formData.maintainedBudgetServices"
+                    [isEnum]="false"
+                    [multiple]="true"
+                    [label]="'Serviços para aprovar'"
+                    [showSearch]="false"
+                  ></app-select>
+                </ng-container>
+
+                <app-button
+                  [buttonLoading]="controller.loadingApprovalOrReprove"
+                  [label]="'Enviar'"
+                  (click)="controller.handleApproveOrReproveDispute()"
+                ></app-button>
+              </ng-container>
+            </form>
+          </div>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            item.status ===
+              controller.ESchedulingStatus[
+                'Serviço aprovado pelo administrador'
+              ] ||
+            item.status ===
+              controller.ESchedulingStatus[
+                'Serviço aprovado parcialmente pelo administrador'
+              ]
+          "
+        >
+          <div>
+            <p><b>Nome do adminstrador</b></p>
+            <p>
+              {{ controller.formData.userAdministrator.name }}
+            </p>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="controller.schedulingHistory.finalized.length">
+  <h5>Conclusão ({{ controller.schedulingHistory.finalized.length }})</h5>
+
+  <div class="history-container">
+    <ng-container *ngFor="let item of controller.schedulingHistory.finalized">
+      <div class="history-content">
+        <div class="history-item">
+          <div>
+            <p><b>Status</b></p>
+            <p>{{ item.description }}</p>
+          </div>
+          <div>
+            <p>{{ item.created | customDate : "dd/MM/yyyy HH:mm" }}</p>
+          </div>
+        </div>
+        <div>
+          <p><b>Data de ínicio do serviço</b></p>
+          <p>
+            {{
+              controller.formData.serviceStartDate
+                | customDate : "dd/MM/yyyy HH:mm"
+            }}
+          </p>
+        </div>
+        <div>
+          <p><b>Data de conclusão</b></p>
+          <p>
+            {{
+              controller.formData.serviceEndDate
+                | customDate : "dd/MM/yyyy HH:mm"
+            }}
+          </p>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+
+<app-view-image [config]="configModalViewImage"> </app-view-image>

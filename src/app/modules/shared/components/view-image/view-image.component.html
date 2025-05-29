@@ -1,0 +1,20 @@
+<ng-template [ngIf]="config.open">
+  <section class="bg-span" (click)="onClose()"></section>
+  <section class="image-container">
+    <header>
+      <p *ngIf="config.imageName">{{ config.imageName }}</p>
+      <button class="btn-close" (click)="onClose()">
+        Fechar
+        <img src="assets/icons/close.svg" alt="Fechar modal" />
+      </button>
+    </header>
+
+    <div class="image-content">
+      <img
+        [src]="config.imageSrc"
+        [alt]="config.imageName || ''"
+        onerror="src = 'assets/images/blank-image.jpg'"
+      />
+    </div>
+  </section>
+</ng-template>

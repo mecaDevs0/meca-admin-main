@@ -1,0 +1,10 @@
+<app-read
+  [controller]="controller"
+  [buttonsHidden]="[
+    controller.EButtonsHidden.export,
+    controller.EButtonsHidden.write
+  ]"
+>
+  <app-rating-filter filter [controller]="controller"></app-rating-filter>
+  <app-rating-list list [controller]="controller"></app-rating-list>
+</app-read>

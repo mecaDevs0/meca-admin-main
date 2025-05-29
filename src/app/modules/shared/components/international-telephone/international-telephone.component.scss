@@ -1,0 +1,144 @@
+fieldset {
+  width: 100%;
+}
+
+.phone-code-select-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+
+  label {
+    font-weight: bold;
+  }
+
+  > form {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+  }
+
+  input {
+    border-radius: 0 8px 8px 0;
+    padding: 12px 10px;
+  }
+
+  fieldset {
+    display: flex;
+  }
+}
+
+.phone-code-select {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 175px;
+  height: 50px;
+  border: 1px solid #ebebeb;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  gap: 2px;
+
+  cursor: pointer;
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.phone-code-flags {
+  max-width: 40px;
+  border: 1px solid #d2d2d2;
+}
+
+.phone-code-show-more {
+  width: 20px;
+}
+
+.phone-code-number {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  background-color: #ebebeb;
+}
+
+.phone-code-select-modal {
+  width: 320px;
+  height: 340px;
+  background-color: #fff;
+  position: absolute;
+  top: 83px;
+  border-radius: 8px;
+  box-shadow: 1px 1px 10px 2px #c6c6c6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  padding: 10px;
+  z-index: 1;
+
+  > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.phone-code {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+
+  input,
+  select,
+  textarea {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    width: 100%;
+    height: 44px;
+    background: #ffffff;
+    border: 1px solid #0000001a;
+    border-radius: 100px;
+    color: #00000066;
+    font-size: 14px;
+    font-weight: 600;
+
+    &::placeholder {
+      color: #00000066;
+    }
+
+    &:hover,
+    &:focus {
+      border-color: var(--secondaryColor);
+    }
+  }
+}
+
+.search {
+  position: relative;
+  min-width: 294px;
+}
+
+.search-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}

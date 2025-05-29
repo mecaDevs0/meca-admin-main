@@ -1,0 +1,62 @@
+h5 {
+  font-size: 18px;
+}
+
+.history-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 15px 0;
+}
+
+.history-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #bff1dd69;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.services {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 5px 0;
+}
+
+.dispute-bg {
+  background: #ffff0047 !important;
+}
+
+.images-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+  margin: 10px 0;
+
+  img {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      opacity: 0.8;
+    }
+  }
+}
+
+.form-dispute {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 50%;
+  margin: 0 auto;
+}

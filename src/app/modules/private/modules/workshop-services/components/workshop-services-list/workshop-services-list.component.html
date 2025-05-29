@@ -1,0 +1,27 @@
+<app-list [controller]="controller">
+  <ng-container header>
+    <th>Serviço</th>
+  </ng-container>
+
+  <ng-container body *ngFor="let item of controller.list; index as i">
+    <tr class="select-item cursor">
+      <td [routerLink]="['view', item?.id]">{{ item?.name }}</td>
+
+      <td class="status">
+        <app-list-status-button
+          [controller]="controller"
+          [item]="item"
+          [index]="i"
+          [blockedName]="controller.EBlockedName['dataBlocked']"
+        ></app-list-status-button>
+      </td>
+
+      <td class="actions">
+        <app-list-actions-button
+          [controller]="controller"
+          [item]="item"
+        ></app-list-actions-button>
+      </td>
+    </tr>
+  </ng-container>
+</app-list>

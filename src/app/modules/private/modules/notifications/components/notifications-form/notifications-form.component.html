@@ -1,0 +1,36 @@
+<app-form [controller]="controller">
+  <form [formGroup]="controller.form">
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('title')"
+      >
+        <label for="title">Título <abbr class="input-required">*</abbr></label>
+        <input type="text" formControlName="title" id="title" />
+        <app-form-error
+          [control]="controller.form.get('title')"
+        ></app-form-error>
+      </div>
+    </div>
+
+    <div class="form-content">
+      <div
+        class="form-content-item"
+        [ngClass]="controller.displayFieldCss('content')"
+      >
+        <label for="content"
+          >Descrição <abbr class="input-required">*</abbr></label
+        >
+        <textarea
+          formControlName="content"
+          id="content"
+          cols="30"
+          rows="5"
+        ></textarea>
+        <app-form-error
+          [control]="controller.form.get('content')"
+        ></app-form-error>
+      </div>
+    </div>
+  </form>
+</app-form>

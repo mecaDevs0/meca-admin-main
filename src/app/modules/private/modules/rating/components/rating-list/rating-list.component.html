@@ -1,0 +1,23 @@
+<app-list [controller]="controller" [actions]="false" [status]="false">
+  <ng-container header>
+    <th>Nome do usuário</th>
+    <th>Placa do carro</th>
+    <th>Nome da Oficina</th>
+    <th>Avaliações em estrelas</th>
+    <th>Descrição da avaliação</th>
+    <th>Data da avaliação</th>
+  </ng-container>
+
+  <ng-container body *ngFor="let item of controller.list; index as i">
+    <tr class="select-item">
+      <td>{{ item?.profile?.fullName }}</td>
+      <td>{{ item?.vehicle?.plate }}</td>
+      <td>{{ item?.workshop?.companyName }}</td>
+      <td>{{ item?.ratingAverage }}</td>
+      <td [title]="item?.observations" [style.maxWidth]="'200px'">
+        {{ item?.observations || "N/A" }}
+      </td>
+      <td>{{ item.created | customDate : "dd/MM/yyyy HH:mm" }}</td>
+    </tr>
+  </ng-container>
+</app-list>

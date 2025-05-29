@@ -1,0 +1,104 @@
+<div class="aside-menu-container" [ngClass]="{ inactive: !menuIsActive }">
+  <nav class="aside-menu-nav">
+    <ul>
+      <ng-container *ngFor="let menu of menuList">
+        <li
+          (keypress)="handleKeyPress($event, menu.route)"
+          (click)="handleMenu()"
+          [routerLink]="menu.route"
+          routerLinkActive="active-route"
+          *ngIf="
+            handleMenuItemsFilter(menu.name) &&
+            menu.step <= currentStep &&
+            !menu.hidden
+          "
+        >
+          <img src="assets/icons/menu/{{ menu.svg }}" alt="" />
+          <a>{{ menu.nameShownInMenu }}</a>
+
+          <!-- <ng-container *ngIf="menu.name === EMenuItem['Fila de atendimentos']">
+            <p
+              class="count-style"
+              [ngClass]="{
+                'count-animation': attendanceService?.numberOfCalls
+              }"
+            >
+              {{ attendanceService?.numberOfCalls }}
+            </p>
+          </ng-container> -->
+        </li>
+      </ng-container>
+
+      <div class="aside-menu-mobile">
+        <li
+          (keypress)="handleKeyPress($event, '/app/profile/list')"
+          (click)="handleMenu()"
+          [routerLink]="['/app/profile/list']"
+          routerLinkActive="active-route"
+        >
+          <svg
+            width="15"
+            height="14"
+            viewBox="0 0 12 11"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6.00008 1.43341C6.77341 1.43341 7.40008 2.06008 7.40008 2.83341C7.40008 3.60675 6.77341 4.23341 6.00008 4.23341C5.22675 4.23341 4.60008 3.60675 4.60008 2.83341C4.60008 2.06008 5.22675 1.43341 6.00008 1.43341ZM6.00008 7.43341C7.98008 7.43341 10.0667 8.40675 10.0667 8.83341V9.56675H1.93341V8.83341C1.93341 8.40675 4.02008 7.43341 6.00008 7.43341ZM6.00008 0.166748C4.52675 0.166748 3.33341 1.36008 3.33341 2.83341C3.33341 4.30675 4.52675 5.50008 6.00008 5.50008C7.47341 5.50008 8.66675 4.30675 8.66675 2.83341C8.66675 1.36008 7.47341 0.166748 6.00008 0.166748ZM6.00008 6.16675C4.22008 6.16675 0.666748 7.06008 0.666748 8.83341V10.1667C0.666748 10.5334 0.966748 10.8334 1.33341 10.8334H10.6667C11.0334 10.8334 11.3334 10.5334 11.3334 10.1667V8.83341C11.3334 7.06008 7.78008 6.16675 6.00008 6.16675Z"
+              fill="black"
+              fill-opacity="0.6"
+            />
+          </svg>
+          <a>Meus dados</a>
+        </li>
+
+        <li (click)="handleMenu()" (click)="handleLogout()">
+          <svg
+            width="16"
+            height="17"
+            viewBox="0 0 16 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10.6667 11.8334L14.0001 8.50008L10.6667 5.16675"
+              fill="black"
+              fill-opacity="0.4"
+            />
+            <path
+              d="M10.6667 11.8334L14.0001 8.50008L10.6667 5.16675"
+              stroke="black"
+              stroke-opacity="0.4"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M14 8.5H6"
+              stroke="black"
+              stroke-opacity="0.4"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M6 14.5H3.33333C2.97971 14.5 2.64057 14.3595 2.39052 14.1095C2.14048 13.8594 2 13.5203 2 13.1667V3.83333C2 3.47971 2.14048 3.14057 2.39052 2.89052C2.64057 2.64048 2.97971 2.5 3.33333 2.5H6"
+              stroke="black"
+              stroke-opacity="0.4"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <a (keypress)="handleLogout()">Sair</a>
+        </li>
+      </div>
+    </ul>
+  </nav>
+</div>
+
+<div>
+  <button class="menu-mobile" (click)="handleMenu()">
+    <img src="assets/icons/menu/menu.svg" alt="Menu" />
+  </button>
+</div>

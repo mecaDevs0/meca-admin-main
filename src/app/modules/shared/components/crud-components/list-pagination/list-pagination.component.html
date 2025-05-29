@@ -1,0 +1,58 @@
+<section class="pagination-container">
+  <div class="d-flex gap20">
+    <div>
+      <select
+        class="btn-per-page"
+        [ngModel]="pageSize"
+        (ngModelChange)="setPageSize($event)"
+      >
+        <option *ngFor="let item of perPageList" [ngValue]="item.id">
+          {{ item.name }}
+        </option>
+      </select>
+    </div>
+    <div>
+      <p class="text-per-page">
+        Exibindo {{ getOf() }} - {{ getTill() }} de {{ listSizeFiltered || 0 }}.
+        <ng-container *ngIf="listSize !== listSizeFiltered">
+          (Filtrados de {{ listSize }} registros)
+        </ng-container>
+      </p>
+    </div>
+  </div>
+  <div>
+    <nav aria-label="Page navigation">
+      <ul class="d-flex">
+        <li class="btn-previous" (click)="previousPage()">
+          <a aria-label="Previous">
+            <span>Anterior</span>
+          </a>
+        </li>
+
+        <ng-container *ngFor="let pg of totalPages; let i = index">
+          <li
+            class="pagination-items"
+            [ngClass]="{
+              active: i + 1 === page
+            }"
+            *ngIf="
+              i + 1 === page ||
+              i + 1 === page + 1 ||
+              i + 1 === page - 1 ||
+              i + 1 === page + 2 ||
+              i + 1 === page - 2
+            "
+          >
+            <a (click)="setPage(pg)">{{ pg }}</a>
+          </li>
+        </ng-container>
+
+        <li class="btn-next" (click)="nextPage()">
+          <a aria-label="Next">
+            <span>Próximo</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</section>

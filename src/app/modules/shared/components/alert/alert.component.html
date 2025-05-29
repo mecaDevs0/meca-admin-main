@@ -1,0 +1,27 @@
+<ng-template [ngIf]="config.open">
+  <section class="alert-container" (click)="onClose()"></section>
+  <div *ngIf="!config.isReason" class="alert-content">
+    <p class="title-alert">{{ config.title }}</p>
+    <div class="box-buttons">
+      <button (click)="handlerResponse(true)">Sim</button>
+      <button class="btn-cancel" (click)="handlerResponse(false)">Não</button>
+    </div>
+  </div>
+
+  <div *ngIf="config.isReason" class="alert-content">
+    <p class="title-alert">{{ config.title }}</p>
+    <form [formGroup]="reasonForm">
+      <div [ngClass]="displayFieldCss('reason')">
+        <input type="text" formControlName="reason" />
+        <app-form-error [control]="reasonForm.get('reason')"></app-form-error>
+      </div>
+    </form>
+
+    <div class="box-buttons">
+      <button (click)="handlerReasonResponse(true)">Confirmar</button>
+      <button class="btn-cancel" (click)="handlerReasonResponse(false)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</ng-template>

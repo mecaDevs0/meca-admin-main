@@ -1,0 +1,14 @@
+.pagination {
+  margin: 0;
+  padding: 16px 24px;
+}
+
+.page-link {
+  color: #212529 !important;
+}
+
+.page-item.active .page-link {
+  background-color: var(--primaryColor);
+  border-color: var(--primaryColor);
+  color: #fff !important;
+}

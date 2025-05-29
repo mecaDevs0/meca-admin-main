@@ -1,0 +1,31 @@
+<ng-container *ngIf="!controller.detailsLoading">
+  <div class="breadcrumb-content">
+    <div>
+      <h2
+        *ngIf="!hiddenBreadcrumb"
+        class="cursor"
+        [routerLink]="controller.baseRoute"
+      >
+        {{ controller.breadCrumbTitle }}
+      </h2>
+      <h2 *ngIf="hiddenBreadcrumb">
+        {{ controller.breadCrumbTitle }}
+      </h2>
+      <ng-container *ngIf="!hiddenBreadcrumb">
+        <span>></span>
+        <h2>
+          {{
+            customSubtitle
+              ? customSubtitle
+              : controller.formData
+              ? "Editar"
+              : "Cadastrar"
+          }}
+          {{ customSubtitle ? "" : controller.breadCrumbSubtitle }}
+        </h2>
+      </ng-container>
+    </div>
+  </div>
+
+  <ng-content></ng-content>
+</ng-container>
