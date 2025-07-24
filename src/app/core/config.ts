@@ -2,14 +2,14 @@ import { IConfigBase } from './interfaces/CORE/IConfigBase';
 
 export const CONFIG_BASE: IConfigBase = {
   appName: 'Meca - Admin',
-  megaleiosUrl: 'https://api.megaleios.com',
+  megaleiosUrl: 'https://api.mecabr.com/',
   currentStep: 1,
   withLogFireBaseErrors: false,
   apiUrls: {
     // dev: 'http://localhost:5000',
-    dev: 'https://apidev.megaleios.com/ApiMecaDev',
-    hml: 'https://apihom.megaleios.com/ApiMecaHml',
-    prod: 'https://api-meca.megaleios.com',
+    dev: 'https://api.mecabr.com/',
+    hml: 'https://api.mecabr.com/',
+    prod: 'https://api.mecabr.com/',
   },
   frameworkCall: null,
   agora: {
