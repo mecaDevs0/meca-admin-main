@@ -24,7 +24,7 @@ export const CONFIG_BASE: IConfigBase = {
     messagingSenderId: '',
     appId: '',
     measurementId: 'G-89H62RJ6W3',
-    email: 'services@megaleios.com',
+    email: 'contato@mecabr.com',
     password: 'ru@4kUWhjbp@',
   },
 };
