@@ -14,6 +14,7 @@ import { AuthenticationService } from '@app/core/services/authentication/authent
 import { IUserAdministrator } from '@app/core/interfaces/IUserAdministrator';
 import { EMenuItem } from '@app/core/enums/EMenuItem';
 import { IToken } from '@app/core/interfaces/CORE/IToken';
+import { ILoginAdminViewModel } from '@app/core/interfaces/ILoginAdminViewModel';
 
 @Component({
   selector: 'app-login',
@@ -71,7 +72,11 @@ export class LoginComponent extends GlobalClass<IUserAdministrator> {
 
   handleSubmit(): void {
     this.formLoading = true;
-    this.httpService.post(`${this.uri}/Token`, this.form.value).subscribe(
+            const payload = {
+      Email: this.form.value.email,
+      Password: this.form.value.password,
+    };
+    this.httpService.post(`${this.uri}/Token`, payload).subscribe(
       async ({ data }) => {
         localStorage.clear();
         sessionStorage.clear();
