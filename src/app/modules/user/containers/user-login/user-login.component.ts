@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { Validators } from '@angular/forms';
-import { trimWhiteSpace } from '@functions/validators.function';
 import { GlobalClass } from '@app/core/classes/global.class';
-import { IProfile } from '@app/core/interfaces/IProfile';
-import { IToken } from '@app/core/interfaces/CORE/IToken';
 import { EMenuItem } from '@app/core/enums/EMenuItem';
+import { IProfile } from '@app/core/interfaces/IProfile';
+import { trimWhiteSpace } from '@functions/validators.function';
 
 @Component({
   selector: 'app-user-login',
@@ -13,7 +12,7 @@ import { EMenuItem } from '@app/core/enums/EMenuItem';
 })
 export class UserLoginComponent extends GlobalClass<IProfile> {
   redirectTo!: string;
-  uri: string = 'Profile';
+  uri: string = 'UserAdministrator';
   accessLevelName: EMenuItem | null = null;
 
   ngOnInit(): void {
