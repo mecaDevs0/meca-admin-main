@@ -31,8 +31,13 @@ export class UserLoginComponent extends GlobalClass<IProfile> {
 
   handleSubmit(): void {
     this.formLoading = true;
+    this.formErrors = false;
+    
+    console.log('Tentando fazer login...', this.form.value);
+    
     this.httpService.post(`${this.uri}/Token`, this.form.value).subscribe(
       async ({ data }) => {
+        console.log('Login bem-sucedido:', data);
         sessionStorage.clear();
 
         setTimeout(() => {
@@ -41,8 +46,19 @@ export class UserLoginComponent extends GlobalClass<IProfile> {
           this.formLoading = false;
         }, 600);
       },
-      (_) => {
+      (error) => {
+        console.error('Erro no login:', error);
         this.formLoading = false;
+        this.formErrors = true;
+        
+        // Melhor tratamento de erro
+        if (error.status === 401) {
+          console.error('Credenciais inválidas');
+        } else if (error.status === 0) {
+          console.error('Erro de conexão - possível problema de CORS ou SSL');
+        } else {
+          console.error('Erro desconhecido:', error.message);
+        }
       }
     );
   }
