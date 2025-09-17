@@ -39,8 +39,11 @@ export class RecoverPasswordComponent extends GlobalClass<IUserAdministrator> {
   }
 
   handleForgotPassword = () => {
+    const payload = {
+      email: this.form.value.email,
+    };
     this.httpService
-      .post(`${this.uri}/ForgotPassword`, this.form.value)
+      .post(`${this.uri}/ForgotPassword`, payload)
       .subscribe(
         (_) => {
           this.formIsSend = true;

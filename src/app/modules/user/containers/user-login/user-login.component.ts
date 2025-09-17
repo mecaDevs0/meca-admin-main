@@ -32,9 +32,14 @@ export class UserLoginComponent extends GlobalClass<IProfile> {
     this.formLoading = true;
     this.formErrors = false;
     
-    console.log('Tentando fazer login...', this.form.value);
+    const payload = {
+      email: this.form.value.email,
+      password: this.form.value.password,
+    };
     
-    this.httpService.post(`${this.uri}/Token`, this.form.value).subscribe(
+    console.log('Tentando fazer login...', payload);
+    
+    this.httpService.post(`${this.uri}/Token`, payload).subscribe(
       async ({ data }) => {
         console.log('Login bem-sucedido:', data);
         sessionStorage.clear();

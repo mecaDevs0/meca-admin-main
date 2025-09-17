@@ -72,9 +72,9 @@ export class LoginComponent extends GlobalClass<IUserAdministrator> {
 
   handleSubmit(): void {
     this.formLoading = true;
-            const payload = {
-      Email: this.form.value.email,
-      Password: this.form.value.password,
+    const payload = {
+      email: this.form.value.email,
+      password: this.form.value.password,
     };
     this.httpService.post(`${this.uri}/Token`, payload).subscribe(
       async ({ data }) => {
