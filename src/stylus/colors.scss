@@ -1,8 +1,39 @@
 :root {
-  --primaryColor: #00c977;
-  --primaryColorLight: #00c97740;
-  --secondaryColor: #64af7d;
-  --secondaryColorLight: #64af7d40;
-  --tertiaryColor: #559675;
-  --tertiaryColorLight: #55967540;
+  /* Cores principais modernas */
+  --primaryColor: #2563eb;
+  --primaryColorLight: #3b82f640;
+  --secondaryColor: #1e40af;
+  --secondaryColorLight: #1e40af40;
+  --tertiaryColor: #1d4ed8;
+  --tertiaryColorLight: #1d4ed840;
+  
+  /* Cores de suporte */
+  --successColor: #10b981;
+  --successColorLight: #10b98140;
+  --warningColor: #f59e0b;
+  --warningColorLight: #f59e0b40;
+  --errorColor: #ef4444;
+  --errorColorLight: #ef444440;
+  
+  /* Cores neutras */
+  --gray50: #f9fafb;
+  --gray100: #f3f4f6;
+  --gray200: #e5e7eb;
+  --gray300: #d1d5db;
+  --gray400: #9ca3af;
+  --gray500: #6b7280;
+  --gray600: #4b5563;
+  --gray700: #374151;
+  --gray800: #1f2937;
+  --gray900: #111827;
+  
+  /* Gradientes */
+  --gradientPrimary: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  --gradientSecondary: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  
+  /* Sombras */
+  --shadowSm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadowMd: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadowLg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadowXl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }

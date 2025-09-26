@@ -1,15 +1,18 @@
 svg {
-  fill: var(--secondaryColor);
+  fill: var(--primaryColor);
   width: 20px;
   height: 20px;
   display: flex;
+  transition: all 0.3s ease;
 }
 
 .cursor {
   cursor: pointer;
+  transition: all 0.3s ease;
 
   &:hover {
-    opacity: 0.7;
+    opacity: 0.8;
+    transform: scale(1.05);
   }
 }
 
@@ -25,33 +28,86 @@ svg {
   text-align: center;
 }
 
+/* Tipografia moderna */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--gray800);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+/* Espaçamentos modernos */
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-8 { margin-top: 2rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.p-8 { padding: 2rem; }
+
+/* Flexbox utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Border radius */
+.rounded { border-radius: 0.375rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.rounded-2xl { border-radius: 1rem; }
+
 .breadcrumb-content {
-  margin-bottom: 50px !important;
-  color: #666666;
+  margin-bottom: 2rem !important;
+  color: var(--gray600);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--gray200);
+  box-shadow: var(--shadowMd);
 
   > div {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1.5rem;
     flex: 1;
   }
 
   span {
-    color: #cccccc;
+    color: var(--gray400);
+    font-weight: 500;
   }
 
   h2 {
-    font-size: 16px;
+    font-size: 1.5rem;
+    color: var(--gray800);
+    margin: 0;
+    font-weight: 600;
   }
 
   .cursor {
+    transition: all 0.3s ease;
+    
     &:hover {
-      text-decoration: underline;
+      color: var(--primaryColor);
+      transform: translateX(2px);
     }
   }
 }
@@ -66,52 +122,67 @@ svg {
   z-index: 200000 !important;
 }
 
-.badge-pending {
-  border-radius: 8px;
-  background: #fdfac0;
-  padding: 8px 12px;
-  color: #000 !important;
+/* Badges modernos */
+.badge {
+  border-radius: 12px;
+  padding: 8px 16px;
   font-size: 14px;
-  font-style: normal;
-  font-weight: bold !important;
-  line-height: 140%;
-  letter-spacing: 0.25px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadowSm);
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadowMd);
+  }
+}
+
+.badge-pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #f59e0b;
 }
 
 .badge-success {
-  border-radius: 8px;
-  background: #c1fdc0;
-  padding: 8px 12px;
-  color: #005b25;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: bold !important;
-  line-height: 140%;
-  letter-spacing: 0.25px;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 1px solid #10b981;
 }
 
 .badge-canceled {
-  border-radius: 8px;
-  background: #fdc0c0;
-  padding: 8px 12px;
-  color: #740000;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: bold !important;
-  line-height: 140%;
-  letter-spacing: 0.25px;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 1px solid #ef4444;
 }
 
 .badge-chargeBack {
-  border-radius: 8px;
-  background: #c0f2fd;
-  padding: 8px 12px;
-  color: #00507d;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: bold !important;
-  line-height: 140%;
-  letter-spacing: 0.25px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border: 1px solid #3b82f6;
+}
+
+/* Badges adicionais */
+.badge-info {
+  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  color: #0c4a6e;
+  border: 1px solid #0ea5e9;
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.badge-secondary {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #475569;
+  border: 1px solid #64748b;
 }
 
 @media screen and (max-width: 840px) {
