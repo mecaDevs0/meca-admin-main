@@ -3,12 +3,15 @@
   height: 100vh;
   z-index: 2000;
   width: 280px;
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(37, 99, 235, 0.1);
   display: flex;
   flex-direction: column;
-  padding: 90px 0 40px;
-  transition: all 0.7s;
+  padding: 100px 0 40px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: auto;
+  box-shadow: var(--shadowLg);
 }
 
 .aside-menu-nav ul {
@@ -19,30 +22,45 @@ li {
   flex: 1;
   display: flex;
   align-items: center;
-  padding: 7px 30px;
-  gap: 10px;
+  padding: 12px 24px;
+  gap: 12px;
   cursor: pointer;
-  min-height: 50px;
+  min-height: 56px;
+  margin: 4px 16px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 
   a {
-    color: #00000099 !important;
+    color: var(--gray600) !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
   }
 
   &:hover,
   &.focus {
+    background: rgba(37, 99, 235, 0.1);
+    transform: translateX(8px);
+    
     > a {
-      text-decoration: underline;
-      color: var(--secondaryColor) !important;
+      color: var(--primaryColor) !important;
+      font-weight: 600;
     }
 
     svg {
-      stroke: var(--secondaryColor) !important;
+      stroke: var(--primaryColor) !important;
+      transform: scale(1.1);
     }
   }
 
   img {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  svg {
+    transition: all 0.3s ease;
   }
 }
 
@@ -51,8 +69,31 @@ svg {
 }
 
 .active-route {
-  background: var(--primaryColorLight);
-  fill: #333333 !important;
+  background: var(--gradientPrimary);
+  color: white !important;
+  box-shadow: var(--shadowMd);
+  
+  a {
+    color: white !important;
+    font-weight: 600;
+  }
+  
+  svg {
+    stroke: white !important;
+    fill: white !important;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 24px;
+    background: white;
+    border-radius: 0 4px 4px 0;
+  }
 }
 
 .menu-mobile {

@@ -23,10 +23,13 @@ h1 {
   top: 0;
   left: 0;
   z-index: 1000;
-  padding: 15px 30px;
+  padding: 20px 30px;
   width: 100%;
-  background-color: #ffffff;
-  box-shadow: 1px 1px 5px 0px #dfdfdfde;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+  box-shadow: var(--shadowLg);
+  transition: all 0.3s ease;
 }
 
 .user-info {
@@ -34,59 +37,104 @@ h1 {
   align-items: center;
   justify-content: flex-end;
   flex: 1;
-  gap: 7px;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(37, 99, 235, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+  }
 }
 
 .user-name {
   margin: 0 5px;
+  font-weight: 600;
+  color: var(--gray700);
+  font-size: 14px;
 }
 
 .btn-dropdown {
   background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(37, 99, 235, 0.1);
+    transform: scale(1.1);
+  }
+  
   svg {
     width: 15px;
     height: 15px;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover svg {
+    transform: rotate(180deg);
   }
 }
 
 .menu-dropdown {
   position: absolute;
-  top: 70px;
+  top: 80px;
   right: 45px;
-  width: 165px;
-  height: 126px;
-  padding: 0;
-  border-radius: 8px;
-  box-shadow: 1px 1px 8px 0px #00000060;
-  background-color: #fff;
+  width: 200px;
+  padding: 8px 0;
+  border-radius: 16px;
+  box-shadow: var(--shadowXl);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(37, 99, 235, 0.1);
   transform: translateY(0);
-  transition: transform 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 1;
   z-index: 1500;
+  animation: fadeInUp 0.3s ease-out;
 
   li {
-    height: 62px;
+    height: 48px;
     display: flex;
     align-items: center;
     padding: 0 20px;
-    gap: 15px;
+    gap: 12px;
     cursor: pointer;
     position: relative;
+    margin: 4px 8px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
 
     &:hover,
     &:focus {
-      text-decoration: underline;
+      background: rgba(37, 99, 235, 0.1);
+      transform: translateX(4px);
 
       a {
-        color: var(--secondaryColor);
+        color: var(--primaryColor);
+        font-weight: 600;
       }
+      
+      svg {
+        transform: scale(1.1);
+      }
+    }
+    
+    svg {
+      transition: all 0.3s ease;
     }
   }
 }
 
 .dropdownInactive {
-  transform: translateY(-330px);
+  transform: translateY(-20px) scale(0.95);
   opacity: 0;
+  pointer-events: none;
 }
 
 .link-active {
