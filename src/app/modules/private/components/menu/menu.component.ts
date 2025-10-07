@@ -5,6 +5,7 @@ import { Location } from '@angular/common';
 import { CONFIG_BASE } from '@core/config';
 import { AsideMenuService } from '../aside-menu/services/aside-menu.service';
 import { SessionService } from '../../../../core/services/session/session.service';
+import { ThemeService } from '../../../../core/services/theme/theme.service';
 
 @Component({
   selector: 'app-menu',
@@ -22,7 +23,8 @@ export class MenuComponent implements OnInit {
     private router: Router,
     private location: Location,
     public asideMenuService: AsideMenuService,
-    public sessionService: SessionService
+    public sessionService: SessionService,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit(): void {}
@@ -35,4 +37,6 @@ export class MenuComponent implements OnInit {
   };
 
   handleBack = () => this.location.back();
+
+  toggleTheme = () => this.themeService.toggleTheme();
 }

@@ -50,6 +50,31 @@ h1 {
   }
 }
 
+.theme-toggle {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(37, 99, 235, 0.1);
+    transform: scale(1.15) rotate(15deg);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  svg {
+    transition: all 0.3s ease;
+  }
+}
+
 .user-name {
   margin: 0 5px;
   font-weight: 600;

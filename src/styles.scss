@@ -1,1 +1,204 @@
 @import './stylus/global';
+
+// ========================================
+// DARK THEME STYLES
+// ========================================
+
+body.dark-theme {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  
+  // Menu/Header
+  .menu-container {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  .user-info {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+  
+  .user-name {
+    color: #e0e0e0 !important;
+  }
+  
+  // Sidebar
+  .aside-menu-container {
+    background: #252525 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    
+    li {
+      color: #b0b0b0 !important;
+      
+      &:hover {
+        background: rgba(37, 99, 235, 0.15) !important;
+      }
+      
+      &.active-route {
+        background: rgba(37, 99, 235, 0.2) !important;
+        color: #fff !important;
+      }
+      
+      a {
+        color: inherit !important;
+      }
+    }
+  }
+  
+  // Main content
+  main {
+    background: #1a1a1a !important;
+  }
+  
+  // Cards
+  .card, .content-card {
+    background: #252525 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e0e0e0 !important;
+  }
+  
+  // Tables
+  table {
+    background: #252525 !important;
+    color: #e0e0e0 !important;
+    
+    thead {
+      background: #2a2a2a !important;
+      
+      th {
+        color: #b0b0b0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+    }
+    
+    tbody {
+      tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        
+        &:hover {
+          background: rgba(37, 99, 235, 0.1) !important;
+        }
+        
+        td {
+          color: #e0e0e0 !important;
+        }
+      }
+    }
+  }
+  
+  // Forms
+  input, select, textarea {
+    background: #2a2a2a !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #e0e0e0 !important;
+    
+    &::placeholder {
+      color: #707070 !important;
+    }
+    
+    &:focus {
+      border-color: rgba(37, 99, 235, 0.5) !important;
+      background: #303030 !important;
+    }
+  }
+  
+  // Buttons
+  button:not(.btn-primary):not(.btn-success):not(.btn-danger) {
+    background: #2a2a2a !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #e0e0e0 !important;
+    
+    &:hover {
+      background: #303030 !important;
+      border-color: rgba(37, 99, 235, 0.5) !important;
+    }
+  }
+  
+  // Headings
+  h1, h2, h3, h4, h5, h6 {
+    color: #e0e0e0 !important;
+  }
+  
+  // Dropdown
+  .menu-dropdown {
+    background: rgba(40, 40, 40, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    
+    li {
+      &:hover {
+        background: rgba(37, 99, 235, 0.15) !important;
+        
+        a {
+          color: #fff !important;
+        }
+      }
+      
+      svg {
+        path {
+          fill: #b0b0b0 !important;
+          stroke: #b0b0b0 !important;
+        }
+      }
+    }
+  }
+  
+  // Badges/Labels
+  .badge, .label {
+    background: #2a2a2a !important;
+    color: #e0e0e0 !important;
+  }
+  
+  // Modals
+  .modal-content {
+    background: #252525 !important;
+    color: #e0e0e0 !important;
+  }
+  
+  // Pagination
+  .pagination {
+    button, a {
+      background: #2a2a2a !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      color: #e0e0e0 !important;
+      
+      &:hover {
+        background: rgba(37, 99, 235, 0.2) !important;
+      }
+      
+      &.active {
+        background: rgba(37, 99, 235, 0.3) !important;
+        color: #fff !important;
+      }
+    }
+  }
+  
+  // Search boxes
+  .search-box {
+    background: #2a2a2a !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+  
+  // Scrollbar
+  ::-webkit-scrollbar {
+    background: #252525;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #404040;
+    
+    &:hover {
+      background: #505050;
+    }
+  }
+}
+
+// Light theme (default)
+body.light-theme {
+  background-color: #f5f7fa;
+  color: #333;
+}
