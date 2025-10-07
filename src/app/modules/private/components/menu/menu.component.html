@@ -23,7 +23,7 @@
 
     <app-notifications
       [quantityNotifications]="
-        sessionService.userLogged.totalNotificationNoRead || 0
+        sessionService.userLogged?.totalNotificationNoRead || 0
       "
     ></app-notifications>
 
