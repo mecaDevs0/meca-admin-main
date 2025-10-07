@@ -18,7 +18,7 @@
       </td>
       <td [routerLink]="['view', item?.id]">{{ item.vehicle.plate }}</td>
       <td [routerLink]="['view', item?.id]">{{ item.profile.fullName }}</td>
-      <td [routerLink]="['view', item?.id]">{{ item.workshop.companyName }}</td>
+      <td [routerLink]="['view', item?.id]">{{ item.workshop?.companyName || 'Oficina não informada' }}</td>
       <td [routerLink]="['view', item?.id]">
         {{ item.status | schedulingStatus }}
       </td>

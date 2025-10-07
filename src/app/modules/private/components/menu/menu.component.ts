@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '@services/authentication/authentication.service';
-import { Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CONFIG_BASE } from '@core/config';
-import { AsideMenuService } from '../aside-menu/services/aside-menu.service';
+import { AuthenticationService } from '@services/authentication/authentication.service';
 import { SessionService } from '../../../../core/services/session/session.service';
 import { ThemeService } from '../../../../core/services/theme/theme.service';
+import { AsideMenuService } from '../aside-menu/services/aside-menu.service';
 
 @Component({
   selector: 'app-menu',

@@ -79,23 +79,23 @@
   <h4>Dados da oficina</h4>
   <div>
     <p><b>Nome da empresa</b></p>
-    <p>{{ controller.formData.workshop.companyName }}</p>
+    <p>{{ controller.formData.workshop?.companyName || 'Oficina não informada' }}</p>
   </div>
   <div>
     <p><b>CNPJ</b></p>
-    <p>{{ controller.formData.workshop.cnpj | cpfOrCnpj }}</p>
+    <p>{{ controller.formData.workshop?.cnpj | cpfOrCnpj || 'N/A' }}</p>
   </div>
   <div>
     <p><b>Nome do responsável</b></p>
-    <p>{{ controller.formData.workshop.fullName }}</p>
+    <p>{{ controller.formData.workshop?.fullName || 'N/A' }}</p>
   </div>
   <div>
     <p><b>E-mail do responsável</b></p>
-    <p>{{ controller.formData.workshop.email }}</p>
+    <p>{{ controller.formData.workshop?.email || 'N/A' }}</p>
   </div>
   <div>
     <p><b>Telefone do responsável</b></p>
-    <p>{{ controller.formData.workshop.phone | phone }}</p>
+    <p>{{ controller.formData.workshop?.phone | phone || 'N/A' }}</p>
   </div>
 
   <hr />
