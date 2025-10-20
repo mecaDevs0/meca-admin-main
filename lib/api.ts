@@ -3,7 +3,7 @@
  * Cliente para comunicação com a API Medusa
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'
 
 interface ApiResponse<T = any> {
   data?: T
@@ -97,6 +97,25 @@ class MecaApiClient {
     return this.request(`/admin/master-services/${id}`, {
       method: 'DELETE',
     })
+  }
+
+  // Users
+  async getUsers(type?: 'customer' | 'workshop') {
+    const query = type ? `?type=${type}` : ''
+    return this.request(`/admin/users${query}`)
+  }
+
+  // Notifications
+  async sendNotification(data: { title: string; message: string; target: string }) {
+    return this.request('/admin/notifications/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  // API Health
+  async checkHealth() {
+    return this.request('/health')
   }
 }
 
