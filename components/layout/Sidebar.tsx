@@ -66,6 +66,11 @@ export default function Sidebar() {
       icon: Activity,
     },
     { 
+      name: 'Teste API', 
+      path: '/test-api', 
+      icon: Activity,
+    },
+    { 
       name: 'Perfil', 
       path: '/dashboard/profile', 
       icon: User,

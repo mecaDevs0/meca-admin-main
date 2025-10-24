@@ -3,7 +3,7 @@
  * Cliente para comunicação com a API Medusa
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
 
 interface ApiResponse<T = any> {
   data?: T
@@ -58,56 +58,73 @@ class MecaApiClient {
   // Workshops
   async getWorkshops(status?: string) {
     const query = status ? `?status=${status}` : ''
-    return this.request(`/admin/workshops${query}`)
+    return this.request(`/workshops${query}`)
   }
 
   async approveWorkshop(id: string) {
-    return this.request(`/admin/workshops/${id}/approve`, {
-      method: 'POST',
+    return this.request(`/workshops/${id}/approve`, {
+      method: 'PUT',
     })
   }
 
   async rejectWorkshop(id: string, reason: string) {
-    return this.request(`/admin/workshops/${id}/reject`, {
-      method: 'POST',
+    return this.request(`/workshops/${id}/reject`, {
+      method: 'PUT',
       body: JSON.stringify({ reason }),
     })
   }
 
-  // Master Services
-  async getMasterServices() {
-    return this.request('/admin/master-services')
+  // Services
+  async getServices() {
+    return this.request('/services')
   }
 
-  async createMasterService(data: { title: string; description?: string; category?: string }) {
-    return this.request('/admin/master-services', {
+  async createService(data: { name: string; description?: string; category?: string }) {
+    return this.request('/services', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
-  async updateMasterService(id: string, data: { title?: string; description?: string; category?: string }) {
-    return this.request(`/admin/master-services/${id}`, {
+  async updateService(id: string, data: { name?: string; description?: string; category?: string }) {
+    return this.request(`/services/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     })
   }
 
-  async deleteMasterService(id: string) {
-    return this.request(`/admin/master-services/${id}`, {
+  async deleteService(id: string) {
+    return this.request(`/services/${id}`, {
       method: 'DELETE',
     })
   }
 
-  // Users
+  // Users/Customers
   async getUsers(type?: 'customer' | 'workshop') {
-    const query = type ? `?type=${type}` : ''
-    return this.request(`/admin/users${query}`)
+    if (type === 'customer') {
+      return this.request('/customers')
+    } else if (type === 'workshop') {
+      return this.request('/workshops')
+    }
+    return this.request('/customers')
+  }
+
+  // Bookings
+  async getBookings(status?: string) {
+    const query = status ? `?status=${status}` : ''
+    return this.request(`/bookings${query}`)
+  }
+
+  async updateBookingStatus(id: string, status: string) {
+    return this.request(`/bookings/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    })
   }
 
   // Notifications
   async sendNotification(data: { title: string; message: string; target: string }) {
-    return this.request('/admin/notifications/send', {
+    return this.request('/notifications/send', {
       method: 'POST',
       body: JSON.stringify(data),
     })
