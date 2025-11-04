@@ -291,3 +291,11 @@ sudo ufw enable
 - Monitorar logs de acesso
 - Implementar rate limiting
 
+
+
+
+
+
+
+
+

@@ -131,3 +131,11 @@ Para dúvidas ou problemas:
 - Testar endpoints em `/test-api`
 - Verificar status da API em `/dashboard/api-status`
 
+
+
+
+
+
+
+
+

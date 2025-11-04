@@ -148,3 +148,11 @@ Para problemas técnicos:
 - Teste a API em `/test-api`
 - Verifique se a API da EC2 está funcionando
 
+
+
+
+
+
+
+
+

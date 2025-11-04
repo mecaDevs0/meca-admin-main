@@ -212,3 +212,11 @@ Para problemas técnicos:
 - Verifique configuração DNS
 - Consulte documentação da GoDaddy
 
+
+
+
+
+
+
+
+

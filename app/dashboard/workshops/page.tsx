@@ -80,7 +80,7 @@ export default function WorkshopsPage() {
       showToast.dismiss(loadingToast)
       
       if (!error && data) {
-        showToast.success('Oficina aprovada!', `${data.oficina?.name || 'Oficina'} foi aprovada com sucesso`)
+        showToast.success('Oficina aprovada!', `Oficina foi aprovada com sucesso`)
         
         // Aguardar um pouco e recarregar a lista para garantir que o backend processou
         setTimeout(() => {

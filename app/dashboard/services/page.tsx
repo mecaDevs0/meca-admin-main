@@ -63,31 +63,35 @@ export default function ServicesPage() {
     e.preventDefault()
     
     if (editingService) {
-      const { error } = await showToast.promise(
-        apiClient.updateMasterService(editingService.id, formData),
+      await showToast.promise(
+        apiClient.updateService(editingService.id, {
+          name: formData.title,
+          description: formData.description,
+          category: formData.category
+        }),
         {
           loading: 'Atualizando serviço...',
           success: 'Serviço atualizado com sucesso!',
           error: (err) => err || 'Erro ao atualizar serviço',
         }
       )
-      if (!error) {
-        loadServices()
-        closeModal()
-      }
+      loadServices()
+      closeModal()
     } else {
-      const { error } = await showToast.promise(
-        apiClient.createMasterService(formData),
+      await showToast.promise(
+        apiClient.createService({
+          name: formData.title,
+          description: formData.description,
+          category: formData.category
+        }),
         {
           loading: 'Criando serviço...',
           success: 'Serviço criado com sucesso!',
           error: (err) => err || 'Erro ao criar serviço',
         }
       )
-      if (!error) {
-        loadServices()
-        closeModal()
-      }
+      loadServices()
+      closeModal()
     }
   }
 
@@ -98,18 +102,15 @@ export default function ServicesPage() {
     // Por enquanto mantém o confirm nativo, mas pode ser substituído por um modal customizado
     if (!confirm('Tem certeza que deseja excluir este serviço?')) return
     
-    const { error } = await showToast.promise(
-      apiClient.deleteMasterService(id),
+    await showToast.promise(
+      apiClient.deleteService(id),
       {
         loading: 'Excluindo serviço...',
         success: 'Serviço excluído com sucesso!',
         error: (err) => err || 'Erro ao excluir serviço',
       }
     )
-    
-    if (!error) {
-      loadServices()
-    }
+    loadServices()
   }
 
   const openModal = (service?: MasterService) => {
@@ -195,4 +196,12 @@ export default function ServicesPage() {
       />
     </div>
   )
+}}
+}}
 }
+}
+}
+}
+}
+}
+
