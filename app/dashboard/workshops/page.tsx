@@ -5,9 +5,10 @@ import RejectModal from '@/components/workshops/RejectModal'
 import WorkshopCard from '@/components/workshops/WorkshopCard'
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
-import { AlertCircle, Building2 } from 'lucide-react'
+import { AlertCircle, Building2, Clock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 
 interface Workshop {
   id: string
@@ -150,26 +151,56 @@ export default function WorkshopsPage() {
         <FilterButtons activeFilter={filter} onFilterChange={setFilter} />
 
         {loading ? (
-          <div className="flex justify-center py-8">
-            <div className="w-8 h-8 border-4 border-[#00c977] border-t-transparent rounded-full animate-spin" />
+          <div className="flex justify-center py-12">
+            <div className="w-10 h-10 border-4 border-[#00c977] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="space-y-4">
             {workshops.length === 0 ? (
-              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-8 text-center">
-                <AlertCircle className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nenhuma oficina encontrada</h3>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-12 text-center"
+              >
+                <AlertCircle className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhuma oficina encontrada</h3>
                 <p className="text-gray-500 dark:text-gray-400">Não há oficinas com o status selecionado no momento.</p>
-              </div>
+              </motion.div>
             ) : (
-              workshops.map((workshop) => (
-                <WorkshopCard
-                  key={workshop.id}
-                  workshop={workshop}
-                  onApprove={handleApprove}
-                  onReject={() => setSelectedWorkshop(workshop.id)}
-                />
-              ))
+              <>
+                {filter === 'pendente' || filter === 'all' ? (
+                  <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-2 border-yellow-300 dark:border-yellow-700/50 rounded-2xl p-4 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
+                        <Clock className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
+                          {workshops.filter(w => w.status === 'pendente').length} oficina{workshops.filter(w => w.status === 'pendente').length !== 1 ? 's' : ''} pendente{workshops.filter(w => w.status === 'pendente').length !== 1 ? 's' : ''}
+                        </h3>
+                        <p className="text-xs text-yellow-700 dark:text-yellow-300">Aprove ou rejeite as oficinas pendentes</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+                
+                <div className="grid gap-4">
+                  {workshops.map((workshop, index) => (
+                    <motion.div
+                      key={workshop.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <WorkshopCard
+                        workshop={workshop}
+                        onApprove={handleApprove}
+                        onReject={() => setSelectedWorkshop(workshop.id)}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}

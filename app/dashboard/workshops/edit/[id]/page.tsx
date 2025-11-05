@@ -58,8 +58,15 @@ export default function EditWorkshopPage() {
       }
 
       const workshopData = data.data || data
-      setWorkshop(workshopData as Workshop)
-      setFormData(workshopData as Workshop)
+      
+      // Garantir que description existe (mesmo que null)
+      const normalizedData = {
+        ...workshopData,
+        description: workshopData.description ?? null
+      }
+      
+      setWorkshop(normalizedData as Workshop)
+      setFormData(normalizedData as Workshop)
     } catch (error) {
       showToast.error('Erro', 'Ocorreu um erro ao carregar a oficina')
       console.error('Erro:', error)

@@ -12,7 +12,8 @@ import {
   Edit
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 
 interface Workshop {
   id: string
@@ -38,21 +39,23 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
   onReject
 }) => {
   const router = useRouter()
+  const [isApproving, setIsApproving] = useState(false)
+  const [isRejecting, setIsRejecting] = useState(false)
 
   const getStatusConfig = (status: string) => {
     const configs = {
       pendente: {
-        color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        color: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700',
         icon: Clock,
         label: 'PENDENTE'
       },
       aprovado: {
-        color: 'bg-green-100 text-green-800 border-green-200',
+        color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700',
         icon: CheckCircle,
         label: 'APROVADO'
       },
       rejeitado: {
-        color: 'bg-red-100 text-red-800 border-red-200',
+        color: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700',
         icon: XCircle,
         label: 'REJEITADO'
       },
@@ -63,75 +66,131 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
   const statusConfig = getStatusConfig(workshop.status)
   const StatusIcon = statusConfig.icon
 
+  const handleApprove = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsApproving(true)
+    try {
+      await onApprove(workshop.id)
+    } finally {
+      setTimeout(() => setIsApproving(false), 1000)
+    }
+  }
+
+  const handleReject = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onReject(workshop.id)
+  }
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Não navegar se clicar nos botões
+    const target = e.target as HTMLElement
+    if (target.closest('button') || target.closest('motion.button')) {
+      return
+    }
+    router.push(`/dashboard/workshops/edit/${workshop.id}`)
+  }
+
   return (
-    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl p-4 transition-all duration-300">
-      <div className="flex justify-between items-start">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      whileHover={{ scale: 1.01, y: -2 }}
+      onClick={handleCardClick}
+      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6 cursor-pointer"
+    >
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Informações Principais */}
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-[#00c977] rounded-lg flex items-center justify-center">
-              <Building2 className="w-4 h-4 text-white" />
+          <div className="flex items-start gap-4 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+              <Building2 className="w-6 h-6 text-white" />
             </div>
             
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{workshop.name}</h3>
-              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${statusConfig.color} dark:border-opacity-50`}>
-                <StatusIcon className="w-3 h-3" />
-                {statusConfig.label}
-              </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">{workshop.name}</h3>
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${statusConfig.color}`}>
+                  <StatusIcon className="w-3.5 h-3.5" />
+                  {statusConfig.label}
+                </span>
+              </div>
             </div>
           </div>
           
-          <div className="space-y-2 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <FileText className="w-4 h-4" />
-              <span>{workshop.cnpj}</span>
+              <FileText className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.cnpj}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Mail className="w-4 h-4" />
-              <span>{workshop.email}</span>
+              <Mail className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.email}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Phone className="w-4 h-4" />
-              <span>{workshop.phone}</span>
+              <Phone className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.phone}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <MapPin className="w-4 h-4" />
-              <span>{workshop.address}</span>
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.address}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() => router.push(`/dashboard/workshops/edit/${workshop.id}`)}
-            className="bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
+        {/* Ações */}
+        <div className="flex flex-col gap-2 lg:w-auto w-full">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/dashboard/workshops/edit/${workshop.id}`)
+            }}
+            className="bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl dark:from-gray-700 dark:to-gray-800"
           >
             <Edit className="w-4 h-4" />
             Editar
-          </button>
+          </motion.button>
 
           {workshop.status === 'pendente' && (
             <>
-              <button
-                onClick={() => onApprove(workshop.id)}
-                className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleApprove}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
               >
-                <CheckCircle className="w-4 h-4" />
-                Aprovar
-              </button>
+                {isApproving ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Aprovar
+                  </>
+                )}
+              </motion.button>
               
-              <button
-                onClick={() => onReject(workshop.id)}
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleReject}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
               >
                 <XCircle className="w-4 h-4" />
                 Rejeitar
-              </button>
+              </motion.button>
             </>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

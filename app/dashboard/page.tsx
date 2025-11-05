@@ -9,7 +9,8 @@ import {
   Clock,
   Users,
   Bell,
-  Activity
+  Activity,
+  DollarSign
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -18,15 +19,18 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 interface DashboardMetrics {
   total_customers: number
   customers_this_week: number
+  new_users_this_month: number
   active_customers: number
   total_oficinas: number
   workshops_this_week: number
+  new_workshops_this_month: number
   active_workshops: number
   oficinas_by_status: {
     pendente?: number
     aprovado?: number
     rejeitado?: number
   }
+  revenue_this_month: number
   customer_registrations: Array<{ name: string; value: number }>
   workshop_registrations: Array<{ name: string; value: number }>
   total_bookings_last_month: number
@@ -218,8 +222,8 @@ export default function DashboardPage() {
               <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_customers || 0}</p>
               <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600 dark:text-gray-400">Cadastrados esta semana</span>
-                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.customers_this_week || 0}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Novos este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_users_this_month || 0}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-600 dark:text-gray-400">Ativos (3 meses)</span>
@@ -246,8 +250,8 @@ export default function DashboardPage() {
               <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_oficinas || 0}</p>
               <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600 dark:text-gray-400">Registradas esta semana</span>
-                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.workshops_this_week || 0}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Novas este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_workshops_this_month || 0}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-600 dark:text-gray-400">Ativas (3 meses)</span>
@@ -257,7 +261,30 @@ export default function DashboardPage() {
             </div>
           </motion.div>
           
-          {/* Card 3 - Pendentes (Clicável) */}
+          {/* Card 3 - Receita do Mês */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg aspect-square flex flex-col justify-between sm:col-span-2 lg:col-span-2"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita do Mês</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">
+                R$ {(metrics.revenue_this_month || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 4 - Pendentes (Clicável) */}
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
@@ -287,6 +314,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg sm:col-span-2 lg:col-span-3"
+            data-onboard="client-chart"
           >
             <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Clientes (6 meses)</h2>
             <ResponsiveContainer width="100%" height={200}>
