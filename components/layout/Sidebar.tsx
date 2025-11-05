@@ -1,6 +1,7 @@
 'use client'
 
 import Logo from '@/components/ui/Logo'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
     Activity,
@@ -29,51 +30,59 @@ export default function Sidebar() {
     router.push('/login')
   }
 
-  const menuItems = [
+  const menuItems: Array<{
+    name: string
+    path: string
+    icon: any
+    onboardKey: string
+  }> = [
     { 
       name: 'Dashboard', 
       path: '/dashboard', 
       icon: LayoutDashboard,
+      onboardKey: 'dashboard',
     },
     { 
       name: 'Oficinas', 
       path: '/dashboard/workshops', 
       icon: Building2,
+      onboardKey: 'workshops',
     },
     { 
       name: 'Serviços', 
       path: '/dashboard/services', 
       icon: Wrench,
+      onboardKey: 'services',
     },
     { 
       name: 'Notificações', 
       path: '/dashboard/notifications', 
       icon: Bell,
+      onboardKey: 'notifications',
     },
     { 
       name: 'Usuários', 
       path: '/dashboard/users', 
       icon: Users,
+      onboardKey: 'users',
     },
     { 
       name: 'Relatórios', 
       path: '/dashboard/reports', 
       icon: FileText,
+      onboardKey: 'reports',
     },
     { 
       name: 'Status API', 
       path: '/dashboard/api-status', 
       icon: Activity,
-    },
-    { 
-      name: 'Teste API', 
-      path: '/test-api', 
-      icon: Activity,
+      onboardKey: 'api-status',
     },
     { 
       name: 'Perfil', 
       path: '/dashboard/profile', 
       icon: User,
+      onboardKey: 'profile',
     },
   ]
 
@@ -85,61 +94,69 @@ export default function Sidebar() {
     <motion.aside
       initial={false}
       animate={{ 
-        width: isCollapsed ? 60 : 200,
+        width: isCollapsed ? 80 : 240,
         transition: { duration: 0.3, ease: "easeInOut" }
       }}
-      className="fixed left-0 top-0 h-screen bg-gray-900 text-white flex flex-col border-r border-gray-800 z-50"
+      className="fixed left-0 top-0 h-screen bg-gradient-to-b from-[#252940] via-[#1B1D2E] to-[#252940] text-white flex flex-col border-r border-white/10 shadow-2xl z-50 backdrop-blur-xl rounded-r-3xl"
+      data-onboard="sidebar"
     >
       {/* Header */}
-      <div className="p-3 border-b border-gray-800 flex items-center justify-between">
+      <div className="p-5 border-b border-white/10 flex items-center justify-between backdrop-blur-sm rounded-tr-3xl">
         <AnimatePresence mode="wait">
           {!isCollapsed ? (
             <motion.div
               key="expanded"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center gap-2"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="flex items-center justify-center"
             >
-              <Logo variant="icon" color="white" size="sm" />
-              <span className="text-sm font-medium">MECA</span>
+              <Logo variant="full" color="white" size="lg" animated />
             </motion.div>
           ) : (
             <motion.div
               key="collapsed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="flex items-center justify-center w-full"
             >
-              <Logo variant="icon" color="white" size="sm" />
+              <Logo variant="icon" color="white" size="md" animated />
             </motion.div>
           )}
         </AnimatePresence>
         
-        <button
+        <motion.button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1 rounded hover:bg-gray-800 transition-colors"
+          className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200"
+          whileHover={{ scale: 1.1, rotate: isCollapsed ? 0 : 180 }}
+          whileTap={{ scale: 0.9 }}
         >
           {isCollapsed ? (
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="w-4 h-4" />
           ) : (
-            <ChevronLeft className="w-3 h-3" />
+            <ChevronLeft className="w-4 h-4" />
           )}
-        </button>
+        </motion.button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
         {menuItems.map((item) => (
-          <Link
+          <motion.div
             key={item.path}
-            href={item.path}
-            className={`flex items-center gap-2 px-2 py-2 rounded text-sm transition-colors ${
-              isActive(item.path)
-                ? 'bg-[#00c977] text-white'
-                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-            }`}
+            whileHover={{ x: 6, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
+            <Link
+              href={item.path}
+              data-onboard={item.onboardKey}
+              className={`flex items-center gap-4 px-5 py-4 rounded-3xl text-sm font-semibold transition-all duration-300 ${
+                isActive(item.path)
+                  ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-xl shadow-[#00c977]/40'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white backdrop-blur-sm'
+              } ${isCollapsed ? 'justify-center' : ''}`}
+            >
             <item.icon className="w-4 h-4 flex-shrink-0" />
             
             <AnimatePresence>
@@ -154,15 +171,36 @@ export default function Sidebar() {
                 </motion.span>
               )}
             </AnimatePresence>
-          </Link>
+            </Link>
+          </motion.div>
         ))}
       </nav>
 
+      {/* Theme Toggle */}
+      <div className="p-3 border-t border-white/10">
+        <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          {!isCollapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-xs font-medium text-white/70"
+            >
+              Tema
+            </motion.span>
+          )}
+          <div data-onboard="theme-toggle" className={isCollapsed ? 'flex justify-center' : ''}>
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+
       {/* Logout */}
-      <div className="p-2 border-t border-gray-800">
-        <button
+      <div className="p-3 border-t border-white/10">
+        <motion.button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2 px-2 py-2 rounded text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white backdrop-blur-sm transition-all duration-200 ${isCollapsed ? 'justify-center' : ''}`}
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.95 }}
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
           
@@ -178,7 +216,7 @@ export default function Sidebar() {
               </motion.span>
             )}
           </AnimatePresence>
-        </button>
+        </motion.button>
       </div>
     </motion.aside>
   )

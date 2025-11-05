@@ -35,7 +35,7 @@ const RejectModal: React.FC<RejectModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-100"
+          className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-100 dark:border-gray-700"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -45,13 +45,13 @@ const RejectModal: React.FC<RejectModalProps> = ({
                 scale: [1, 1.1, 1],
                 transition: { duration: 2, repeat: Infinity }
               }}
-              className="p-3 bg-red-100 rounded-2xl"
+              className="p-3 bg-red-100 dark:bg-red-900/30 rounded-2xl"
             >
-              <XCircle className="w-8 h-8 text-red-600" />
+              <XCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
             </motion.div>
             <div>
-              <h3 className="text-2xl font-bold text-[#252940]">Rejeitar Oficina</h3>
-              <p className="text-gray-600">Esta ação não pode ser desfeita</p>
+              <h3 className="text-2xl font-bold text-[#252940] dark:text-white">Rejeitar Oficina</h3>
+              <p className="text-gray-600 dark:text-gray-400">Esta ação não pode ser desfeita</p>
             </div>
           </div>
 
@@ -60,11 +60,11 @@ const RejectModal: React.FC<RejectModalProps> = ({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 mb-6"
+            className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-700 rounded-2xl p-4 mb-6"
           >
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
-              <p className="text-yellow-800 font-medium text-sm">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+              <p className="text-yellow-800 dark:text-yellow-300 font-medium text-sm">
                 Por favor, informe o motivo da rejeição para que a oficina possa corrigir os problemas identificados.
               </p>
             </div>
@@ -73,7 +73,7 @@ const RejectModal: React.FC<RejectModalProps> = ({
           {/* Form */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Motivo da Rejeição *
               </label>
               <motion.textarea
@@ -82,7 +82,7 @@ const RejectModal: React.FC<RejectModalProps> = ({
                 transition={{ delay: 0.2 }}
                 value={reason}
                 onChange={(e) => onReasonChange(e.target.value)}
-                className="w-full border-2 border-gray-200 rounded-2xl p-4 h-32 focus:ring-4 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all duration-300 resize-none"
+                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 h-32 focus:ring-4 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all duration-300 resize-none bg-gray-50 dark:bg-gray-900/50 focus:bg-white dark:focus:bg-gray-900 text-gray-900 dark:text-white"
                 placeholder="Ex: Documentação incompleta, dados incorretos, informações faltando, etc."
                 required
               />
@@ -110,7 +110,7 @@ const RejectModal: React.FC<RejectModalProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onClose}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 rounded-2xl font-bold transition-all duration-300"
+                className="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-4 rounded-2xl font-bold transition-all duration-300"
               >
                 Cancelar
               </motion.button>

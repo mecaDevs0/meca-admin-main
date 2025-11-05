@@ -1,6 +1,7 @@
 'use client'
 
 import { showToast } from '@/lib/toast'
+import { apiClient } from '@/lib/api'
 import { Calendar, Mail, Phone, Search, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -34,17 +35,40 @@ export default function UsersPage() {
     setLoading(true)
     
     try {
-      const response = await fetch(`/api/admin/users?type=${filter === 'all' ? '' : filter}`)
-      const result = await response.json()
-
-      if (response.ok && result.users) {
-        setUsers(result.users)
-      } else {
-        console.error('Erro ao carregar usuários:', result)
-        setUsers([])
+      const token = localStorage.getItem('meca_admin_token')
+      if (!token) {
+        router.push('/login')
+        return
       }
+      apiClient.setToken(token)
+      
+      const type = filter === 'all' ? undefined : filter
+      const { data, error } = await apiClient.getUsers(type)
+      
+      if (error || !data) {
+        showToast.error('Erro ao carregar usuários', error || 'Não foi possível carregar os dados')
+        setUsers([])
+        setLoading(false)
+        return
+      }
+      
+      // A API retorna { success: true, customers: [...] } ou { success: true, data: { customers: [...] } }
+      const usersData = data.customers || data.data?.customers || data.data || (Array.isArray(data) ? data : [])
+      
+      // Mapear dados da API para o formato esperado
+      const mappedUsers = usersData.map((user: any) => ({
+        id: user.id,
+        name: user.name || user.full_name || 'Sem nome',
+        email: user.email || 'Não informado',
+        phone: user.phone || 'Não informado',
+        type: user.type || 'customer',
+        created_at: user.created_at || new Date().toISOString()
+      }))
+      
+      setUsers(mappedUsers)
     } catch (error) {
       console.error('Erro na requisição:', error)
+      showToast.error('Erro', 'Ocorreu um erro ao carregar os usuários')
       setUsers([])
     }
 
@@ -62,32 +86,33 @@ export default function UsersPage() {
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 bg-[#00c977] rounded-lg flex items-center justify-center">
-            <Users className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Usuários</h1>
-            <p className="text-sm text-gray-500">Gerencie clientes e proprietários de oficinas</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Usuários</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Gerencie clientes e proprietários de oficinas</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        {/* Filters */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Buscar por nome, email ou telefone..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c977] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#00c977] focus:border-transparent dark:bg-gray-900/50 dark:text-white"
               />
             </div>
           </div>
@@ -97,8 +122,8 @@ export default function UsersPage() {
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === 'all' 
-                  ? 'bg-[#00c977] text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-lg' 
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               Todos
@@ -107,8 +132,8 @@ export default function UsersPage() {
               onClick={() => setFilter('customer')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === 'customer' 
-                  ? 'bg-[#00c977] text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-lg' 
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               Clientes
@@ -117,8 +142,8 @@ export default function UsersPage() {
               onClick={() => setFilter('workshop')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === 'workshop' 
-                  ? 'bg-[#00c977] text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-lg' 
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               Oficinas
@@ -135,14 +160,14 @@ export default function UsersPage() {
       ) : (
         <div className="space-y-4">
           {filteredUsers.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <Users className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum usuário encontrado</h3>
-              <p className="text-gray-500">Não há usuários com os filtros selecionados.</p>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-8 text-center">
+              <Users className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nenhum usuário encontrado</h3>
+              <p className="text-gray-500 dark:text-gray-400">Não há usuários com os filtros selecionados.</p>
             </div>
           ) : (
             filteredUsers.map((user) => (
-              <div key={user.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors">
+              <div key={user.id} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl p-4 transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -154,8 +179,8 @@ export default function UsersPage() {
                     </div>
                     
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{user.name}</h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{user.name}</h3>
+                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                         <div className="flex items-center gap-1">
                           <Mail className="w-4 h-4" />
                           <span>{user.email}</span>
@@ -177,8 +202,8 @@ export default function UsersPage() {
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       user.type === 'customer' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-blue-100 text-blue-800'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
                     }`}>
                       {user.type === 'customer' ? 'Cliente' : 'Oficina'}
                     </span>
@@ -189,6 +214,7 @@ export default function UsersPage() {
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }

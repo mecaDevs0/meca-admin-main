@@ -1,6 +1,7 @@
 'use client'
 
 import Sidebar from '@/components/layout/Sidebar'
+import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
@@ -19,9 +20,10 @@ export default function DashboardLayout({
   }, [router])
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <OnboardingTour />
       <Sidebar />
-      <main className="flex-1 ml-[60px] lg:ml-[200px] p-4">
+      <main className="flex-1 ml-[80px] lg:ml-[240px] overflow-x-hidden">
         {children}
       </main>
     </div>

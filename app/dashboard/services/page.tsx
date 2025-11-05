@@ -35,24 +35,37 @@ export default function ServicesPage() {
   const loadServices = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/admin/master-services')
-      const result = await response.json()
-      
-      if (response.ok && result.services) {
-        // Mapear dados reais da API para o formato esperado
-        const mappedServices = result.services.map((service: any) => ({
-          id: service.id,
-          title: service.name || service.title,
-          description: service.description || 'Descrição não disponível',
-          category: service.category || 'Geral'
-        }))
-        setServices(mappedServices)
-      } else {
-        console.error('Erro ao carregar serviços:', result)
-        setServices([])
+      const token = localStorage.getItem('meca_admin_token')
+      if (!token) {
+        router.push('/login')
+        return
       }
+      apiClient.setToken(token)
+      
+      const { data, error } = await apiClient.getServices()
+      
+      if (error || !data) {
+        showToast.error('Erro ao carregar serviços', error || 'Não foi possível carregar os dados')
+        setServices([])
+        setLoading(false)
+        return
+      }
+      
+      // A API retorna { success: true, services: [...] } ou { success: true, data: { services: [...] } }
+      const servicesData = data.services || data.data?.services || (Array.isArray(data) ? data : data.data || [])
+      
+      // Mapear dados reais da API para o formato esperado
+      const mappedServices = servicesData.map((service: any) => ({
+        id: service.id,
+        title: service.name || service.title || 'Sem nome',
+        description: service.description || 'Descrição não disponível',
+        category: service.category || 'Geral'
+      }))
+      
+      setServices(mappedServices)
     } catch (error) {
       console.error('Erro na requisição:', error)
+      showToast.error('Erro', 'Ocorreu um erro ao carregar os serviços')
       setServices([])
     }
     
@@ -135,17 +148,18 @@ export default function ServicesPage() {
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Serviços</h1>
-          <p className="text-sm text-gray-500">Catálogo de serviços base</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Serviços</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Catálogo de serviços base</p>
+          </div>
         
         <button
           onClick={() => openModal()}
-          className="bg-[#00c977] hover:bg-[#00b369] text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+          className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 shadow-lg transition-all"
         >
           <Plus className="w-4 h-4" />
           Novo Serviço
@@ -159,13 +173,13 @@ export default function ServicesPage() {
       ) : (
         <div>
           {services.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <AlertCircle className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum serviço encontrado</h3>
-              <p className="text-gray-500 mb-4">Crie seu primeiro serviço para começar.</p>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-8 text-center">
+              <AlertCircle className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nenhum serviço encontrado</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">Crie seu primeiro serviço para começar.</p>
               <button
                 onClick={() => openModal()}
-                className="bg-[#00c977] hover:bg-[#00b369] text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 mx-auto"
+                className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 mx-auto shadow-lg transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Criar Serviço
@@ -194,6 +208,7 @@ export default function ServicesPage() {
         onFormChange={setFormData}
         isEditing={!!editingService}
       />
+      </div>
     </div>
   )
 }
