@@ -3,7 +3,7 @@
 import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Building2, Mail, MapPin, Phone, Save, X, Check } from 'lucide-react'
+import { ArrowLeft, Building2, Mail, MapPin, Phone, Save, X, Check, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -102,6 +102,53 @@ export default function EditWorkshopPage() {
       ...prev,
       [field]: value,
     }))
+  }
+
+  const handleApprove = async () => {
+    setSaving(true)
+    try {
+      const { data, error } = await apiClient.approveWorkshop(workshopId)
+
+      if (error || !data) {
+        showToast.error('Erro ao aprovar', error || 'Não foi possível aprovar a oficina')
+        return
+      }
+
+      showToast.success('Oficina aprovada!', 'A oficina foi aprovada com sucesso')
+      setTimeout(() => {
+        router.push('/dashboard/workshops')
+      }, 1000)
+    } catch (error) {
+      showToast.error('Erro', 'Ocorreu um erro ao aprovar a oficina')
+      console.error('Erro:', error)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleReject = async () => {
+    const reason = prompt('Motivo da rejeição (opcional):')
+    if (reason === null) return // Usuário cancelou
+
+    setSaving(true)
+    try {
+      const { data, error } = await apiClient.rejectWorkshop(workshopId, reason || '')
+
+      if (error || !data) {
+        showToast.error('Erro ao rejeitar', error || 'Não foi possível rejeitar a oficina')
+        return
+      }
+
+      showToast.success('Oficina rejeitada', 'A oficina foi rejeitada com sucesso')
+      setTimeout(() => {
+        router.push('/dashboard/workshops')
+      }, 1000)
+    } catch (error) {
+      showToast.error('Erro', 'Ocorreu um erro ao rejeitar a oficina')
+      console.error('Erro:', error)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const containerVariants = {
@@ -291,36 +338,85 @@ export default function EditWorkshopPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => router.push('/dashboard/workshops')}
-                className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
-              >
-                <X className="w-5 h-5" />
-                Cancelar
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleSave}
-                disabled={saving}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white font-semibold rounded-xl shadow-lg shadow-[#00c977]/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {saving ? (
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                  />
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" />
-                    Salvar Alterações
-                  </>
-                )}
-              </motion.button>
+            <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+              {/* Approve/Reject Actions (only if pending) */}
+              {workshop.status === 'pendente' && (
+                <div className="flex gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleApprove}
+                    disabled={saving}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl shadow-lg shadow-green-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {saving ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      />
+                    ) : (
+                      <>
+                        <CheckCircle className="w-5 h-5" />
+                        Aprovar Oficina
+                      </>
+                    )}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleReject}
+                    disabled={saving}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {saving ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      />
+                    ) : (
+                      <>
+                        <XCircle className="w-5 h-5" />
+                        Rejeitar Oficina
+                      </>
+                    )}
+                  </motion.button>
+                </div>
+              )}
+              
+              {/* Save/Cancel Actions */}
+              <div className="flex gap-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => router.push('/dashboard/workshops')}
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                >
+                  <X className="w-5 h-5" />
+                  Cancelar
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white font-semibold rounded-xl shadow-lg shadow-[#00c977]/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {saving ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    />
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5" />
+                      Salvar Alterações
+                    </>
+                  )}
+                </motion.button>
+              </div>
             </div>
           </div>
         </motion.div>

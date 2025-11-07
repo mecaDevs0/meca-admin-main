@@ -58,7 +58,9 @@ export default function UsersPage() {
       // Mapear dados da API para o formato esperado
       const mappedUsers = usersData.map((user: any) => ({
         id: user.id,
-        name: user.name || user.full_name || 'Sem nome',
+        name: user.first_name && user.last_name 
+          ? `${user.first_name} ${user.last_name}`.trim()
+          : user.first_name || user.last_name || user.name || user.full_name || 'Sem nome',
         email: user.email || 'Não informado',
         phone: user.phone || 'Não informado',
         type: user.type || 'customer',

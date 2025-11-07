@@ -105,3 +105,4 @@ O admin está **funcionando corretamente** no frontend:
 
 **Pendência**: Atualizar API na EC2 com os novos endpoints de login por código.
 
+

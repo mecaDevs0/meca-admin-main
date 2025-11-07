@@ -37,14 +37,33 @@ export default function WorkshopsPage() {
       return
     }
     apiClient.setToken(token)
-    loadWorkshops()
-  }, [filter, router])
+    
+    // Verificar se há query param de status
+    const searchParams = new URLSearchParams(window.location.search)
+    const statusParam = searchParams.get('status')
+    if (statusParam && (statusParam === 'pending' || statusParam === 'pendente')) {
+      setFilter('pendente')
+    }
+  }, [router])
+
+  useEffect(() => {
+    const token = localStorage.getItem('meca_admin_token')
+    if (token) {
+      apiClient.setToken(token)
+      loadWorkshops()
+    }
+  }, [filter])
 
   const loadWorkshops = async () => {
     setLoading(true)
     try {
-      const status = filter === 'all' ? undefined : filter
-      const { data, error } = await apiClient.getWorkshops(status)
+      // Normalizar status para a API: 'pendente' -> 'pending'
+      let statusParam = filter === 'all' ? undefined : filter
+      if (statusParam === 'pendente') statusParam = 'pending'
+      if (statusParam === 'aprovado') statusParam = 'approved'
+      if (statusParam === 'rejeitado') statusParam = 'rejected'
+      
+      const { data, error } = await apiClient.getWorkshops(statusParam)
 
       if (error || !data) {
         showToast.error('Erro ao carregar oficinas', error || 'Não foi possível carregar os dados')
@@ -56,18 +75,26 @@ export default function WorkshopsPage() {
       const workshopsData = data.oficinas || data.data?.oficinas || (Array.isArray(data) ? data : data.data || [])
       
       // Mapear dados da API para o formato esperado
-      const mappedWorkshops = workshopsData.map((workshop: any) => ({
-        id: workshop.id,
-        name: workshop.name || 'Sem nome',
-        cnpj: workshop.cnpj || 'Não informado',
-        email: workshop.email || 'Não informado',
-        phone: workshop.phone || 'Não informado',
-        address: workshop.address 
-          ? `${workshop.address}, ${workshop.city || ''}, ${workshop.state || ''}`.trim().replace(/^,\s*|,\s*$/g, '')
-          : 'Endereço não informado',
-        status: workshop.status || 'pendente',
-        created_at: workshop.created_at || new Date().toISOString()
-      }))
+      const mappedWorkshops = workshopsData.map((workshop: any) => {
+        // Normalizar status: 'pending' -> 'pendente', 'approved' -> 'aprovado', 'rejected' -> 'rejeitado'
+        let normalizedStatus = (workshop.status || 'pendente').toLowerCase()
+        if (normalizedStatus === 'pending') normalizedStatus = 'pendente'
+        if (normalizedStatus === 'approved') normalizedStatus = 'aprovado'
+        if (normalizedStatus === 'rejected') normalizedStatus = 'rejeitado'
+        
+        return {
+          id: workshop.id,
+          name: workshop.name || 'Sem nome',
+          cnpj: workshop.cnpj || 'Não informado',
+          email: workshop.email || 'Não informado',
+          phone: workshop.phone || 'Não informado',
+          address: workshop.address 
+            ? `${workshop.address}, ${workshop.city || ''}, ${workshop.state || ''}`.trim().replace(/^,\s*|,\s*$/g, '')
+            : 'Endereço não informado',
+          status: normalizedStatus as 'pendente' | 'aprovado' | 'rejeitado',
+          created_at: workshop.created_at || new Date().toISOString()
+        }
+      })
       
       setWorkshops(mappedWorkshops)
     } catch (error) {

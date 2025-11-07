@@ -76,6 +76,11 @@ export default function ProfilePage() {
   }
 
   const handlePasswordChange = async () => {
+    if (!passwordData.currentPassword) {
+      showToast.error('Senha atual obrigatória', 'Por favor, informe sua senha atual')
+      return
+    }
+
     if (!passwordData.newPassword || passwordData.newPassword.length < 6) {
       showToast.error('Senha inválida', 'A senha deve ter pelo menos 6 caracteres')
       return
@@ -88,12 +93,32 @@ export default function ProfilePage() {
 
     setSaving(true)
     try {
-      // TODO: Implementar endpoint de mudança de senha
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      showToast.success('Senha alterada!', 'Sua senha foi alterada com sucesso')
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const token = localStorage.getItem('meca_admin_token')
+
+      const response = await fetch(`${API_URL}/admin/profile/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        showToast.success('Senha alterada!', 'Sua senha foi alterada com sucesso')
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      } else {
+        showToast.error('Erro', data.error || 'Não foi possível alterar a senha')
+      }
     } catch (error) {
-      showToast.error('Erro', 'Não foi possível alterar a senha')
+      console.error('Erro ao alterar senha:', error)
+      showToast.error('Erro de conexão', 'Verifique se a API está rodando')
     }
     setSaving(false)
   }
@@ -230,18 +255,6 @@ export default function ProfilePage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Último Login
-              </label>
-              <input
-                type="text"
-                value={profile.last_login ? new Date(profile.last_login).toLocaleString('pt-BR') : 'Não disponível'}
-                readOnly
-                className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400"
-              />
-            </div>
           </div>
         </motion.div>
 

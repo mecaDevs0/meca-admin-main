@@ -169,7 +169,7 @@ export default function NotificationsPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-6xl mx-auto"
+        className="w-full max-w-full mx-auto"
       >
         {/* Header */}
         <motion.div variants={itemVariants} className="mb-6">

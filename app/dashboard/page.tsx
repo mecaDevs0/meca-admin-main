@@ -75,11 +75,22 @@ export default function DashboardPage() {
       console.log('Customer Registrations:', metricsData.customer_registrations)
       console.log('Workshop Registrations:', metricsData.workshop_registrations)
       
-      // Garantir que os arrays de registros existam
+      // Processar dados dos gráficos garantindo formato correto
+      const processChartData = (data: any[] | undefined): Array<{ name: string; value: number }> => {
+        if (!data || !Array.isArray(data)) {
+          return []
+        }
+        return data.map((item: any) => ({
+          name: item.name || item.month || 'N/A',
+          value: parseInt(item.value || item.count || '0', 10)
+        })).filter(item => item.value >= 0) // Garantir que valores são válidos
+      }
+      
+      // Garantir que os arrays de registros existam e estejam no formato correto
       const finalMetrics: DashboardMetrics = {
         ...metricsData,
-        customer_registrations: metricsData.customer_registrations || [],
-        workshop_registrations: metricsData.workshop_registrations || []
+        customer_registrations: processChartData(metricsData.customer_registrations),
+        workshop_registrations: processChartData(metricsData.workshop_registrations)
       }
       
       setMetrics(finalMetrics)
@@ -200,17 +211,15 @@ export default function DashboardPage() {
           </div>
         </motion.div>
 
-        {/* Bento Grid Layout - 5 cards (3 superiores, 2 inferiores) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6">
-          
-          {/* Row 1: 3 Metric Cards */}
+        {/* Bento Grid Layout - 4 cards na mesma linha */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
           
           {/* Card 1 - Clientes */}
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg aspect-square flex flex-col justify-between sm:col-span-2 lg:col-span-2"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-2xl flex items-center justify-center shadow-lg">
@@ -238,7 +247,7 @@ export default function DashboardPage() {
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg aspect-square flex flex-col justify-between sm:col-span-2 lg:col-span-2"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-2xl flex items-center justify-center shadow-lg">
@@ -266,7 +275,7 @@ export default function DashboardPage() {
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg aspect-square flex flex-col justify-between sm:col-span-2 lg:col-span-2"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -290,7 +299,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             onClick={handleApproveWorkshops}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg aspect-square flex flex-col justify-between sm:col-span-2 lg:col-span-2 cursor-pointer"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between cursor-pointer"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -306,21 +315,24 @@ export default function DashboardPage() {
             </div>
           </motion.div>
           
-          {/* Row 2: 2 Charts */}
+        </div>
+
+        {/* Row 2: 2 Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           
           {/* Chart 1 - Registro de Clientes (últimos 6 meses) */}
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg sm:col-span-2 lg:col-span-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
             data-onboard="client-chart"
           >
             <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Clientes (6 meses)</h2>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={metrics.customer_registrations && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.customer_registrations && Array.isArray(metrics.customer_registrations) && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
                 name: item.name || item.month || 'N/A',
-                value: item.value || item.count || 0
+                value: parseInt(item.value || item.count || '0')
               })) : [
                 { name: 'Jan', value: 0 },
                 { name: 'Fev', value: 0 },
@@ -352,13 +364,13 @@ export default function DashboardPage() {
             variants={itemVariants}
             whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg sm:col-span-2 lg:col-span-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
           >
             <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Oficinas (6 meses)</h2>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={metrics.workshop_registrations && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.workshop_registrations && Array.isArray(metrics.workshop_registrations) && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
                 name: item.name || item.month || 'N/A',
-                value: item.value || item.count || 0
+                value: parseInt(item.value || item.count || '0')
               })) : [
                 { name: 'Jan', value: 0 },
                 { name: 'Fev', value: 0 },

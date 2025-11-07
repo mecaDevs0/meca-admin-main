@@ -99,3 +99,4 @@ Verifique se a API está rodando na EC2:
 http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000
 ```
 
+
