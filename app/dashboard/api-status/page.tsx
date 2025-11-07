@@ -208,3 +208,231 @@ export default function ApiStatusPage() {
     </div>
   )
 }
+
+        </motion.div>
+
+        {/* API Endpoints */}
+        {loading ? (
+          <Loading message="Verificando endpoints..." size={150} />
+        ) : (
+          <motion.div variants={itemVariants} className="space-y-4">
+            {apiStatuses.map((status, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {getStatusIcon(status.status)}
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#252940] dark:text-white">{status.endpoint}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">{status.path}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {status.lastCheck}
+                        {status.responseTime && ` • ${status.responseTime}ms`}
+                      </p>
+                      {status.error && (
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{status.error}</p>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`px-4 py-2 rounded-full text-sm font-semibold border ${getStatusColor(status.status)}`}>
+                    {status.status === 'online' ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Refresh Button */}
+        <motion.div variants={itemVariants} className="mt-6 text-center">
+          <motion.button
+            onClick={checkApiStatus}
+            disabled={loading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 rounded-2xl text-sm font-semibold shadow-lg transition-all duration-200 flex items-center gap-2 mx-auto"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Verificando...' : 'Verificar Status'}
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+
+        </motion.div>
+
+        {/* API Endpoints */}
+        {loading ? (
+          <Loading message="Verificando endpoints..." size={150} />
+        ) : (
+          <motion.div variants={itemVariants} className="space-y-4">
+            {apiStatuses.map((status, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {getStatusIcon(status.status)}
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#252940] dark:text-white">{status.endpoint}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">{status.path}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {status.lastCheck}
+                        {status.responseTime && ` • ${status.responseTime}ms`}
+                      </p>
+                      {status.error && (
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{status.error}</p>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`px-4 py-2 rounded-full text-sm font-semibold border ${getStatusColor(status.status)}`}>
+                    {status.status === 'online' ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Refresh Button */}
+        <motion.div variants={itemVariants} className="mt-6 text-center">
+          <motion.button
+            onClick={checkApiStatus}
+            disabled={loading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 rounded-2xl text-sm font-semibold shadow-lg transition-all duration-200 flex items-center gap-2 mx-auto"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Verificando...' : 'Verificar Status'}
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+
+        </motion.div>
+
+        {/* API Endpoints */}
+        {loading ? (
+          <Loading message="Verificando endpoints..." size={150} />
+        ) : (
+          <motion.div variants={itemVariants} className="space-y-4">
+            {apiStatuses.map((status, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {getStatusIcon(status.status)}
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#252940] dark:text-white">{status.endpoint}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">{status.path}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {status.lastCheck}
+                        {status.responseTime && ` • ${status.responseTime}ms`}
+                      </p>
+                      {status.error && (
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{status.error}</p>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`px-4 py-2 rounded-full text-sm font-semibold border ${getStatusColor(status.status)}`}>
+                    {status.status === 'online' ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Refresh Button */}
+        <motion.div variants={itemVariants} className="mt-6 text-center">
+          <motion.button
+            onClick={checkApiStatus}
+            disabled={loading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 rounded-2xl text-sm font-semibold shadow-lg transition-all duration-200 flex items-center gap-2 mx-auto"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Verificando...' : 'Verificar Status'}
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+
+        </motion.div>
+
+        {/* API Endpoints */}
+        {loading ? (
+          <Loading message="Verificando endpoints..." size={150} />
+        ) : (
+          <motion.div variants={itemVariants} className="space-y-4">
+            {apiStatuses.map((status, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {getStatusIcon(status.status)}
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#252940] dark:text-white">{status.endpoint}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">{status.path}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {status.lastCheck}
+                        {status.responseTime && ` • ${status.responseTime}ms`}
+                      </p>
+                      {status.error && (
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{status.error}</p>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`px-4 py-2 rounded-full text-sm font-semibold border ${getStatusColor(status.status)}`}>
+                    {status.status === 'online' ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Refresh Button */}
+        <motion.div variants={itemVariants} className="mt-6 text-center">
+          <motion.button
+            onClick={checkApiStatus}
+            disabled={loading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 rounded-2xl text-sm font-semibold shadow-lg transition-all duration-200 flex items-center gap-2 mx-auto"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Verificando...' : 'Verificar Status'}
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}

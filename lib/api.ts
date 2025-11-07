@@ -215,3 +215,379 @@ class MecaApiClient {
 }
 
 export const apiClient = new MecaApiClient(API_URL)
+
+  async rejectWorkshop(id: string, reason: string) {
+    return this.request(`/admin/workshops/${id}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    })
+  }
+
+  // Services
+  async getServices() {
+    return this.request('/services')
+  }
+
+  async createService(data: { name: string; description?: string; category?: string }) {
+    return this.request('/services', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateService(id: string, data: { name?: string; description?: string; category?: string }) {
+    return this.request(`/services/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteService(id: string) {
+    return this.request(`/services/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Users/Customers
+  async getUsers(type?: 'customer' | 'workshop') {
+    if (type === 'customer') {
+      return this.request('/customers')
+    } else if (type === 'workshop') {
+      return this.request('/workshops')
+    }
+    return this.request('/customers')
+  }
+
+  async getCustomers(filters?: { search?: string; limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.search) query.append('search', filters.search)
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/customers${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // Bookings
+  async getBookings(status?: string) {
+    const query = status ? `?status=${status}` : ''
+    return this.request(`/admin/bookings${query}`)
+  }
+
+  async updateBookingStatus(id: string, status: string) {
+    return this.request(`/bookings/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    })
+  }
+
+  // Notifications
+  async sendNotification(data: {
+    title: string
+    message: string
+    customer_ids?: string[]
+    workshop_ids?: string[]
+    target: 'all' | 'customers' | 'workshops' | 'specific'
+  }) {
+    return this.request('/admin/notifications/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getNotifications(filters?: { limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/admin/notifications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // API Health
+  async checkHealth() {
+    return this.request('/health')
+  }
+}
+
+export const apiClient = new MecaApiClient(API_URL)
+
+  async rejectWorkshop(id: string, reason: string) {
+    return this.request(`/admin/workshops/${id}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    })
+  }
+
+  // Services
+  async getServices() {
+    return this.request('/services')
+  }
+
+  async createService(data: { name: string; description?: string; category?: string }) {
+    return this.request('/services', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateService(id: string, data: { name?: string; description?: string; category?: string }) {
+    return this.request(`/services/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteService(id: string) {
+    return this.request(`/services/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Users/Customers
+  async getUsers(type?: 'customer' | 'workshop') {
+    if (type === 'customer') {
+      return this.request('/customers')
+    } else if (type === 'workshop') {
+      return this.request('/workshops')
+    }
+    return this.request('/customers')
+  }
+
+  async getCustomers(filters?: { search?: string; limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.search) query.append('search', filters.search)
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/customers${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // Bookings
+  async getBookings(status?: string) {
+    const query = status ? `?status=${status}` : ''
+    return this.request(`/admin/bookings${query}`)
+  }
+
+  async updateBookingStatus(id: string, status: string) {
+    return this.request(`/bookings/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    })
+  }
+
+  // Notifications
+  async sendNotification(data: {
+    title: string
+    message: string
+    customer_ids?: string[]
+    workshop_ids?: string[]
+    target: 'all' | 'customers' | 'workshops' | 'specific'
+  }) {
+    return this.request('/admin/notifications/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getNotifications(filters?: { limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/admin/notifications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // API Health
+  async checkHealth() {
+    return this.request('/health')
+  }
+}
+
+export const apiClient = new MecaApiClient(API_URL)
+
+  async rejectWorkshop(id: string, reason: string) {
+    return this.request(`/admin/workshops/${id}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    })
+  }
+
+  // Services
+  async getServices() {
+    return this.request('/services')
+  }
+
+  async createService(data: { name: string; description?: string; category?: string }) {
+    return this.request('/services', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateService(id: string, data: { name?: string; description?: string; category?: string }) {
+    return this.request(`/services/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteService(id: string) {
+    return this.request(`/services/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Users/Customers
+  async getUsers(type?: 'customer' | 'workshop') {
+    if (type === 'customer') {
+      return this.request('/customers')
+    } else if (type === 'workshop') {
+      return this.request('/workshops')
+    }
+    return this.request('/customers')
+  }
+
+  async getCustomers(filters?: { search?: string; limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.search) query.append('search', filters.search)
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/customers${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // Bookings
+  async getBookings(status?: string) {
+    const query = status ? `?status=${status}` : ''
+    return this.request(`/admin/bookings${query}`)
+  }
+
+  async updateBookingStatus(id: string, status: string) {
+    return this.request(`/bookings/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    })
+  }
+
+  // Notifications
+  async sendNotification(data: {
+    title: string
+    message: string
+    customer_ids?: string[]
+    workshop_ids?: string[]
+    target: 'all' | 'customers' | 'workshops' | 'specific'
+  }) {
+    return this.request('/admin/notifications/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getNotifications(filters?: { limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/admin/notifications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // API Health
+  async checkHealth() {
+    return this.request('/health')
+  }
+}
+
+export const apiClient = new MecaApiClient(API_URL)
+
+  async rejectWorkshop(id: string, reason: string) {
+    return this.request(`/admin/workshops/${id}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    })
+  }
+
+  // Services
+  async getServices() {
+    return this.request('/services')
+  }
+
+  async createService(data: { name: string; description?: string; category?: string }) {
+    return this.request('/services', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateService(id: string, data: { name?: string; description?: string; category?: string }) {
+    return this.request(`/services/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteService(id: string) {
+    return this.request(`/services/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Users/Customers
+  async getUsers(type?: 'customer' | 'workshop') {
+    if (type === 'customer') {
+      return this.request('/customers')
+    } else if (type === 'workshop') {
+      return this.request('/workshops')
+    }
+    return this.request('/customers')
+  }
+
+  async getCustomers(filters?: { search?: string; limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.search) query.append('search', filters.search)
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/customers${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // Bookings
+  async getBookings(status?: string) {
+    const query = status ? `?status=${status}` : ''
+    return this.request(`/admin/bookings${query}`)
+  }
+
+  async updateBookingStatus(id: string, status: string) {
+    return this.request(`/bookings/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    })
+  }
+
+  // Notifications
+  async sendNotification(data: {
+    title: string
+    message: string
+    customer_ids?: string[]
+    workshop_ids?: string[]
+    target: 'all' | 'customers' | 'workshops' | 'specific'
+  }) {
+    return this.request('/admin/notifications/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getNotifications(filters?: { limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/admin/notifications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // API Health
+  async checkHealth() {
+    return this.request('/health')
+  }
+}
+
+export const apiClient = new MecaApiClient(API_URL)

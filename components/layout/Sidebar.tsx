@@ -262,3 +262,327 @@ export default function Sidebar() {
 
 
 
+
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="font-medium"
+                >
+                  {item.name}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            </Link>
+          </motion.div>
+        ))}
+      </nav>
+
+      {/* Theme Toggle */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          {!isCollapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`text-xs font-medium transition-colors duration-300 ${
+                mounted && theme === 'dark'
+                  ? 'text-white/70'
+                  : 'text-gray-600 dark:text-white/70'
+              }`}
+            >
+              Tema
+            </motion.span>
+          )}
+          <div data-onboard="theme-toggle" className={isCollapsed ? 'flex justify-center' : ''}>
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <motion.button
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium backdrop-blur-sm transition-all duration-200 ${isCollapsed ? 'justify-center' : ''} ${
+            mounted && theme === 'dark'
+              ? 'text-white/70 hover:bg-white/10 hover:text-white'
+              : 'text-gray-700 hover:bg-gray-100 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white'
+          }`}
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="font-medium"
+              >
+                Sair
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.button>
+      </div>
+    </motion.aside>
+  )
+}
+
+
+
+
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="font-medium"
+                >
+                  {item.name}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            </Link>
+          </motion.div>
+        ))}
+      </nav>
+
+      {/* Theme Toggle */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          {!isCollapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`text-xs font-medium transition-colors duration-300 ${
+                mounted && theme === 'dark'
+                  ? 'text-white/70'
+                  : 'text-gray-600 dark:text-white/70'
+              }`}
+            >
+              Tema
+            </motion.span>
+          )}
+          <div data-onboard="theme-toggle" className={isCollapsed ? 'flex justify-center' : ''}>
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <motion.button
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium backdrop-blur-sm transition-all duration-200 ${isCollapsed ? 'justify-center' : ''} ${
+            mounted && theme === 'dark'
+              ? 'text-white/70 hover:bg-white/10 hover:text-white'
+              : 'text-gray-700 hover:bg-gray-100 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white'
+          }`}
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="font-medium"
+              >
+                Sair
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.button>
+      </div>
+    </motion.aside>
+  )
+}
+
+
+
+
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="font-medium"
+                >
+                  {item.name}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            </Link>
+          </motion.div>
+        ))}
+      </nav>
+
+      {/* Theme Toggle */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          {!isCollapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`text-xs font-medium transition-colors duration-300 ${
+                mounted && theme === 'dark'
+                  ? 'text-white/70'
+                  : 'text-gray-600 dark:text-white/70'
+              }`}
+            >
+              Tema
+            </motion.span>
+          )}
+          <div data-onboard="theme-toggle" className={isCollapsed ? 'flex justify-center' : ''}>
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <motion.button
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium backdrop-blur-sm transition-all duration-200 ${isCollapsed ? 'justify-center' : ''} ${
+            mounted && theme === 'dark'
+              ? 'text-white/70 hover:bg-white/10 hover:text-white'
+              : 'text-gray-700 hover:bg-gray-100 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white'
+          }`}
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="font-medium"
+              >
+                Sair
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.button>
+      </div>
+    </motion.aside>
+  )
+}
+
+
+
+
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="font-medium"
+                >
+                  {item.name}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            </Link>
+          </motion.div>
+        ))}
+      </nav>
+
+      {/* Theme Toggle */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          {!isCollapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`text-xs font-medium transition-colors duration-300 ${
+                mounted && theme === 'dark'
+                  ? 'text-white/70'
+                  : 'text-gray-600 dark:text-white/70'
+              }`}
+            >
+              Tema
+            </motion.span>
+          )}
+          <div data-onboard="theme-toggle" className={isCollapsed ? 'flex justify-center' : ''}>
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className={`p-3 border-t transition-colors duration-300 ${
+        mounted && theme === 'dark'
+          ? 'border-white/10'
+          : 'border-gray-200 dark:border-white/10'
+      }`}>
+        <motion.button
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium backdrop-blur-sm transition-all duration-200 ${isCollapsed ? 'justify-center' : ''} ${
+            mounted && theme === 'dark'
+              ? 'text-white/70 hover:bg-white/10 hover:text-white'
+              : 'text-gray-700 hover:bg-gray-100 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white'
+          }`}
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="font-medium"
+              >
+                Sair
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.button>
+      </div>
+    </motion.aside>
+  )
+}
+
+
+

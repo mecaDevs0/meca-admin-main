@@ -42,3 +42,63 @@ export default function DashboardLayout({
     </SidebarProvider>
   )
 }
+    </div>
+  )
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <SidebarProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </SidebarProvider>
+  )
+}
+    </div>
+  )
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <SidebarProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </SidebarProvider>
+  )
+}
+    </div>
+  )
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <SidebarProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </SidebarProvider>
+  )
+}
+    </div>
+  )
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <SidebarProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </SidebarProvider>
+  )
+}

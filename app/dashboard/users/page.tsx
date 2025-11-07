@@ -220,3 +220,115 @@ export default function UsersPage() {
     </div>
   )
 }
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(user.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      user.type === 'customer' 
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
+                    }`}>
+                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      </div>
+    </div>
+  )
+}
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(user.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      user.type === 'customer' 
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
+                    }`}>
+                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      </div>
+    </div>
+  )
+}
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(user.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      user.type === 'customer' 
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
+                    }`}>
+                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      </div>
+    </div>
+  )
+}
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(user.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      user.type === 'customer' 
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
+                    }`}>
+                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      </div>
+    </div>
+  )
+}

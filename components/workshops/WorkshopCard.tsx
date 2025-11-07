@@ -195,3 +195,291 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
 }
 
 export default WorkshopCard
+
+              <Mail className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.email}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Phone className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.phone}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.address}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Ações */}
+        <div className="flex flex-col gap-2 lg:w-auto w-full">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/dashboard/workshops/edit/${workshop.id}`)
+            }}
+            className="bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl dark:from-gray-700 dark:to-gray-800"
+          >
+            <Edit className="w-4 h-4" />
+            Editar
+          </motion.button>
+
+          {workshop.status === 'pendente' && (
+            <>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleApprove}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                {isApproving ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Aprovar
+                  </>
+                )}
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleReject}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                <XCircle className="w-4 h-4" />
+                Rejeitar
+              </motion.button>
+            </>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+export default WorkshopCard
+
+              <Mail className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.email}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Phone className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.phone}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.address}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Ações */}
+        <div className="flex flex-col gap-2 lg:w-auto w-full">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/dashboard/workshops/edit/${workshop.id}`)
+            }}
+            className="bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl dark:from-gray-700 dark:to-gray-800"
+          >
+            <Edit className="w-4 h-4" />
+            Editar
+          </motion.button>
+
+          {workshop.status === 'pendente' && (
+            <>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleApprove}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                {isApproving ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Aprovar
+                  </>
+                )}
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleReject}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                <XCircle className="w-4 h-4" />
+                Rejeitar
+              </motion.button>
+            </>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+export default WorkshopCard
+
+              <Mail className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.email}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Phone className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.phone}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.address}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Ações */}
+        <div className="flex flex-col gap-2 lg:w-auto w-full">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/dashboard/workshops/edit/${workshop.id}`)
+            }}
+            className="bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl dark:from-gray-700 dark:to-gray-800"
+          >
+            <Edit className="w-4 h-4" />
+            Editar
+          </motion.button>
+
+          {workshop.status === 'pendente' && (
+            <>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleApprove}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                {isApproving ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Aprovar
+                  </>
+                )}
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleReject}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                <XCircle className="w-4 h-4" />
+                Rejeitar
+              </motion.button>
+            </>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+export default WorkshopCard
+
+              <Mail className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.email}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Phone className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.phone}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{workshop.address}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Ações */}
+        <div className="flex flex-col gap-2 lg:w-auto w-full">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/dashboard/workshops/edit/${workshop.id}`)
+            }}
+            className="bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl dark:from-gray-700 dark:to-gray-800"
+          >
+            <Edit className="w-4 h-4" />
+            Editar
+          </motion.button>
+
+          {workshop.status === 'pendente' && (
+            <>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleApprove}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                {isApproving ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Aprovar
+                  </>
+                )}
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleReject}
+                disabled={isApproving || isRejecting}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                <XCircle className="w-4 h-4" />
+                Rejeitar
+              </motion.button>
+            </>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+export default WorkshopCard

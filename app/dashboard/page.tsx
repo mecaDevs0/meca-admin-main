@@ -402,3 +402,771 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+        {/* Bento Grid Layout - 4 cards na mesma linha */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+          
+          {/* Card 1 - Clientes */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-2xl flex items-center justify-center shadow-lg">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Clientes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_customers || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novos este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_users_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativos (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_customers || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 2 - Oficinas */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-2xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Oficinas</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_oficinas || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novas este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_workshops_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativas (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_workshops || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 3 - Receita do Mês */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita do Mês</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">
+                R$ {(metrics.revenue_this_month || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 4 - Pendentes (Clicável) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            onClick={handleApproveWorkshops}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between cursor-pointer"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Oficinas Pendentes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.oficinas_by_status?.pendente || 0}</p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
+              </div>
+            </div>
+          </motion.div>
+          
+        </div>
+
+        {/* Row 2: 2 Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          
+          {/* Chart 1 - Registro de Clientes (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+            data-onboard="client-chart"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Clientes (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.customer_registrations && Array.isArray(metrics.customer_registrations) && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Clientes" fill="#00c977" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* Chart 2 - Registro de Oficinas (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Oficinas (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.workshop_registrations && Array.isArray(metrics.workshop_registrations) && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Oficinas" fill="#252940" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+        {/* Bento Grid Layout - 4 cards na mesma linha */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+          
+          {/* Card 1 - Clientes */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-2xl flex items-center justify-center shadow-lg">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Clientes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_customers || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novos este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_users_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativos (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_customers || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 2 - Oficinas */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-2xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Oficinas</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_oficinas || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novas este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_workshops_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativas (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_workshops || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 3 - Receita do Mês */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita do Mês</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">
+                R$ {(metrics.revenue_this_month || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 4 - Pendentes (Clicável) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            onClick={handleApproveWorkshops}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between cursor-pointer"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Oficinas Pendentes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.oficinas_by_status?.pendente || 0}</p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
+              </div>
+            </div>
+          </motion.div>
+          
+        </div>
+
+        {/* Row 2: 2 Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          
+          {/* Chart 1 - Registro de Clientes (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+            data-onboard="client-chart"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Clientes (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.customer_registrations && Array.isArray(metrics.customer_registrations) && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Clientes" fill="#00c977" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* Chart 2 - Registro de Oficinas (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Oficinas (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.workshop_registrations && Array.isArray(metrics.workshop_registrations) && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Oficinas" fill="#252940" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+        {/* Bento Grid Layout - 4 cards na mesma linha */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+          
+          {/* Card 1 - Clientes */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-2xl flex items-center justify-center shadow-lg">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Clientes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_customers || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novos este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_users_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativos (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_customers || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 2 - Oficinas */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-2xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Oficinas</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_oficinas || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novas este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_workshops_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativas (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_workshops || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 3 - Receita do Mês */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita do Mês</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">
+                R$ {(metrics.revenue_this_month || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 4 - Pendentes (Clicável) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            onClick={handleApproveWorkshops}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between cursor-pointer"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Oficinas Pendentes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.oficinas_by_status?.pendente || 0}</p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
+              </div>
+            </div>
+          </motion.div>
+          
+        </div>
+
+        {/* Row 2: 2 Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          
+          {/* Chart 1 - Registro de Clientes (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+            data-onboard="client-chart"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Clientes (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.customer_registrations && Array.isArray(metrics.customer_registrations) && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Clientes" fill="#00c977" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* Chart 2 - Registro de Oficinas (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Oficinas (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.workshop_registrations && Array.isArray(metrics.workshop_registrations) && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Oficinas" fill="#252940" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+        {/* Bento Grid Layout - 4 cards na mesma linha */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+          
+          {/* Card 1 - Clientes */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-2xl flex items-center justify-center shadow-lg">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Clientes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_customers || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novos este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_users_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativos (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_customers || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 2 - Oficinas */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-2xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total de Oficinas</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_oficinas || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Novas este mês</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.new_workshops_this_month || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Ativas (3 meses)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_workshops || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 3 - Receita do Mês */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita do Mês</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">
+                R$ {(metrics.revenue_this_month || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Card 4 - Pendentes (Clicável) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            onClick={handleApproveWorkshops}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between cursor-pointer"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Oficinas Pendentes</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.oficinas_by_status?.pendente || 0}</p>
+              <div className="pt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
+              </div>
+            </div>
+          </motion.div>
+          
+        </div>
+
+        {/* Row 2: 2 Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          
+          {/* Chart 1 - Registro de Clientes (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+            data-onboard="client-chart"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Clientes (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.customer_registrations && Array.isArray(metrics.customer_registrations) && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Clientes" fill="#00c977" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* Chart 2 - Registro de Oficinas (últimos 6 meses) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+          >
+            <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Oficinas (6 meses)</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={metrics.workshop_registrations && Array.isArray(metrics.workshop_registrations) && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
+                name: item.name || item.month || 'N/A',
+                value: parseInt(item.value || item.count || '0')
+              })) : [
+                { name: 'Jan', value: 0 },
+                { name: 'Fev', value: 0 },
+                { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 },
+                { name: 'Mai', value: 0 },
+                { name: 'Jun', value: 0 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)', 
+                    borderRadius: '12px',
+                    padding: '8px 12px'
+                  }}
+                  className="dark:bg-gray-800 dark:border-gray-700"
+                />
+                <Bar dataKey="value" name="Oficinas" fill="#252940" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+        </div>
+      </motion.div>
+    </div>
+  )
+}

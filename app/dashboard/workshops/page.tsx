@@ -246,3 +246,58 @@ export default function WorkshopsPage() {
     </div>
   )
 }
+
+    <div>
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-[#00c977] rounded-lg flex items-center justify-center">
+            <Building2 className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Oficinas</h1>
+            <p className="text-sm text-gray-500">Gerencie o cadastro e aprovação de oficinas</p>
+          </div>
+        </div>
+      </div>
+
+      <FilterButtons activeFilter={filter} onFilterChange={setFilter} />
+
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <div className="w-6 h-6 border-2 border-[#00c977] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {workshops.length === 0 ? (
+            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+              <AlertCircle className="w-8 h-8 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma oficina encontrada</h3>
+              <p className="text-gray-500">Não há oficinas com o status selecionado no momento.</p>
+            </div>
+          ) : (
+            workshops.map((workshop) => (
+              <WorkshopCard
+                key={workshop.id}
+                workshop={workshop}
+                onApprove={handleApprove}
+                onReject={() => setSelectedWorkshop(workshop.id)}
+              />
+            ))
+          )}
+        </div>
+      )}
+
+      <RejectModal
+        isOpen={!!selectedWorkshop}
+        onClose={() => {
+          setSelectedWorkshop(null)
+          setRejectReason('')
+        }}
+        onConfirm={handleReject}
+        reason={rejectReason}
+        onReasonChange={setRejectReason}
+      />
+    </div>
+  )
+}
