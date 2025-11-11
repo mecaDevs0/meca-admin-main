@@ -5,8 +5,8 @@ import { apiClient } from '@/lib/api'
 import { Loading } from '@/components/ui/Loading'
 import { motion } from 'framer-motion'
 import {
-  Building2,
-  Clock,
+    Building2,
+    Clock,
   Users,
   Bell,
   Activity,
@@ -151,7 +151,7 @@ export default function DashboardPage() {
         animate="visible"
         className="max-w-[1920px] mx-auto"
       >
-        {/* Header */}
+      {/* Header */}
         <motion.div variants={itemVariants} className="mb-4 sm:mb-6" data-onboard="dashboard">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white mb-1 sm:mb-2">Dashboard</h1>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Acompanhe as principais métricas do marketplace</p>
@@ -290,7 +290,7 @@ export default function DashboardPage() {
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
               </div>
-            </div>
+      </div>
           </motion.div>
           
           {/* Card 4 - Pendentes (Clicável) */}
@@ -312,11 +312,11 @@ export default function DashboardPage() {
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
               </div>
-            </div>
+          </div>
           </motion.div>
           
         </div>
-
+        
         {/* Row 2: 2 Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           
@@ -504,11 +504,11 @@ export default function DashboardPage() {
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
               </div>
-            </div>
+          </div>
           </motion.div>
           
         </div>
-
+        
         {/* Row 2: 2 Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           
@@ -696,11 +696,11 @@ export default function DashboardPage() {
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
               </div>
-            </div>
+          </div>
           </motion.div>
           
         </div>
-
+        
         {/* Row 2: 2 Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           
@@ -857,7 +857,7 @@ export default function DashboardPage() {
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
                 <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-            </div>
+          </div>
             <div className="space-y-2">
               <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita do Mês</h3>
               <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">
@@ -865,8 +865,8 @@ export default function DashboardPage() {
               </p>
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
-              </div>
-            </div>
+        </div>
+      </div>
           </motion.div>
           
           {/* Card 4 - Pendentes (Clicável) */}
@@ -888,7 +888,7 @@ export default function DashboardPage() {
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
               </div>
-            </div>
+          </div>
           </motion.div>
           
         </div>
@@ -1005,9 +1005,9 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-600 dark:text-gray-400">Ativos (3 meses)</span>
                   <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_customers || 0}</span>
-                </div>
-              </div>
-            </div>
+          </div>
+        </div>
+      </div>
           </motion.div>
           
           {/* Card 2 - Oficinas */}
@@ -1035,7 +1035,7 @@ export default function DashboardPage() {
                   <span className="font-semibold text-[#252940] dark:text-white">{metrics.active_workshops || 0}</span>
                 </div>
               </div>
-            </div>
+          </div>
           </motion.div>
           
           {/* Card 3 - Receita do Mês */}
@@ -1058,7 +1058,7 @@ export default function DashboardPage() {
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
               </div>
-            </div>
+          </div>
           </motion.div>
           
           {/* Card 4 - Pendentes (Clicável) */}
@@ -1080,7 +1080,7 @@ export default function DashboardPage() {
               <div className="pt-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Clique para aprovar ou rejeitar</p>
               </div>
-            </div>
+          </div>
           </motion.div>
           
         </div>
@@ -1165,7 +1165,7 @@ export default function DashboardPage() {
             </ResponsiveContainer>
           </motion.div>
 
-        </div>
+      </div>
       </motion.div>
     </div>
   )

@@ -88,13 +88,13 @@ export default function ReportsPage() {
         animate="visible"
         className="max-w-7xl mx-auto"
       >
-        {/* Header */}
+      {/* Header */}
         <motion.div variants={itemVariants} className="mb-6">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg">
               <FileText className="w-6 h-6 text-white" />
-            </div>
-            <div>
+          </div>
+          <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">Relatórios</h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">Acompanhe métricas e performance da plataforma</p>
             </div>
@@ -138,16 +138,16 @@ export default function ReportsPage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
                   <Building2 className="w-5 h-5 text-white" />
-                </div>
-              </div>
+        </div>
+      </div>
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Total de Oficinas</h3>
               <p className="text-2xl font-bold text-[#252940] dark:text-white">{metrics.total_workshops || 0}</p>
             </div>
           </motion.div>
         )}
 
-        {/* Reports Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Reports Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -4 }}
@@ -252,8 +252,8 @@ export default function ReportsPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Avaliações e feedback</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
-              Gerar Relatório
-            </button>
+            Gerar Relatório
+          </button>
           </motion.div>
         </div>
       </motion.div>
@@ -419,8 +419,8 @@ export default function ReportsPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Avaliações e feedback</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
-              Gerar Relatório
-            </button>
+            Gerar Relatório
+          </button>
           </motion.div>
         </div>
       </motion.div>
@@ -586,8 +586,8 @@ export default function ReportsPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Avaliações e feedback</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
-              Gerar Relatório
-            </button>
+            Gerar Relatório
+          </button>
           </motion.div>
         </div>
       </motion.div>
@@ -681,8 +681,8 @@ export default function ReportsPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Performance e aprovações de oficinas</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
-              Gerar Relatório
-            </button>
+            Gerar Relatório
+          </button>
           </motion.div>
 
           <motion.div
@@ -695,7 +695,7 @@ export default function ReportsPage() {
                 <Users className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-[#252940] dark:text-white">Relatório de Usuários</h3>
-            </div>
+        </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Crescimento e atividade de usuários</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
@@ -717,8 +717,8 @@ export default function ReportsPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Serviços mais solicitados</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
-              Gerar Relatório
-            </button>
+            Gerar Relatório
+          </button>
           </motion.div>
 
           <motion.div
@@ -731,7 +731,7 @@ export default function ReportsPage() {
                 <DollarSign className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-[#252940] dark:text-white">Relatório Financeiro</h3>
-            </div>
+        </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Comissões e pagamentos</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
@@ -753,8 +753,8 @@ export default function ReportsPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Avaliações e feedback</p>
             <button className="bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg w-full justify-center">
               <Download className="w-4 h-4" />
-              Gerar Relatório
-            </button>
+            Gerar Relatório
+          </button>
           </motion.div>
         </div>
       </motion.div>
@@ -800,7 +800,7 @@ export default function ReportsPage() {
               </div>
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Total de Agendamentos</h3>
               <p className="text-2xl font-bold text-[#252940] dark:text-white">{metrics.total_bookings || 0}</p>
-            </div>
+      </div>
 
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg">
               <div className="flex items-center justify-between mb-4">
