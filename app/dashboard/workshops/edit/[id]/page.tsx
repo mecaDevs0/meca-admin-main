@@ -49,15 +49,21 @@ export default function EditWorkshopPage() {
   const loadWorkshop = async () => {
     setLoading(true)
     try {
-      const { data, error } = await apiClient.getWorkshop(workshopId)
+      const { data: response, error } = await apiClient.getWorkshop(workshopId)
 
-      if (error || !data) {
+      if (error) {
         showToast.error('Erro ao carregar oficina', error || 'Não foi possível carregar os dados')
         router.push('/dashboard/workshops')
         return
       }
 
-      const workshopData = data.data || data
+      const payload = response && typeof response === 'object' && 'data' in response
+        ? (response as { data?: unknown }).data
+        : response
+
+      const workshopData = (payload && typeof payload === 'object' && !Array.isArray(payload))
+        ? payload
+        : (Array.isArray(payload) ? payload[0] : (response && typeof response === 'object' ? response : {}))
       
       // Garantir que description existe (mesmo que null)
       const normalizedData = {
@@ -78,9 +84,9 @@ export default function EditWorkshopPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const { data, error } = await apiClient.updateWorkshop(workshopId, formData)
+      const { data: response, error } = await apiClient.updateWorkshop(workshopId, formData)
 
-      if (error || !data) {
+      if (error) {
         showToast.error('Erro ao salvar', error || 'Não foi possível salvar as alterações')
         return
       }

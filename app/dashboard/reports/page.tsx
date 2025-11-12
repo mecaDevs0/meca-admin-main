@@ -36,17 +36,20 @@ export default function ReportsPage() {
   const loadMetrics = async () => {
     setLoading(true)
     try {
-      const { data, error } = await apiClient.getDashboardMetrics()
+      const { data: response, error } = await apiClient.getDashboardMetrics()
 
-      if (error || !data) {
+      if (error) {
         showToast.error('Erro ao carregar métricas', error || 'Não foi possível carregar os dados')
         setMetrics(null)
         setLoading(false)
         return
       }
 
-      const metricsData = data.data || data
-      setMetrics(metricsData as ReportMetrics)
+      const normalized = (response && typeof response === 'object' && 'data' in response)
+        ? (response as { data?: unknown }).data
+        : response
+
+      setMetrics((normalized || {}) as ReportMetrics)
     } catch (error) {
       console.error('Erro na requisição:', error)
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')

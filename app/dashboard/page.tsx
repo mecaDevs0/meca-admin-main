@@ -40,6 +40,24 @@ interface DashboardMetrics {
 
 const COLORS = ['#00c977', '#252940', '#f59e0b', '#ef4444', '#3b82f6']
 
+const DEFAULT_METRICS: DashboardMetrics = {
+  total_customers: 0,
+  customers_this_week: 0,
+  new_users_this_month: 0,
+  active_customers: 0,
+  total_oficinas: 0,
+  workshops_this_week: 0,
+  new_workshops_this_month: 0,
+  active_workshops: 0,
+  oficinas_by_status: {},
+  revenue_this_month: 0,
+  customer_registrations: [],
+  workshop_registrations: [],
+  total_bookings_last_month: 0,
+  total_revenue_last_month: 0,
+  meca_commission_last_month: 0,
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
@@ -59,24 +77,26 @@ export default function DashboardPage() {
   const loadMetrics = async () => {
     setLoading(true)
     try {
-      const { data, error } = await apiClient.getDashboardMetrics()
+      const { data: response, error } = await apiClient.getDashboardMetrics()
 
-      if (error || !data) {
+      if (error) {
         showToast.error('Erro ao carregar métricas', error || 'Não foi possível carregar os dados')
         setMetrics(null)
         setLoading(false)
         return
       }
 
-      const metricsData = data.data || data
-      
-      // Log para debug
-      console.log('Dashboard Metrics:', metricsData)
-      console.log('Customer Registrations:', metricsData.customer_registrations)
-      console.log('Workshop Registrations:', metricsData.workshop_registrations)
-      
+      const rawMetrics = (response && typeof response === 'object' && 'data' in response)
+        ? (response as { data?: unknown }).data
+        : response
+
+      const metricsData = (rawMetrics && typeof rawMetrics === 'object'
+        ? rawMetrics
+        : {}) as Partial<DashboardMetrics>
+
       // Garantir que os arrays de registros existam
       const finalMetrics: DashboardMetrics = {
+        ...DEFAULT_METRICS,
         ...metricsData,
         customer_registrations: metricsData.customer_registrations || [],
         workshop_registrations: metricsData.workshop_registrations || []
@@ -338,9 +358,11 @@ export default function DashboardPage() {
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(229, 231, 235, 0.5)', 
                     borderRadius: '12px',
-                    padding: '8px 12px'
+                    padding: '8px 12px',
+                    color: '#111827'
                   }}
-                  className="dark:bg-gray-800 dark:border-gray-700"
+                  labelStyle={{ color: '#6b7280', fontWeight: 600 }}
+                  itemStyle={{ color: '#111827' }}
                 />
                 <Bar dataKey="value" name="Clientes" fill="#00c977" radius={[12, 12, 0, 0]} />
               </BarChart>
@@ -376,9 +398,11 @@ export default function DashboardPage() {
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(229, 231, 235, 0.5)', 
                     borderRadius: '12px',
-                    padding: '8px 12px'
+                    padding: '8px 12px',
+                    color: '#111827'
                   }}
-                  className="dark:bg-gray-800 dark:border-gray-700"
+                  labelStyle={{ color: '#6b7280', fontWeight: 600 }}
+                  itemStyle={{ color: '#111827' }}
                 />
                 <Bar dataKey="value" name="Oficinas" fill="#252940" radius={[12, 12, 0, 0]} />
               </BarChart>

@@ -104,7 +104,6 @@ export function OnboardingTour() {
       overlayColor: 'rgba(0, 0, 0, 0.85)',
       popoverClass: 'driver-popover-custom',
       doneBtnText: 'Concluir',
-      closeBtnText: '✕',
       nextBtnText: 'Próximo',
       prevBtnText: 'Anterior',
       steps: [

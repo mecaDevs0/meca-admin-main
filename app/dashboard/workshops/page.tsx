@@ -44,16 +44,28 @@ export default function WorkshopsPage() {
     setLoading(true)
     try {
       const status = filter === 'all' ? undefined : filter
-      const { data, error } = await apiClient.getWorkshops(status)
+      const { data: response, error } = await apiClient.getWorkshops(status)
 
-      if (error || !data) {
+      if (error) {
         showToast.error('Erro ao carregar oficinas', error || 'Não foi possível carregar os dados')
         setWorkshops([])
         return
       }
 
       // A API retorna { success: true, oficinas: [...] } ou { success: true, data: { oficinas: [...] } }
-      const workshopsData = data.oficinas || data.data?.oficinas || (Array.isArray(data) ? data : data.data || [])
+      const payload = response && typeof response === 'object' && 'data' in response
+        ? (response as { data?: unknown }).data
+        : response
+
+      const rawWorkshops = (payload && typeof payload === 'object' && 'oficinas' in (payload as Record<string, unknown>))
+        ? (payload as { oficinas: unknown }).oficinas
+        : Array.isArray(payload)
+          ? payload
+          : Array.isArray(response)
+            ? response
+            : []
+
+      const workshopsData = Array.isArray(rawWorkshops) ? rawWorkshops : []
       
       // Mapear dados da API para o formato esperado
       const mappedWorkshops = workshopsData.map((workshop: any) => ({

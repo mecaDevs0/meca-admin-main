@@ -43,9 +43,9 @@ export default function UsersPage() {
       apiClient.setToken(token)
       
       const type = filter === 'all' ? undefined : filter
-      const { data, error } = await apiClient.getUsers(type)
+      const { data: response, error } = await apiClient.getUsers(type)
       
-      if (error || !data) {
+      if (error) {
         showToast.error('Erro ao carregar usuários', error || 'Não foi possível carregar os dados')
         setUsers([])
         setLoading(false)
@@ -53,7 +53,19 @@ export default function UsersPage() {
       }
       
       // A API retorna { success: true, customers: [...] } ou { success: true, data: { customers: [...] } }
-      const usersData = data.customers || data.data?.customers || data.data || (Array.isArray(data) ? data : [])
+      const payload = response && typeof response === 'object' && 'data' in response
+        ? (response as { data?: unknown }).data
+        : response
+
+      const rawUsers = (payload && typeof payload === 'object' && 'customers' in (payload as Record<string, unknown>))
+        ? (payload as { customers: unknown }).customers
+        : Array.isArray(payload)
+          ? payload
+          : Array.isArray(response)
+            ? response
+            : []
+
+      const usersData = Array.isArray(rawUsers) ? rawUsers : []
       
       // Mapear dados da API para o formato esperado
       const mappedUsers = usersData.map((user: any) => ({

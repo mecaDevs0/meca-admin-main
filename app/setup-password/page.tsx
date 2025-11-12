@@ -6,9 +6,17 @@ import { apiClient } from '@/lib/api'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, Eye, EyeOff, Lock, KeyRound } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 
 export default function SetupPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+      <SetupPasswordContent />
+    </Suspense>
+  )
+}
+
+function SetupPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')

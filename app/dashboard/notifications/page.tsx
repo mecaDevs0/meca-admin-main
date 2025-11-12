@@ -55,15 +55,19 @@ export default function NotificationsPage() {
         apiClient.getWorkshops(),
       ])
 
-      if (customersRes.data) {
-        const customersData = Array.isArray(customersRes.data) ? customersRes.data : customersRes.data.data || []
-        setCustomers(customersData as Customer[])
+      const normalize = <T,>(payload: unknown): T[] => {
+        if (Array.isArray(payload)) {
+          return payload as T[]
+        }
+        if (payload && typeof payload === 'object' && 'data' in (payload as Record<string, unknown>)) {
+          const inner = (payload as { data?: unknown }).data
+          return Array.isArray(inner) ? (inner as T[]) : []
+        }
+        return []
       }
 
-      if (workshopsRes.data) {
-        const workshopsData = Array.isArray(workshopsRes.data) ? workshopsRes.data : workshopsRes.data.data || []
-        setWorkshops(workshopsData as Workshop[])
-      }
+      setCustomers(normalize<Customer>(customersRes.data))
+      setWorkshops(normalize<Workshop>(workshopsRes.data))
     } catch (error) {
       showToast.error('Erro ao carregar dados', 'Não foi possível carregar usuários e oficinas')
       console.error('Erro:', error)

@@ -42,17 +42,28 @@ export default function ServicesPage() {
       }
       apiClient.setToken(token)
       
-      const { data, error } = await apiClient.getServices()
+      const { data: response, error } = await apiClient.getServices()
       
-      if (error || !data) {
+      if (error) {
         showToast.error('Erro ao carregar serviços', error || 'Não foi possível carregar os dados')
         setServices([])
         setLoading(false)
         return
       }
+
+      const payload = response && typeof response === 'object' && 'data' in response
+        ? (response as { data?: unknown }).data
+        : response
+
+      const rawServices = (payload && typeof payload === 'object' && 'services' in (payload as Record<string, unknown>))
+        ? (payload as { services: unknown }).services
+        : Array.isArray(payload)
+          ? payload
+          : Array.isArray(response)
+            ? response
+            : []
       
-      // A API retorna { success: true, services: [...] } ou { success: true, data: { services: [...] } }
-      const servicesData = data.services || data.data?.services || (Array.isArray(data) ? data : data.data || [])
+      const servicesData = Array.isArray(rawServices) ? rawServices : []
       
       // Mapear dados reais da API para o formato esperado
       const mappedServices = servicesData.map((service: any) => ({
