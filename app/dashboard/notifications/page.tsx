@@ -55,19 +55,47 @@ export default function NotificationsPage() {
         apiClient.getWorkshops(),
       ])
 
-      const normalize = <T,>(payload: unknown): T[] => {
+      const normalize = <T,>(payload: unknown, extraKeys: string[] = []): T[] => {
         if (Array.isArray(payload)) {
           return payload as T[]
         }
-        if (payload && typeof payload === 'object' && 'data' in (payload as Record<string, unknown>)) {
-          const inner = (payload as { data?: unknown }).data
-          return Array.isArray(inner) ? (inner as T[]) : []
+        if (payload && typeof payload === 'object') {
+          const source = payload as Record<string, unknown>
+
+          if (Array.isArray(source.data)) {
+            return source.data as T[]
+          }
+
+          for (const key of extraKeys) {
+            if (Array.isArray(source[key])) {
+              return source[key] as T[]
+            }
+          }
         }
         return []
       }
 
-      setCustomers(normalize<Customer>(customersRes.data))
-      setWorkshops(normalize<Workshop>(workshopsRes.data))
+      const normalizeAndSanitizeCustomers = normalize<Customer & Record<string, any>>(
+        customersRes.data,
+        ['customers', 'usuarios', 'rows']
+      ).map((item) => ({
+        id: item.id?.toString() ?? '',
+        first_name: item.first_name ?? item.nome ?? '',
+        last_name: item.last_name ?? item.sobrenome ?? '',
+        email: item.email ?? item.contato_email ?? '',
+      })).filter((item) => item.id)
+
+      const normalizeAndSanitizeWorkshops = normalize<Record<string, any>>(
+        workshopsRes.data,
+        ['oficinas', 'workshops', 'rows', 'data']
+      ).map((item) => ({
+        id: item.id?.toString() ?? '',
+        name: item.name ?? item.nome ?? item.fantasia ?? 'Oficina sem nome',
+        email: item.email ?? item.contato_email ?? '',
+      })).filter((item) => item.id)
+
+      setCustomers(normalizeAndSanitizeCustomers)
+      setWorkshops(normalizeAndSanitizeWorkshops)
     } catch (error) {
       showToast.error('Erro ao carregar dados', 'Não foi possível carregar usuários e oficinas')
       console.error('Erro:', error)

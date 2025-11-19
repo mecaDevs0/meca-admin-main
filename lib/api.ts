@@ -116,6 +116,22 @@ class MecaApiClient {
     })
   }
 
+  async getMecaFeeSettings(params?: { workshopId?: string }) {
+    const query = params?.workshopId ? `?workshopId=${params.workshopId}` : ''
+    return this.request(`/admin/settings/meca-fee${query}`)
+  }
+
+  async updateMecaFeeSettings(data: {
+    global_fee?: number
+    workshop_id?: string
+    workshop_fee?: number | null
+  }) {
+    return this.request('/admin/settings/meca-fee', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
   async approveWorkshop(id: string) {
     return this.request(`/admin/workshops/${id}/approve`, {
       method: 'PUT',

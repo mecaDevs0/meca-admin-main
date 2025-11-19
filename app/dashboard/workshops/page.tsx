@@ -19,6 +19,7 @@ interface Workshop {
   address: string
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
+  meca_fee_percentage?: number | null
 }
 
 export default function WorkshopsPage() {
@@ -78,7 +79,13 @@ export default function WorkshopsPage() {
           ? `${workshop.address}, ${workshop.city || ''}, ${workshop.state || ''}`.trim().replace(/^,\s*|,\s*$/g, '')
           : 'Endereço não informado',
         status: workshop.status || 'pendente',
-        created_at: workshop.created_at || new Date().toISOString()
+        created_at: workshop.created_at || new Date().toISOString(),
+        meca_fee_percentage:
+          typeof workshop.meca_fee_percentage === 'number'
+            ? workshop.meca_fee_percentage
+            : workshop.meca_fee_percentage !== null && workshop.meca_fee_percentage !== undefined
+              ? Number(workshop.meca_fee_percentage)
+              : null,
       }))
       
       setWorkshops(mappedWorkshops)

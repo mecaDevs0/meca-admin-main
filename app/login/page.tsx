@@ -5,7 +5,7 @@ import { showToast } from '@/lib/toast'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, Eye, EyeOff, Lock, Mail, KeyRound } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type LoginMode = 'password' | 'code'
 
@@ -20,6 +20,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [sendingCode, setSendingCode] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('meca_admin_token')
+      if (token) {
+        router.replace('/dashboard')
+      }
+    } catch (error) {
+      console.error('Erro ao verificar token salvo:', error)
+    }
+  }, [router])
 
   const handleSendCode = async () => {
     if (!email) {

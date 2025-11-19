@@ -9,7 +9,8 @@ import {
   MapPin,
   Phone,
   XCircle,
-  Edit
+  Edit,
+  Percent
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
@@ -24,6 +25,7 @@ interface Workshop {
   address: string
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
+  meca_fee_percentage?: number | null
 }
 
 interface WorkshopCardProps {
@@ -135,6 +137,17 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
               <MapPin className="w-4 h-4 flex-shrink-0" />
               <span className="truncate">{workshop.address}</span>
             </div>
+            {typeof workshop.meca_fee_percentage === 'number' && (
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <Percent className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  Taxa MECA personalizada:{' '}
+                  <span className="font-semibold text-[#00c977] dark:text-[#4ade80]">
+                    {(workshop.meca_fee_percentage * 100).toFixed(2)}%
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
