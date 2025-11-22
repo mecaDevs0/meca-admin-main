@@ -68,6 +68,23 @@ export default function WorkshopsPage() {
 
       const workshopsData = Array.isArray(rawWorkshops) ? rawWorkshops : []
       
+      // Função para normalizar status da API (inglês) para o formato do frontend (português)
+      const normalizeStatus = (status: string | null | undefined): 'pendente' | 'aprovado' | 'rejeitado' => {
+        if (!status) return 'pendente'
+        
+        const normalized = status.toLowerCase().trim()
+        
+        // Mapear status em inglês para português
+        if (normalized === 'approved' || normalized === 'aprovado') {
+          return 'aprovado'
+        }
+        if (normalized === 'rejected' || normalized === 'rejeitado') {
+          return 'rejeitado'
+        }
+        // pending, pendente, null, vazio, etc. = pendente
+        return 'pendente'
+      }
+
       // Mapear dados da API para o formato esperado
       const mappedWorkshops = workshopsData.map((workshop: any) => ({
         id: workshop.id,
@@ -78,7 +95,7 @@ export default function WorkshopsPage() {
         address: workshop.address 
           ? `${workshop.address}, ${workshop.city || ''}, ${workshop.state || ''}`.trim().replace(/^,\s*|,\s*$/g, '')
           : 'Endereço não informado',
-        status: workshop.status || 'pendente',
+        status: normalizeStatus(workshop.status),
         created_at: workshop.created_at || new Date().toISOString(),
         meca_fee_percentage:
           typeof workshop.meca_fee_percentage === 'number'

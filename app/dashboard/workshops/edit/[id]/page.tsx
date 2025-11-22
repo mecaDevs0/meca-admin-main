@@ -313,9 +313,26 @@ export default function EditWorkshopPage() {
             Voltar
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-xl flex items-center justify-center shadow-lg">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
+            {workshop.logo_url && workshop.logo_url.startsWith('http') ? (
+              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border-2 border-white/20">
+                <img 
+                  src={workshop.logo_url} 
+                  alt={workshop.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+                <div className="w-12 h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-xl flex items-center justify-center shadow-lg hidden">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+            )}
             <div>
               <h1 className="text-3xl font-bold text-[#252940] dark:text-white">Editar Oficina</h1>
               <p className="text-gray-600 dark:text-gray-400">{workshop.name}</p>
@@ -420,6 +437,35 @@ export default function EditWorkshopPage() {
                 </div>
               </div>
             </div>
+
+            {/* Logo Display */}
+            {workshop.logo_url && workshop.logo_url.startsWith('http') && (
+              <div>
+                <h2 className="text-xl font-semibold text-[#252940] dark:text-white mb-4">Logo da Oficina</h2>
+                <div className="flex items-center gap-4">
+                  <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-lg">
+                    <img 
+                      src={workshop.logo_url} 
+                      alt={`Logo ${workshop.name}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Logo atual da oficina. Para alterar, use o app da oficina.
+                    </p>
+                    <a 
+                      href={workshop.logo_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-[#00c977] hover:underline mt-2 inline-block"
+                    >
+                      Ver imagem completa →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Additional Info */}
             <div>
