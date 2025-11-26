@@ -9,6 +9,7 @@ interface ApiResponse<T = any> {
   data?: T
   error?: string
   success?: boolean
+  status?: number
 }
 
 class MecaApiClient {
@@ -41,11 +42,15 @@ class MecaApiClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: response.statusText }))
-        return { error: errorData.error || errorData.message || 'Request failed', success: false }
+        return {
+          error: errorData.error || errorData.message || 'Request failed',
+          success: false,
+          status: response.status,
+        }
       }
 
       const data = await response.json()
-      return { data, success: true }
+      return { data, success: true, status: response.status }
     } catch (error) {
       return { error: error instanceof Error ? error.message : 'Unknown error', success: false }
     }
@@ -113,6 +118,19 @@ class MecaApiClient {
     return this.request(`/admin/workshops/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+    })
+  }
+
+  async uploadWorkshopLogo(id: string, base64DataUrl: string) {
+    return this.request(`/workshop/${id}/logo`, {
+      method: 'POST',
+      body: JSON.stringify({ logo_base64: base64DataUrl }),
+    })
+  }
+
+  async removeWorkshopLogo(id: string) {
+    return this.request(`/workshop/${id}/logo`, {
+      method: 'DELETE',
     })
   }
 

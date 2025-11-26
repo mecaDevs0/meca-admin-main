@@ -3,9 +3,9 @@
 import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Building2, Mail, MapPin, Percent, Phone, Save, X, Check, Undo2 } from 'lucide-react'
+import { ArrowLeft, Building2, Mail, MapPin, Percent, Phone, Save, X, Check, Undo2, Upload, Trash2, Loader2, ExternalLink } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, ChangeEvent } from 'react'
 
 interface Workshop {
   id: string
@@ -19,12 +19,15 @@ interface Workshop {
   cep?: string
   status?: string
   description?: string
-  logo_url?: string
-  facade_url?: string
+  logo_url?: string | null
+  facade_url?: string | null
   rating?: number
   total_reviews?: number
   meca_fee_percentage?: number | null
 }
+
+const ALLOWED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
+const MAX_LOGO_SIZE_BYTES = 5 * 1024 * 1024
 
 export default function EditWorkshopPage() {
   const router = useRouter()
@@ -41,6 +44,35 @@ export default function EditWorkshopPage() {
   const [workshopMecaFee, setWorkshopMecaFee] = useState<number | null>(null)
   const [effectiveMecaFee, setEffectiveMecaFee] = useState<number | null>(null)
   const [loadingFee, setLoadingFee] = useState(false)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoRemoving, setLogoRemoving] = useState(false)
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null)
+  const logoInputRef = useRef<HTMLInputElement | null>(null)
+  const [isFetchingCep, setIsFetchingCep] = useState(false)
+
+  const isAuthExpiredError = (message?: string) => {
+    if (!message) {
+      return false
+    }
+    const normalized = message.toLowerCase()
+    return normalized.includes('jwt expired') || normalized.includes('token expirado') || normalized.includes('token expired')
+  }
+
+  const handleAuthExpired = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('meca_admin_token')
+    }
+    showToast.error('Sessão expirada', 'Faça login novamente para continuar.')
+    router.push('/login')
+  }
+
+  const handleApiAuthError = (message?: string, status?: number) => {
+    if (status === 401 || isAuthExpiredError(message)) {
+      handleAuthExpired()
+      return true
+    }
+    return false
+  }
 
   const formatPercent = (value?: number | null) => {
     if (value === null || value === undefined) {
@@ -66,6 +98,14 @@ export default function EditWorkshopPage() {
     loadWorkshop()
   }, [workshopId, router])
 
+  useEffect(() => {
+    return () => {
+      if (logoPreviewUrl && typeof window !== 'undefined') {
+        URL.revokeObjectURL(logoPreviewUrl)
+      }
+    }
+  }, [logoPreviewUrl])
+
   const fetchMecaFeeSettings = async () => {
     if (!workshopId) {
         return
@@ -73,7 +113,11 @@ export default function EditWorkshopPage() {
 
     setLoadingFee(true)
     try {
-      const { data: response, error } = await apiClient.getMecaFeeSettings({ workshopId })
+      const { data: response, error, status } = await apiClient.getMecaFeeSettings({ workshopId })
+
+      if (handleApiAuthError(error, status)) {
+        return
+      }
 
       if (error) {
         showToast.error('Erro ao carregar taxa MECA', error || 'Não foi possível obter as taxas.')
@@ -124,9 +168,12 @@ export default function EditWorkshopPage() {
 
     setLoading(true)
     try {
-      const { data: response, error } = await apiClient.getWorkshop(workshopId)
+      const { data: response, error, status } = await apiClient.getWorkshop(workshopId)
 
       if (error) {
+        if (handleApiAuthError(error, status)) {
+          return
+        }
         showToast.error('Erro ao carregar oficina', error || 'Não foi possível carregar os dados')
         router.push('/dashboard/workshops')
         return
@@ -203,9 +250,12 @@ export default function EditWorkshopPage() {
         meca_fee_percentage: overrideDecimal,
       }
 
-      const { data: response, error } = await apiClient.updateWorkshop(workshopId, payload)
+      const { data: response, error, status } = await apiClient.updateWorkshop(workshopId, payload)
 
       if (error) {
+        if (handleApiAuthError(error, status)) {
+          return
+        }
         showToast.error('Erro ao salvar', error || 'Não foi possível salvar as alterações')
         return
       }
@@ -228,6 +278,68 @@ export default function EditWorkshopPage() {
       ...prev,
       [field]: value,
     }))
+  }
+
+  const handleCepBlur = async () => {
+    const cep = formData.cep?.trim().replace(/\D/g, '') || ''
+    
+    // Validar CEP (deve ter 8 dígitos)
+    if (cep.length !== 8) {
+      return
+    }
+
+    // Se já tem city e state preenchidos, não buscar novamente
+    if (formData.city && formData.state) {
+      return
+    }
+
+    setIsFetchingCep(true)
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      
+      if (!response.ok) {
+        throw new Error('Erro ao buscar CEP')
+      }
+
+      const data = await response.json()
+
+      if (data.erro) {
+        showToast.error('CEP não encontrado', 'Verifique se o CEP está correto')
+        return
+      }
+
+      // Preencher campos automaticamente
+      const updates: Partial<Workshop> = {}
+      
+      if (data.logradouro) {
+        // Se não tem address ou está vazio, preencher com logradouro
+        if (!formData.address || formData.address.trim() === '') {
+          updates.address = data.logradouro
+        }
+      }
+      
+      if (data.localidade && !formData.city) {
+        updates.city = data.localidade
+      }
+      
+      if (data.uf && !formData.state) {
+        updates.state = data.uf
+      }
+
+      // Atualizar formData com os dados encontrados
+      if (Object.keys(updates).length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          ...updates,
+        }))
+        showToast.success('Endereço encontrado!', 'Os dados foram preenchidos automaticamente')
+      }
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error)
+      showToast.error('Erro ao buscar CEP', 'Não foi possível buscar o endereço. Tente novamente.')
+    } finally {
+      setIsFetchingCep(false)
+    }
   }
 
   const handleMecaFeeInputChange = (value: string) => {
@@ -268,6 +380,178 @@ export default function EditWorkshopPage() {
     }))
   }
 
+  const setLogoPreviewFromFile = (file: File | null) => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    if (!file) {
+      setLogoPreviewUrl(null)
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(file)
+    setLogoPreviewUrl(objectUrl)
+  }
+
+  const readFileAsDataUrl = (file: File) => {
+    if (typeof window === 'undefined') {
+      return Promise.reject(new Error('Upload disponível apenas no navegador.'))
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result)
+        } else {
+          reject(new Error('Não foi possível processar a imagem selecionada.'))
+        }
+      }
+      reader.onerror = () => reject(new Error('Não foi possível ler o arquivo selecionado.'))
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const uploadLogoFile = async (file: File) => {
+    if (!workshopId) {
+      showToast.error('Oficina inválida', 'Não foi possível identificar a oficina.')
+      return
+    }
+
+    if (!ALLOWED_LOGO_MIME_TYPES.includes((file.type || '').toLowerCase())) {
+      showToast.error('Formato inválido', 'Envie uma imagem JPG, PNG ou WebP.')
+      return
+    }
+
+    if (file.size > MAX_LOGO_SIZE_BYTES) {
+      showToast.error('Imagem muito grande', 'O tamanho máximo permitido é 5MB.')
+      return
+    }
+
+    setLogoPreviewFromFile(file)
+    setLogoUploading(true)
+
+    try {
+      const base64DataUrl = await readFileAsDataUrl(file)
+      const { data: response, error, status } = await apiClient.uploadWorkshopLogo(workshopId, base64DataUrl)
+      const serverResponse =
+        response && typeof response === 'object'
+          ? (response as { success?: boolean; error?: string; data?: any })
+          : undefined
+      const apiErrorMessage = serverResponse?.error || error
+
+      if (handleApiAuthError(apiErrorMessage, status)) {
+        return
+      }
+
+      if (error || serverResponse?.success === false) {
+        throw new Error(apiErrorMessage || 'Não foi possível atualizar a logo desta oficina.')
+      }
+
+      const payload =
+        response && typeof response === 'object' && 'data' in response
+          ? (response as { data?: Record<string, any> }).data
+          : response
+
+      const updatedLogoUrl =
+        (payload && typeof payload === 'object' && 'logo_url' in payload ? (payload as any).logo_url : null) ||
+        null
+
+      if (updatedLogoUrl) {
+        setWorkshop((prev) => (prev ? { ...prev, logo_url: updatedLogoUrl } : prev))
+        setFormData((prev) => ({
+          ...prev,
+          logo_url: updatedLogoUrl,
+        }))
+      } else {
+        await loadWorkshop()
+      }
+
+      showToast.success('Logo atualizada', 'A nova logo foi salva com sucesso.')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao enviar logo.'
+      if (handleApiAuthError(message)) {
+        return
+      }
+      showToast.error('Erro ao enviar logo', message)
+    } finally {
+      setLogoUploading(false)
+      setLogoPreviewFromFile(null)
+      if (logoInputRef.current) {
+        logoInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleLogoFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) {
+      return
+    }
+    await uploadLogoFile(file)
+    event.target.value = ''
+  }
+
+  const handleLogoRemove = async () => {
+    if (!workshopId) {
+      showToast.error('Oficina inválida', 'Não foi possível identificar a oficina.')
+      return
+    }
+
+    if (!workshop?.logo_url) {
+      showToast.info('Sem logo para remover', 'Esta oficina não possui logo cadastrada.')
+      return
+    }
+
+    const confirmRemoval =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm('Tem certeza que deseja remover a logo desta oficina?')
+
+    if (!confirmRemoval) {
+      return
+    }
+
+    setLogoRemoving(true)
+    try {
+      const { data: response, error, status } = await apiClient.removeWorkshopLogo(workshopId)
+      const serverResponse =
+        response && typeof response === 'object'
+          ? (response as { success?: boolean; error?: string; data?: any })
+          : undefined
+      const apiErrorMessage = serverResponse?.error || error
+
+      if (handleApiAuthError(apiErrorMessage, status)) {
+        return
+      }
+
+      if (error || serverResponse?.success === false) {
+        throw new Error(apiErrorMessage || 'Não foi possível remover a logo desta oficina.')
+      }
+
+      setWorkshop((prev) => (prev ? { ...prev, logo_url: null } : prev))
+      setFormData((prev) => ({
+        ...prev,
+        logo_url: null,
+      }))
+
+      showToast.success('Logo removida', 'A logo foi removida com sucesso.')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao remover logo.'
+      if (handleApiAuthError(message)) {
+        return
+      }
+      showToast.error('Erro ao remover logo', message)
+    } finally {
+      setLogoRemoving(false)
+      setLogoPreviewFromFile(null)
+      if (logoInputRef.current) {
+        logoInputRef.current.value = ''
+      }
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -299,6 +583,10 @@ export default function EditWorkshopPage() {
     </div>
   )
   }
+
+  const currentLogoPreview =
+    logoPreviewUrl ||
+    (workshop.logo_url && workshop.logo_url.startsWith('http') ? workshop.logo_url : null)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6">
@@ -427,45 +715,136 @@ export default function EditWorkshopPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">CEP</label>
-                  <input
-                    type="text"
-                    value={formData.cep || ''}
-                    onChange={(e) => handleChange('cep', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all dark:bg-gray-900/50 dark:text-white"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    CEP
+                    {isFetchingCep && (
+                      <span className="ml-2 text-xs text-[#00c977]">Buscando...</span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={formData.cep || ''}
+                      onChange={(e) => {
+                        // Formatar CEP enquanto digita (00000-000)
+                        let value = e.target.value.replace(/\D/g, '')
+                        if (value.length > 5) {
+                          value = value.slice(0, 5) + '-' + value.slice(5, 8)
+                        }
+                        handleChange('cep', value)
+                      }}
+                      onBlur={handleCepBlur}
+                      placeholder="00000-000"
+                      maxLength={9}
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all dark:bg-gray-900/50 dark:text-white"
+                      disabled={isFetchingCep}
+                    />
+                    {isFetchingCep && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <Loader2 className="w-5 h-5 text-[#00c977] animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Digite o CEP e saia do campo para buscar o endereço automaticamente
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Logo Display */}
-            {workshop.logo_url && workshop.logo_url.startsWith('http') && (
-              <div>
-                <h2 className="text-xl font-semibold text-[#252940] dark:text-white mb-4">Logo da Oficina</h2>
-                <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-lg">
-                    <img 
-                      src={workshop.logo_url} 
+            {/* Logo Management */}
+            <div>
+              <h2 className="text-xl font-semibold text-[#252940] dark:text-white mb-2">Logo da Oficina</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Visualize, envie ou remova a logo da oficina. O arquivo será aplicado imediatamente no app da oficina e no app cliente.
+              </p>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white/70 dark:bg-gray-900/40 flex items-center justify-center overflow-hidden shadow-inner">
+                  {logoUploading ? (
+                    <Loader2 className="w-10 h-10 text-[#00c977] animate-spin" />
+                  ) : currentLogoPreview ? (
+                    <img
+                      src={currentLogoPreview}
                       alt={`Logo ${workshop.name}`}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
                     />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Logo atual da oficina. Para alterar, use o app da oficina.
-                    </p>
-                    <a 
-                      href={workshop.logo_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-[#00c977] hover:underline mt-2 inline-block"
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-gray-400 gap-1 text-center px-2">
+                      <Building2 className="w-7 h-7" />
+                      <span className="text-xs leading-tight">Sem logo</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-3">
+                  <input
+                    ref={logoInputRef}
+                    id="logo-upload"
+                    type="file"
+                    accept={ALLOWED_LOGO_MIME_TYPES.join(',')}
+                    className="hidden"
+                    onChange={handleLogoFileChange}
+                    disabled={logoUploading || logoRemoving}
+                  />
+                  <div className="flex flex-wrap gap-3">
+                    <label
+                      htmlFor="logo-upload"
+                      className={`inline-flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-[#00c977]/60 text-[#00c977] font-semibold cursor-pointer transition hover:bg-[#00c977]/5 ${
+                        logoUploading || logoRemoving ? 'opacity-60 cursor-not-allowed' : ''
+                      }`}
                     >
-                      Ver imagem completa →
-                    </a>
+                      {logoUploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          Selecionar logo
+                        </>
+                      )}
+                    </label>
+                    {workshop.logo_url && (
+                      <button
+                        type="button"
+                        onClick={handleLogoRemove}
+                        disabled={logoRemoving || logoUploading}
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-red-200 text-red-600 font-semibold hover:bg-red-50 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {logoRemoving ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        Remover logo
+                      </button>
+                    )}
+                    {workshop.logo_url && (
+                      <a
+                        href={workshop.logo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Ver imagem completa
+                      </a>
+                    )}
                   </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Formatos suportados: JPG, PNG ou WebP. Tamanho máximo: 5MB. Recomende ao menos 500x500px.
+                  </p>
+                  {logoPreviewUrl && (
+                    <p className="text-xs font-medium text-[#00c977]">
+                      Pré-visualização carregada. Finalizando upload...
+                    </p>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Additional Info */}
             <div>
