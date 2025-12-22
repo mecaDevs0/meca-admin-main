@@ -46,7 +46,7 @@ export default function ApiStatusPage() {
   const checkApiStatus = async () => {
     setLoading(true)
     
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
     
     const endpoints = [
       { name: 'Dashboard Metrics', path: '/admin/dashboard-metrics' },
@@ -62,21 +62,31 @@ export default function ApiStatusPage() {
     for (const endpoint of endpoints) {
       try {
         const startTime = Date.now()
+        const token = localStorage.getItem('meca_admin_token')
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 segundos timeout
+        
         const response = await fetch(`${API_URL}${endpoint.path}`, { 
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('meca_admin_token')}`,
+            ...(token && { 'Authorization': `Bearer ${token}` }),
             'Content-Type': 'application/json',
-          }
+          },
+          signal: controller.signal
         })
+        clearTimeout(timeoutId)
         const responseTime = Date.now() - startTime
+
+        // Para endpoints protegidos, considerar online mesmo se retornar 401/403 (API está respondendo)
+        const isOnline = response.ok || (response.status === 401 || response.status === 403)
 
         statuses.push({
           endpoint: endpoint.name,
           path: endpoint.path,
-          status: response.ok ? 'online' : 'offline',
+          status: isOnline ? 'online' : 'offline',
           responseTime,
-          lastCheck: new Date().toLocaleString('pt-BR')
+          lastCheck: new Date().toLocaleString('pt-BR'),
+          ...(response.status === 401 || response.status === 403 ? { error: 'Requer autenticação' } : {})
         })
       } catch (error) {
         statuses.push({
@@ -84,7 +94,7 @@ export default function ApiStatusPage() {
           path: endpoint.path,
           status: 'offline',
           lastCheck: new Date().toLocaleString('pt-BR'),
-          error: error instanceof Error ? error.message : 'Erro desconhecido'
+          error: error instanceof Error ? (error.name === 'AbortError' ? 'Timeout na requisição' : error.message) : 'Erro desconhecido'
         })
       }
     }
@@ -406,6 +416,16 @@ export default function ApiStatusPage() {
                       </details>
                     )}
                   </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </>
+        )}
+      </motion.div>
+    </div>
+  )
+}
+
                 ))}
               </motion.div>
             )}

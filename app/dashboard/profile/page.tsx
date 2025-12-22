@@ -119,7 +119,7 @@ export default function ProfilePage() {
 
     setCreatingAdmin(true)
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'}/admin/auth/create`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'}/admin/auth/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

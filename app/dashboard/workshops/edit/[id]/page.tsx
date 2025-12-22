@@ -81,6 +81,27 @@ export default function EditWorkshopPage() {
     return `${(value * 100).toFixed(2)}%`
   }
 
+  // Função para formatar telefone brasileiro
+  const formatPhone = (value: string): string => {
+    // Remove tudo que não é dígito
+    const digits = value.replace(/\D/g, '')
+    
+    // Limita a 11 dígitos (DDD + 9 dígitos)
+    const limitedDigits = digits.slice(0, 11)
+    
+    // Aplica formatação baseada no tamanho
+    if (limitedDigits.length <= 2) {
+      return limitedDigits
+    } else if (limitedDigits.length <= 6) {
+      return `(${limitedDigits.slice(0, 2)}) ${limitedDigits.slice(2)}`
+    } else if (limitedDigits.length <= 10) {
+      return `(${limitedDigits.slice(0, 2)}) ${limitedDigits.slice(2, 6)}-${limitedDigits.slice(6)}`
+    } else {
+      // Telefone com 9º dígito (celular)
+      return `(${limitedDigits.slice(0, 2)}) ${limitedDigits.slice(2, 7)}-${limitedDigits.slice(7)}`
+    }
+  }
+
   useEffect(() => {
     if (!workshopId) {
       setLoading(false)
@@ -203,10 +224,29 @@ export default function EditWorkshopPage() {
         ? payload
         : (Array.isArray(payload) ? payload[0] : (response && typeof response === 'object' ? response : {}))
       
+      // Função para normalizar status da API (inglês) para o formato do frontend (português)
+      const normalizeStatus = (status: string | null | undefined): 'pendente' | 'aprovado' | 'rejeitado' => {
+        if (!status) return 'pendente'
+        
+        const normalized = status.toLowerCase().trim()
+        
+        // Mapear status em inglês para português
+        if (normalized === 'approved' || normalized === 'aprovado') {
+          return 'aprovado'
+        }
+        if (normalized === 'rejected' || normalized === 'rejeitado') {
+          return 'rejeitado'
+        }
+        // pending, pendente, null, vazio, etc. = pendente
+        return 'pendente'
+      }
+      
       // Garantir que description existe (mesmo que null)
       const normalizedData = {
         ...workshopData,
         description: workshopData.description ?? null,
+        status: normalizeStatus(workshopData.status), // Normalizar status
+        phone: workshopData.phone ? formatPhone(workshopData.phone) : '', // Formatar telefone ao carregar
         meca_fee_percentage:
           workshopData.meca_fee_percentage !== undefined && workshopData.meca_fee_percentage !== null
             ? Number(workshopData.meca_fee_percentage)
@@ -245,8 +285,19 @@ export default function EditWorkshopPage() {
         overrideDecimal = parsed / 100
       }
 
+      // Normalizar status para inglês antes de enviar (API espera inglês)
+      const normalizedStatus = formData.status === 'aprovado' ? 'approved' 
+        : formData.status === 'rejeitado' ? 'rejected'
+        : formData.status === 'pendente' ? 'pending'
+        : formData.status || 'pending'
+
+      // Remover formatação do telefone antes de enviar (apenas dígitos)
+      const cleanPhone = formData.phone ? formData.phone.replace(/\D/g, '') : null
+
       const payload = {
         ...formData,
+        status: normalizedStatus, // Enviar status normalizado para inglês
+        phone: cleanPhone, // Enviar telefone sem formatação
         meca_fee_percentage: overrideDecimal,
       }
 
@@ -274,10 +325,19 @@ export default function EditWorkshopPage() {
   }
 
   const handleChange = (field: keyof Workshop, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }))
+    // Se for telefone, formatar automaticamente
+    if (field === 'phone') {
+      const formatted = formatPhone(value)
+      setFormData(prev => ({
+        ...prev,
+        [field]: formatted,
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [field]: value,
+      }))
+    }
   }
 
   const handleCepBlur = async () => {
@@ -464,7 +524,10 @@ export default function EditWorkshopPage() {
           ...prev,
           logo_url: updatedLogoUrl,
         }))
+        // Limpar preview para forçar uso da URL do servidor
+        setLogoPreviewUrl(null)
       } else {
+        // Recarregar oficina para obter URL assinada atualizada
         await loadWorkshop()
       }
 
@@ -822,9 +885,9 @@ export default function EditWorkshopPage() {
                         Remover logo
                       </button>
                     )}
-                    {workshop.logo_url && (
+                    {currentLogoPreview && (
                       <a
-                        href={workshop.logo_url}
+                        href={currentLogoPreview}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition"

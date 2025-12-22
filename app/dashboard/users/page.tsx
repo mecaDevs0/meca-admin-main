@@ -68,14 +68,23 @@ export default function UsersPage() {
       const usersData = Array.isArray(rawUsers) ? rawUsers : []
       
       // Mapear dados da API para o formato esperado
-      const mappedUsers = usersData.map((user: any) => ({
-        id: user.id,
-        name: user.name || user.full_name || 'Sem nome',
-        email: user.email || 'Não informado',
-        phone: user.phone || 'Não informado',
-        type: user.type || 'customer',
-        created_at: user.created_at || new Date().toISOString()
-      }))
+      const mappedUsers = usersData.map((user: any) => {
+        // A API agora retorna o campo 'name' calculado, mas manter fallback para compatibilidade
+        const firstName = user.first_name || user.firstName || ''
+        const lastName = user.last_name || user.lastName || ''
+        const fullName = [firstName, lastName].filter(Boolean).join(' ').trim()
+        // Priorizar o campo 'name' retornado pela API, depois tentar construir, depois usar email, depois 'Sem nome'
+        const name = user.name || fullName || user.full_name || user.email || 'Sem nome'
+        
+        return {
+          id: user.id,
+          name: name,
+          email: user.email || 'Não informado',
+          phone: user.phone || 'Não informado',
+          type: user.type || 'customer',
+          created_at: user.created_at || new Date().toISOString()
+        }
+      })
       
       setUsers(mappedUsers)
     } catch (error) {
@@ -97,19 +106,64 @@ export default function UsersPage() {
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
+  const handleDeleteTestCustomers = async () => {
+    if (!confirm('Tem certeza que deseja deletar todos os clientes de teste? Esta ação não pode ser desfeita.')) {
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('meca_admin_token')
+      if (!token) {
+        router.push('/login')
+        return
+      }
+      apiClient.setToken(token)
+
+      const { data: response, error } = await apiClient.deleteTestCustomers()
+
+      if (error) {
+        showToast.error('Erro ao deletar clientes de teste', error || 'Não foi possível deletar os clientes')
+        return
+      }
+
+      const deletedCount = (response as any)?.deleted_count || 0
+      if (deletedCount > 0) {
+        showToast.success('Clientes deletados', `${deletedCount} cliente(s) de teste foram deletados com sucesso`)
+        // Recarregar lista
+        loadUsers()
+      } else {
+        showToast.info('Nenhum cliente encontrado', 'Não foram encontrados clientes de teste para deletar')
+      }
+    } catch (error) {
+      console.error('Erro ao deletar clientes de teste:', error)
+      showToast.error('Erro', 'Ocorreu um erro ao deletar os clientes de teste')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg">
-              <Users className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Usuários</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Gerencie clientes e proprietários de oficinas</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Usuários</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Gerencie clientes e proprietários de oficinas</p>
-            </div>
+            {filter === 'customer' || filter === 'all' ? (
+              <button
+                onClick={handleDeleteTestCustomers}
+                disabled={loading}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Limpar Testes
+              </button>
+            ) : null}
           </div>
         </div>
 

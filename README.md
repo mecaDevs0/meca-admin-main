@@ -79,10 +79,10 @@ O cliente API está em `lib/api.ts` e comunica com:
 - `GET /admin/workshops` - Listar oficinas
 - `POST /admin/workshops/:id/approve` - Aprovar oficina
 - `POST /admin/workshops/:id/reject` - Rejeitar oficina
-- `GET /admin/master-services` - Listar serviços
-- `POST /admin/master-services` - Criar serviço
-- `PUT /admin/master-services/:id` - Atualizar serviço
-- `DELETE /admin/master-services/:id` - Excluir serviço
+- `GET /services` - Listar serviços
+- `POST /services` - Criar serviço
+- `PUT /services/:id` - Atualizar serviço
+- `DELETE /services/:id` - Excluir serviço
 
 ## 🚀 Build para Produção
 

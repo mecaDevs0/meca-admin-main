@@ -3,7 +3,7 @@
  * Cliente para comunicação com a API MECA
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
 
 interface ApiResponse<T = any> {
   data?: T
@@ -50,7 +50,9 @@ class MecaApiClient {
       }
 
       const data = await response.json()
-      return { data, success: true, status: response.status }
+      // Se a resposta já tem success, usar esse valor; senão, assumir sucesso
+      const success = data.success !== undefined ? data.success : true
+      return { data, success, status: response.status }
     } catch (error) {
       return { error: error instanceof Error ? error.message : 'Unknown error', success: false }
     }
@@ -193,7 +195,7 @@ class MecaApiClient {
     if (type === 'customer') {
       return this.request('/customers')
     } else if (type === 'workshop') {
-      return this.request('/workshops')
+      return this.request('/admin/workshops')
     }
     return this.request('/customers')
   }
@@ -245,6 +247,13 @@ class MecaApiClient {
   // API Health
   async checkHealth() {
     return this.request('/health')
+  }
+
+  // Delete test customers
+  async deleteTestCustomers() {
+    return this.request('/admin/customers/test', {
+      method: 'DELETE',
+    })
   }
 }
 

@@ -49,7 +49,7 @@ export default function BookingsPage() {
   const loadBookings = async () => {
     setLoading(true)
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
       const token = localStorage.getItem('meca_admin_token')
       
       const url = filter === 'all' 

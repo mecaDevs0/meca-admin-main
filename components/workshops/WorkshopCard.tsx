@@ -26,6 +26,7 @@ interface Workshop {
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
   meca_fee_percentage?: number | null
+  logo_url?: string | null
 }
 
 interface WorkshopCardProps {
@@ -43,6 +44,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
   const router = useRouter()
   const [isApproving, setIsApproving] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   const getStatusConfig = (status: string) => {
     const configs = {
@@ -105,9 +107,20 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
         {/* Informações Principais */}
         <div className="flex-1">
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
+            {workshop.logo_url && workshop.logo_url.trim() !== '' && workshop.logo_url.startsWith('http') && !logoError ? (
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 overflow-hidden bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
+                <img
+                  src={workshop.logo_url}
+                  alt={workshop.name}
+                  className="w-full h-full object-cover"
+                  onError={() => setLogoError(true)}
+                />
+              </div>
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+            )}
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">

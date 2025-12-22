@@ -42,7 +42,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
       
       const response = await fetch(`${API_URL}/admin/auth/send-code`, {
         method: 'POST',
@@ -82,7 +82,7 @@ export default function LoginPage() {
     }
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
       
       const response = await fetch(`${API_URL}/admin/auth/login-code`, {
         method: 'POST',
@@ -124,7 +124,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
       
       const response = await fetch(`${API_URL}/admin/auth/login`, {
         method: 'POST',
@@ -300,7 +300,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
+                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-600"
                       placeholder="admin@meca.com"
                       required
                     />
@@ -321,7 +321,7 @@ export default function LoginPage() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
+                      className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-600"
                       placeholder="••••••••"
                       required
                     />
@@ -400,7 +400,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
+                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-600"
                       placeholder="admin@meca.com"
                       required
                       disabled={codeSent}
@@ -452,7 +452,7 @@ export default function LoginPage() {
                           const value = e.target.value.replace(/\D/g, '').slice(0, 6)
                           setCode(value)
                         }}
-                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-center text-2xl font-bold tracking-widest"
+                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-600 text-center text-2xl font-bold tracking-widest"
                         placeholder="000000"
                         required
                         maxLength={6}

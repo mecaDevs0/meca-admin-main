@@ -5,10 +5,10 @@ import RejectModal from '@/components/workshops/RejectModal'
 import WorkshopCard from '@/components/workshops/WorkshopCard'
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
+import { motion } from 'framer-motion'
 import { AlertCircle, Building2, Clock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 
 interface Workshop {
   id: string
@@ -20,6 +20,7 @@ interface Workshop {
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
   meca_fee_percentage?: number | null
+  logo_url?: string | null
 }
 
 export default function WorkshopsPage() {
@@ -97,6 +98,7 @@ export default function WorkshopsPage() {
           : 'Endereço não informado',
         status: normalizeStatus(workshop.status),
         created_at: workshop.created_at || new Date().toISOString(),
+        logo_url: workshop.logo_url || null,
         meca_fee_percentage:
           typeof workshop.meca_fee_percentage === 'number'
             ? workshop.meca_fee_percentage
@@ -119,18 +121,23 @@ export default function WorkshopsPage() {
     const loadingToast = showToast.loading('Aprovando oficina...')
     
     try {
-      const { data, error } = await apiClient.approveWorkshop(id)
+      const result = await apiClient.approveWorkshop(id)
       
       showToast.dismiss(loadingToast)
       
-      if (!error && data) {
-        showToast.success('Oficina aprovada!', 'A oficina foi aprovada com sucesso')
+      // Verificar se a resposta indica sucesso (tanto no campo success quanto na ausência de error)
+      const isSuccess = (result.success !== false) && !result.error && result.data
+      
+      if (isSuccess) {
+        showToast.success('Oficina aprovada!', (result.data as any)?.message || 'A oficina foi aprovada com sucesso')
         
         setTimeout(() => {
           loadWorkshops()
         }, 500)
       } else {
-        showToast.error('Erro ao aprovar', error || 'Não foi possível aprovar a oficina')
+        // Só mostrar erro se realmente houver erro
+        const errorMessage = (result as any).error || (result.data as any)?.error || 'Não foi possível aprovar a oficina'
+        showToast.error('Erro ao aprovar', errorMessage)
       }
     } catch (err) {
       showToast.dismiss(loadingToast)
