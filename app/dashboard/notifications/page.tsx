@@ -55,44 +55,57 @@ export default function NotificationsPage() {
         apiClient.getWorkshops(),
       ])
 
-      const normalize = <T,>(payload: unknown, extraKeys: string[] = []): T[] => {
-        if (Array.isArray(payload)) {
-          return payload as T[]
-        }
-        if (payload && typeof payload === 'object') {
-          const source = payload as Record<string, unknown>
+      // DEBUG: Log para entender a estrutura
+      console.log('[Notifications] Customers response:', customersRes)
+      console.log('[Notifications] Workshops response:', workshopsRes)
 
-          if (Array.isArray(source.data)) {
-            return source.data as T[]
-          }
-
-          for (const key of extraKeys) {
-            if (Array.isArray(source[key])) {
-              return source[key] as T[]
-            }
-          }
+      // Customers: API retorna { success: true, data: [...] }
+      // apiClient retorna { data: { success: true, data: [...] }, success: true }
+      // Então customersRes.data = { success: true, data: [...] }
+      let customersList: any[] = []
+      if (customersRes.data && typeof customersRes.data === 'object') {
+        const data = customersRes.data as any
+        if (Array.isArray(data.data)) {
+          customersList = data.data
+        } else if (Array.isArray(data.customers)) {
+          customersList = data.customers
+        } else if (Array.isArray(data)) {
+          customersList = data
         }
-        return []
       }
 
-      const normalizeAndSanitizeCustomers = normalize<Customer & Record<string, any>>(
-        customersRes.data,
-        ['customers', 'usuarios', 'rows']
-      ).map((item) => ({
+      const normalizeAndSanitizeCustomers = customersList.map((item) => ({
         id: item.id?.toString() ?? '',
         first_name: item.first_name ?? item.nome ?? '',
         last_name: item.last_name ?? item.sobrenome ?? '',
         email: item.email ?? item.contato_email ?? '',
       })).filter((item) => item.id)
 
-      const normalizeAndSanitizeWorkshops = normalize<Record<string, any>>(
-        workshopsRes.data,
-        ['oficinas', 'workshops', 'rows', 'data']
-      ).map((item) => ({
+      // Workshops: API retorna { success: true, oficinas: [...] }
+      // apiClient retorna { data: { success: true, oficinas: [...] }, success: true }
+      // Então workshopsRes.data = { success: true, oficinas: [...] }
+      let workshopsList: any[] = []
+      if (workshopsRes.data && typeof workshopsRes.data === 'object') {
+        const data = workshopsRes.data as any
+        if (Array.isArray(data.oficinas)) {
+          workshopsList = data.oficinas
+        } else if (Array.isArray(data.workshops)) {
+          workshopsList = data.workshops
+        } else if (Array.isArray(data.data)) {
+          workshopsList = data.data
+        } else if (Array.isArray(data)) {
+          workshopsList = data
+        }
+      }
+
+      const normalizeAndSanitizeWorkshops = workshopsList.map((item) => ({
         id: item.id?.toString() ?? '',
         name: item.name ?? item.nome ?? item.fantasia ?? 'Oficina sem nome',
         email: item.email ?? item.contato_email ?? '',
       })).filter((item) => item.id)
+
+      console.log('[Notifications] Processed customers:', normalizeAndSanitizeCustomers.length)
+      console.log('[Notifications] Processed workshops:', normalizeAndSanitizeWorkshops.length)
 
       setCustomers(normalizeAndSanitizeCustomers)
       setWorkshops(normalizeAndSanitizeWorkshops)
@@ -133,14 +146,33 @@ export default function NotificationsPage() {
         }
       }
 
-      const { data, error } = await apiClient.sendNotification(payload)
+      const response = await apiClient.sendNotification(payload)
 
-      if (error || !data) {
-        showToast.error('Erro ao enviar', error || 'Não foi possível enviar a notificação')
+      // Verificar se houve erro na resposta
+      if (response.error) {
+        showToast.error('Erro ao enviar', response.error)
         return
       }
 
-      showToast.success('Notificação enviada!', 'A notificação foi enviada com sucesso')
+      // Verificar se a resposta foi bem-sucedida
+      // A API retorna { success: true, inserted: X, message: "..." }
+      // e o apiClient coloca isso em response.data
+      const responseData = response.data as any
+      const isSuccess = response.success === true || (responseData && responseData.success === true)
+      
+      if (isSuccess) {
+        let message = 'Notificação enviada com sucesso'
+        if (responseData?.message) {
+          message = responseData.message
+        } else if (responseData?.inserted !== undefined) {
+          message = `${responseData.inserted} notificação(ões) enviada(s)`
+        }
+        showToast.success('Notificação enviada!', message)
+      } else {
+        const errorMsg = responseData?.error || responseData?.message || 'Não foi possível enviar a notificação'
+        showToast.error('Erro ao enviar', errorMsg)
+        return
+      }
       
       // Reset form
       setTitle('')

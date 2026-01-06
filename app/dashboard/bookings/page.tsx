@@ -49,30 +49,40 @@ export default function BookingsPage() {
   const loadBookings = async () => {
     setLoading(true)
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
       const token = localStorage.getItem('meca_admin_token')
-      
-      const url = filter === 'all' 
-        ? `${API_URL}/admin/bookings`
-        : `${API_URL}/admin/bookings?status=${filter}`
-      
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      const result = await response.json()
-      
-      if (response.ok && result.success && result.data) {
-        setBookings(result.data)
-      } else {
-        console.error('Erro ao carregar agendamentos:', result)
-        setBookings([])
+      if (!token) {
+        router.push('/login')
+        return
       }
+      apiClient.setToken(token)
+      
+      const status = filter === 'all' ? undefined : filter
+      const { data: response, error } = await apiClient.getBookings(status)
+      
+      if (error) {
+        showToast.error('Erro ao carregar agendamentos', error || 'Não foi possível carregar os dados')
+        setBookings([])
+        setLoading(false)
+        return
+      }
+
+      const payload = response && typeof response === 'object' && 'data' in response
+        ? (response as { data?: unknown }).data
+        : response
+
+      const rawBookings = (payload && typeof payload === 'object' && 'bookings' in (payload as Record<string, unknown>))
+        ? (payload as { bookings: unknown }).bookings
+        : Array.isArray(payload)
+          ? payload
+          : Array.isArray(response)
+            ? response
+            : []
+      
+      const bookingsData = Array.isArray(rawBookings) ? rawBookings : []
+      setBookings(bookingsData)
     } catch (error) {
       console.error('Erro na requisição:', error)
+      showToast.error('Erro', 'Ocorreu um erro ao carregar os agendamentos')
       setBookings([])
     }
     

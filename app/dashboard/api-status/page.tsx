@@ -46,7 +46,10 @@ export default function ApiStatusPage() {
   const checkApiStatus = async () => {
     setLoading(true)
     
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
+    // Usar proxy interno via HTTPS quando em admin.mecabr.com
+    const API_URL = typeof window !== 'undefined' && window.location.hostname === 'admin.mecabr.com'
+      ? `${window.location.protocol}//${window.location.host}/api-proxy`
+      : (process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000')
     
     const endpoints = [
       { name: 'Dashboard Metrics', path: '/admin/dashboard-metrics' },
@@ -416,16 +419,6 @@ export default function ApiStatusPage() {
                       </details>
                     )}
                   </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </>
-        )}
-      </motion.div>
-    </div>
-  )
-}
-
                 ))}
               </motion.div>
             )}

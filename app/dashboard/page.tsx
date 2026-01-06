@@ -86,20 +86,61 @@ export default function DashboardPage() {
         return
       }
 
-      const rawMetrics = (response && typeof response === 'object' && 'data' in response)
-        ? (response as { data?: unknown }).data
+      // A API retorna { success: true, data: { customers: {...}, workshops: {...}, charts: {...} } }
+      const rawData = (response && typeof response === 'object' && 'data' in response)
+        ? (response as { data?: any }).data
         : response
 
-      const metricsData = (rawMetrics && typeof rawMetrics === 'object'
-        ? rawMetrics
-        : {}) as Partial<DashboardMetrics>
+      if (!rawData || typeof rawData !== 'object') {
+        setMetrics(DEFAULT_METRICS)
+        setLoading(false)
+        return
+      }
 
-      // Garantir que os arrays de registros existam
+      // Mapear estrutura aninhada da API para estrutura plana do frontend
+      const customers = rawData.customers || {}
+      const workshops = rawData.workshops || {}
+      const bookings = rawData.bookings || {}
+      const payments = rawData.payments || {}
+      const charts = rawData.charts || {}
+
+      // Converter chart data para formato esperado
+      const customerRegistrations = Array.isArray(charts.customer_registrations)
+        ? charts.customer_registrations.map((item: any) => ({
+            name: item.month || item.name || '',
+            value: Number(item.count || item.value || 0)
+          }))
+        : []
+
+      const workshopRegistrations = Array.isArray(charts.workshop_registrations)
+        ? charts.workshop_registrations.map((item: any) => ({
+            name: item.month || item.name || '',
+            value: Number(item.count || item.value || 0)
+          }))
+        : []
+
+      // Montar métricas finais
       const finalMetrics: DashboardMetrics = {
         ...DEFAULT_METRICS,
-        ...metricsData,
-        customer_registrations: metricsData.customer_registrations || [],
-        workshop_registrations: metricsData.workshop_registrations || []
+        total_customers: Number(customers.total || 0),
+        customers_this_week: Number(customers.this_week || 0),
+        new_users_this_month: Number(customers.this_month || 0),
+        active_customers: Number(customers.active || 0),
+        total_oficinas: Number(workshops.total || 0),
+        workshops_this_week: Number(workshops.this_week || 0),
+        new_workshops_this_month: Number(workshops.this_month || 0),
+        active_workshops: Number(workshops.active || 0),
+        oficinas_by_status: {
+          pendente: Number(workshops.by_status?.pendente || 0),
+          aprovado: Number(workshops.by_status?.aprovado || 0),
+          rejeitado: Number(workshops.by_status?.rejeitado || 0),
+        },
+        revenue_this_month: Number(payments.total || payments.revenue_this_month || 0),
+        customer_registrations: customerRegistrations,
+        workshop_registrations: workshopRegistrations,
+        total_bookings_last_month: Number(bookings.last_month || bookings.total_last_month || 0),
+        total_revenue_last_month: Number(payments.last_month || payments.revenue_last_month || 0),
+        meca_commission_last_month: Number(payments.commission_last_month || payments.meca_commission_last_month || 0),
       }
       
       setMetrics(finalMetrics)

@@ -42,7 +42,16 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
+      // Em produção, usar proxy interno via admin.mecabr.com (evita mixed content)
+      let API_URL = 'http://18.222.129.59:9000'
+      if (typeof window !== 'undefined' && window.location) {
+        if (window.location.hostname === 'admin.mecabr.com') {
+          // Usar proxy interno via HTTPS do admin (evita mixed content)
+          API_URL = `${window.location.protocol}//${window.location.host}/api-proxy`
+        } else if (process.env.NEXT_PUBLIC_API_URL) {
+          API_URL = process.env.NEXT_PUBLIC_API_URL
+        }
+      }
       
       const response = await fetch(`${API_URL}/admin/auth/send-code`, {
         method: 'POST',
@@ -82,7 +91,16 @@ export default function LoginPage() {
     }
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
+      // Em produção, usar proxy interno via admin.mecabr.com (evita mixed content)
+      let API_URL = 'http://18.222.129.59:9000'
+      if (typeof window !== 'undefined' && window.location) {
+        if (window.location.hostname === 'admin.mecabr.com') {
+          // Usar proxy interno via HTTPS do admin (evita mixed content)
+          API_URL = `${window.location.protocol}//${window.location.host}/api-proxy`
+        } else if (process.env.NEXT_PUBLIC_API_URL) {
+          API_URL = process.env.NEXT_PUBLIC_API_URL
+        }
+      }
       
       const response = await fetch(`${API_URL}/admin/auth/login-code`, {
         method: 'POST',
@@ -124,7 +142,16 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
+      // Em produção, usar proxy interno via admin.mecabr.com (evita mixed content)
+      let API_URL = 'http://18.222.129.59:9000'
+      if (typeof window !== 'undefined' && window.location) {
+        if (window.location.hostname === 'admin.mecabr.com') {
+          // Usar proxy interno via HTTPS do admin (evita mixed content)
+          API_URL = `${window.location.protocol}//${window.location.host}/api-proxy`
+        } else if (process.env.NEXT_PUBLIC_API_URL) {
+          API_URL = process.env.NEXT_PUBLIC_API_URL
+        }
+      }
       
       const response = await fetch(`${API_URL}/admin/auth/login`, {
         method: 'POST',

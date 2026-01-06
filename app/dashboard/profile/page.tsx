@@ -119,7 +119,12 @@ export default function ProfilePage() {
 
     setCreatingAdmin(true)
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'}/admin/auth/create`, {
+      // Usar proxy interno via HTTPS quando em admin.mecabr.com
+      const API_URL = typeof window !== 'undefined' && window.location.hostname === 'admin.mecabr.com'
+        ? `${window.location.protocol}//${window.location.host}/api-proxy`
+        : (process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000')
+      
+      const response = await fetch(`${API_URL}/admin/auth/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

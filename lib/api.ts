@@ -3,7 +3,25 @@
  * Cliente para comunicação com a API MECA
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000'
+import { showToast } from './toast'
+
+// Função para obter URL da API baseado no hostname (executada em runtime)
+const getApiUrl = (): string => {
+  // Em runtime no cliente, detectar se está em produção
+  if (typeof window !== 'undefined' && window.location) {
+    if (window.location.hostname === 'admin.mecabr.com') {
+      // Usar proxy interno via HTTPS do admin (evita mixed content)
+      return `${window.location.protocol}//${window.location.host}/api-proxy`
+    }
+  }
+  // Fallback: usar variável de ambiente ou HTTP padrão
+  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL
+  }
+  return 'http://18.222.129.59:9000'
+}
+
+// Passar a função para ser executada em runtime em cada request
 
 interface ApiResponse<T = any> {
   data?: T
@@ -13,15 +31,59 @@ interface ApiResponse<T = any> {
 }
 
 class MecaApiClient {
-  private baseUrl: string
+  private baseUrl: string | (() => string)
   private token: string | null = null
+  private onTokenExpired?: () => void
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string | (() => string)) {
     this.baseUrl = baseUrl
+    
+    // Configurar callback para quando token expirar
+    if (typeof window !== 'undefined') {
+      this.onTokenExpired = () => {
+        // Limpar token
+        localStorage.removeItem('meca_admin_token')
+        this.token = null
+        
+        // Mostrar mensagem
+        showToast.warning(
+          'Sessão expirada',
+          'Sua sessão expirou. Redirecionando para login...'
+        )
+        
+        // Redirecionar para login após um pequeno delay
+        setTimeout(() => {
+          if (typeof window !== 'undefined' && window.location) {
+            window.location.href = '/login'
+          }
+        }, 2000)
+      }
+    }
+  }
+  
+  // Método para obter a URL atual (útil para debug)
+  getBaseUrl(): string {
+    return typeof this.baseUrl === 'function' ? this.baseUrl() : this.baseUrl
   }
 
   setToken(token: string) {
     this.token = token
+  }
+
+  // Método para verificar se erro é de token expirado
+  private isTokenExpiredError(error: string, status?: number): boolean {
+    if (status === 401) return true
+    
+    const normalized = error?.toLowerCase() || ''
+    return (
+      normalized.includes('jwt expired') ||
+      normalized.includes('token expirado') ||
+      normalized.includes('token expired') ||
+      normalized.includes('unauthorized') ||
+      normalized.includes('não autorizado') ||
+      normalized.includes('invalid token') ||
+      normalized.includes('token inválido')
+    )
   }
 
   private async request<T>(
@@ -34,16 +96,41 @@ class MecaApiClient {
       ...options.headers,
     }
 
+    // Resolver URL em runtime para garantir que usa o proxy correto
+    const currentBaseUrl = typeof this.baseUrl === 'function' ? this.baseUrl() : this.baseUrl
+    const url = `${currentBaseUrl}${endpoint}`
+    
+    // Debug: log URL em produção para verificar se está usando proxy
+    if (typeof window !== 'undefined' && window.location.hostname === 'admin.mecabr.com') {
+      console.log('[API Client] Request URL:', url)
+    }
+    
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const response = await fetch(url, {
         ...options,
         headers,
       })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: response.statusText }))
+        const errorMessage = errorData.error || errorData.message || 'Request failed'
+        
+        // Verificar se é erro de token expirado
+        if (this.isTokenExpiredError(errorMessage, response.status)) {
+          // Chamar callback de token expirado
+          if (this.onTokenExpired) {
+            this.onTokenExpired()
+          }
+          
+          return {
+            error: 'Sessão expirada. Redirecionando para login...',
+            success: false,
+            status: response.status,
+          }
+        }
+        
         return {
-          error: errorData.error || errorData.message || 'Request failed',
+          error: errorMessage,
           success: false,
           status: response.status,
         }
@@ -54,7 +141,22 @@ class MecaApiClient {
       const success = data.success !== undefined ? data.success : true
       return { data, success, status: response.status }
     } catch (error) {
-      return { error: error instanceof Error ? error.message : 'Unknown error', success: false }
+      console.error('API Request Error:', {
+        url,
+        error: error instanceof Error ? error.message : String(error),
+        errorType: error instanceof TypeError ? 'TypeError' : 'Unknown',
+        baseUrl: this.baseUrl,
+        endpoint
+      })
+      
+      const errorMessage = error instanceof TypeError && error.message.includes('fetch')
+        ? 'Erro de conexão. Verifique se a API está acessível e se o servidor está rodando.'
+        : error instanceof Error ? error.message : 'Erro desconhecido'
+        
+      return { 
+        error: errorMessage, 
+        success: false 
+      }
     }
   }
 
@@ -255,6 +357,26 @@ class MecaApiClient {
       method: 'DELETE',
     })
   }
+
+  // Reports
+  async getWorkshopsMonthlyReport(params?: {
+    month?: string
+    year?: string
+    start_date?: string
+    end_date?: string
+    workshop_id?: string
+  }) {
+    const query = new URLSearchParams()
+    if (params?.month) query.append('month', params.month)
+    if (params?.year) query.append('year', params.year)
+    if (params?.start_date) query.append('start_date', params.start_date)
+    if (params?.end_date) query.append('end_date', params.end_date)
+    if (params?.workshop_id) query.append('workshop_id', params.workshop_id)
+    const queryString = query.toString()
+    return this.request(`/admin/workshops/monthly-report${queryString ? `?${queryString}` : ''}`)
+  }
 }
 
-export const apiClient = new MecaApiClient(API_URL)
+// Passar a função diretamente para que seja executada em runtime no cliente
+// Criar cliente com URL detectada em runtime
+export const apiClient = new MecaApiClient(() => getApiUrl())

@@ -55,17 +55,29 @@ export default function WorkshopsPage() {
       }
 
       // A API retorna { success: true, oficinas: [...] } ou { success: true, data: { oficinas: [...] } }
-      const payload = response && typeof response === 'object' && 'data' in response
-        ? (response as { data?: unknown }).data
-        : response
-
-      const rawWorkshops = (payload && typeof payload === 'object' && 'oficinas' in (payload as Record<string, unknown>))
-        ? (payload as { oficinas: unknown }).oficinas
-        : Array.isArray(payload)
-          ? payload
-          : Array.isArray(response)
-            ? response
+      // Primeiro tentar extrair de response.data, depois de response diretamente
+      let rawWorkshops: any[] = []
+      
+      if (response && typeof response === 'object') {
+        // Tentar response.data.oficinas primeiro
+        if ('data' in response && response.data && typeof response.data === 'object' && 'oficinas' in response.data) {
+          rawWorkshops = Array.isArray((response.data as { oficinas: unknown }).oficinas) 
+            ? (response.data as { oficinas: unknown[] }).oficinas 
             : []
+        }
+        // Tentar response.oficinas
+        else if ('oficinas' in response && Array.isArray(response.oficinas)) {
+          rawWorkshops = response.oficinas
+        }
+        // Tentar response.data como array
+        else if ('data' in response && Array.isArray(response.data)) {
+          rawWorkshops = response.data
+        }
+        // Tentar response como array
+        else if (Array.isArray(response)) {
+          rawWorkshops = response
+        }
+      }
 
       const workshopsData = Array.isArray(rawWorkshops) ? rawWorkshops : []
       
@@ -175,18 +187,21 @@ export default function WorkshopsPage() {
     }
   }
 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-[#252940] dark:text-white">Oficinas</h1>
-              <p className="text-gray-600 dark:text-gray-400">Gerencie o cadastro e aprovação de oficinas</p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-[#252940] dark:text-white">Oficinas</h1>
+                <p className="text-gray-600 dark:text-gray-400">Gerencie o cadastro e aprovação de oficinas</p>
+              </div>
             </div>
           </div>
         </div>
