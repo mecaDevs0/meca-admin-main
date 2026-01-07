@@ -380,3 +380,78 @@ class MecaApiClient {
 // Passar a função diretamente para que seja executada em runtime no cliente
 // Criar cliente com URL detectada em runtime
 export const apiClient = new MecaApiClient(() => getApiUrl())
+
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/customers${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // Bookings
+  async getBookings(status?: string) {
+    const query = status ? `?status=${status}` : ''
+    return this.request(`/admin/bookings${query}`)
+  }
+
+  async updateBookingStatus(id: string, status: string) {
+    return this.request(`/bookings/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    })
+  }
+
+  // Notifications
+  async sendNotification(data: {
+    title: string
+    message: string
+    customer_ids?: string[]
+    workshop_ids?: string[]
+    target: 'all' | 'customers' | 'workshops' | 'specific'
+  }) {
+    return this.request('/admin/notifications/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getNotifications(filters?: { limit?: number; offset?: number }) {
+    const query = new URLSearchParams()
+    if (filters?.limit) query.append('limit', filters.limit.toString())
+    if (filters?.offset) query.append('offset', filters.offset.toString())
+    const queryString = query.toString()
+    return this.request(`/admin/notifications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // API Health
+  async checkHealth() {
+    return this.request('/health')
+  }
+
+  // Delete test customers
+  async deleteTestCustomers() {
+    return this.request('/admin/customers/test', {
+      method: 'DELETE',
+    })
+  }
+
+  // Reports
+  async getWorkshopsMonthlyReport(params?: {
+    month?: string
+    year?: string
+    start_date?: string
+    end_date?: string
+    workshop_id?: string
+  }) {
+    const query = new URLSearchParams()
+    if (params?.month) query.append('month', params.month)
+    if (params?.year) query.append('year', params.year)
+    if (params?.start_date) query.append('start_date', params.start_date)
+    if (params?.end_date) query.append('end_date', params.end_date)
+    if (params?.workshop_id) query.append('workshop_id', params.workshop_id)
+    const queryString = query.toString()
+    return this.request(`/admin/workshops/monthly-report${queryString ? `?${queryString}` : ''}`)
+  }
+}
+
+// Passar a função diretamente para que seja executada em runtime no cliente
+// Criar cliente com URL detectada em runtime
+export const apiClient = new MecaApiClient(() => getApiUrl())
