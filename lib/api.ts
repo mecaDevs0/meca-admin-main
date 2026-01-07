@@ -225,6 +225,13 @@ class MecaApiClient {
     })
   }
 
+  async disableWorkshop(id: string, reason: string, details?: string) {
+    return this.request(`/admin/workshops/${id}/disable`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason, details: details || '' }),
+    })
+  }
+
   async uploadWorkshopLogo(id: string, base64DataUrl: string) {
     return this.request(`/workshop/${id}/logo`, {
       method: 'POST',

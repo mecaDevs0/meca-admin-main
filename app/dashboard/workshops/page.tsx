@@ -2,6 +2,7 @@
 
 import FilterButtons from '@/components/workshops/FilterButtons'
 import RejectModal from '@/components/workshops/RejectModal'
+import DisableWorkshopModal from '@/components/workshops/DisableWorkshopModal'
 import WorkshopCard from '@/components/workshops/WorkshopCard'
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
@@ -30,6 +31,7 @@ export default function WorkshopsPage() {
   const [loading, setLoading] = useState(true)
   const [rejectReason, setRejectReason] = useState('')
   const [selectedWorkshop, setSelectedWorkshop] = useState<string | null>(null)
+  const [disableWorkshopId, setDisableWorkshopId] = useState<string | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -187,6 +189,33 @@ export default function WorkshopsPage() {
     }
   }
 
+  const handleDisable = async (reason: string, details: string) => {
+    if (!disableWorkshopId) return
+    
+    const loadingToast = showToast.loading('Desabilitando oficina...')
+    
+    try {
+      const { data, error } = await apiClient.disableWorkshop(disableWorkshopId, reason, details)
+      
+      showToast.dismiss(loadingToast)
+      
+      if (!error && data) {
+        showToast.success('Oficina desabilitada', 'A oficina foi desabilitada e um email foi enviado')
+        setDisableWorkshopId(null)
+        
+        setTimeout(() => {
+          loadWorkshops()
+        }, 500)
+      } else {
+        throw new Error(error || 'Não foi possível desabilitar a oficina')
+      }
+    } catch (err: any) {
+      showToast.dismiss(loadingToast)
+      showToast.error('Erro ao desabilitar', err.message || 'Ocorreu um erro inesperado')
+      throw err
+    }
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6">
@@ -254,6 +283,7 @@ export default function WorkshopsPage() {
                         workshop={workshop}
                         onApprove={handleApprove}
                         onReject={() => setSelectedWorkshop(workshop.id)}
+                        onDisable={() => setDisableWorkshopId(workshop.id)}
                       />
                     </motion.div>
                   ))}
@@ -272,6 +302,13 @@ export default function WorkshopsPage() {
           onConfirm={handleReject}
           reason={rejectReason}
           onReasonChange={setRejectReason}
+        />
+
+        <DisableWorkshopModal
+          isOpen={!!disableWorkshopId}
+          workshopName={workshops.find(w => w.id === disableWorkshopId)?.name || 'Oficina'}
+          onClose={() => setDisableWorkshopId(null)}
+          onConfirm={handleDisable}
         />
       </div>
     </div>

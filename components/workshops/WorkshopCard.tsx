@@ -10,7 +10,8 @@ import {
   Phone,
   XCircle,
   Edit,
-  Percent
+  Percent,
+  Trash2
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
@@ -33,13 +34,15 @@ interface WorkshopCardProps {
   workshop: Workshop
   onApprove: (id: string) => void
   onReject: (id: string) => void
+  onDisable?: (id: string) => void
   delay?: number
 }
 
 const WorkshopCard: React.FC<WorkshopCardProps> = ({ 
   workshop, 
   onApprove, 
-  onReject
+  onReject,
+  onDisable
 }) => {
   const router = useRouter()
   const [isApproving, setIsApproving] = useState(false)
@@ -213,6 +216,22 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
                 Rejeitar
               </motion.button>
             </>
+          )}
+
+          {/* Botão Desabilitar - sempre visível para oficinas aprovadas */}
+          {workshop.status === 'aprovado' && onDisable && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onDisable(workshop.id)
+              }}
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl z-10 mt-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Desabilitar
+            </motion.button>
           )}
         </div>
       </div>
