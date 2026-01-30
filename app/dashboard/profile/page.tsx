@@ -122,7 +122,7 @@ export default function ProfilePage() {
       // Usar proxy interno via HTTPS quando em admin.mecabr.com
       const API_URL = typeof window !== 'undefined' && window.location.hostname === 'admin.mecabr.com'
         ? `${window.location.protocol}//${window.location.host}/api-proxy`
-        : (process.env.NEXT_PUBLIC_API_URL || 'http://18.222.129.59:9000')
+        : (process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com')
       
       const response = await fetch(`${API_URL}/admin/auth/create`, {
         method: 'POST',

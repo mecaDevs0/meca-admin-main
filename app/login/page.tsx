@@ -43,7 +43,7 @@ export default function LoginPage() {
 
     try {
       // Em produção, usar proxy interno via admin.mecabr.com (evita mixed content)
-      let API_URL = 'http://18.222.129.59:9000'
+      let API_URL = 'https://api.mecabr.com'
       if (typeof window !== 'undefined' && window.location) {
         if (window.location.hostname === 'admin.mecabr.com') {
           // Usar proxy interno via HTTPS do admin (evita mixed content)
@@ -92,7 +92,7 @@ export default function LoginPage() {
 
     try {
       // Em produção, usar proxy interno via admin.mecabr.com (evita mixed content)
-      let API_URL = 'http://18.222.129.59:9000'
+      let API_URL = 'https://api.mecabr.com'
       if (typeof window !== 'undefined' && window.location) {
         if (window.location.hostname === 'admin.mecabr.com') {
           // Usar proxy interno via HTTPS do admin (evita mixed content)
@@ -143,7 +143,7 @@ export default function LoginPage() {
 
     try {
       // Em produção, usar proxy interno via admin.mecabr.com (evita mixed content)
-      let API_URL = 'http://18.222.129.59:9000'
+      let API_URL = 'https://api.mecabr.com'
       if (typeof window !== 'undefined' && window.location) {
         if (window.location.hostname === 'admin.mecabr.com') {
           // Usar proxy interno via HTTPS do admin (evita mixed content)

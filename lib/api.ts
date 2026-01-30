@@ -14,11 +14,11 @@ const getApiUrl = (): string => {
       return `${window.location.protocol}//${window.location.host}/api-proxy`
     }
   }
-  // Fallback: usar variável de ambiente ou HTTP padrão
+  // Fallback: usar variável de ambiente ou HTTPS padrão (produção)
   if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL
   }
-  return 'http://18.222.129.59:9000'
+  return 'https://api.mecabr.com'
 }
 
 // Passar a função para ser executada em runtime em cada request
