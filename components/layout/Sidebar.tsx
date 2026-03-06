@@ -7,12 +7,15 @@ import {
     Activity,
     Bell,
     Building2,
+    Calendar,
+    Car,
     ChevronLeft,
     ChevronRight,
     FileText,
     LayoutDashboard,
     LogOut,
     Percent,
+    TrendingUp,
     User,
     Users,
     Wrench
@@ -54,6 +57,12 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       onboardKey: 'workshops',
     },
     {
+      name: 'Agendamentos',
+      path: '/dashboard/bookings',
+      icon: Calendar,
+      onboardKey: 'bookings',
+    },
+    {
       name: 'Serviços',
       path: '/dashboard/services',
       icon: Wrench,
@@ -70,6 +79,18 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       path: '/dashboard/users',
       icon: Users,
       onboardKey: 'users',
+    },
+    {
+      name: 'Veículos',
+      path: '/dashboard/vehicles',
+      icon: Car,
+      onboardKey: 'vehicles',
+    },
+    {
+      name: 'Analytics',
+      path: '/dashboard/analytics',
+      icon: TrendingUp,
+      onboardKey: 'analytics',
     },
     {
       name: 'Relatórios',
