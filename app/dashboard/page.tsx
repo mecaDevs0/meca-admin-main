@@ -10,11 +10,13 @@ import {
   Users,
   Bell,
   Activity,
-  DollarSign
+  DollarSign,
+  Calendar
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useCallback, useEffect, useState } from 'react'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { PeriodSelector } from '@/components/analytics/PeriodSelector'
 
 interface DashboardMetrics {
   total_customers: number
@@ -31,14 +33,17 @@ interface DashboardMetrics {
     rejeitado?: number
   }
   revenue_this_month: number
+  meca_take: number
+  pagbank_fee: number
+  meca_revenue: number
   customer_registrations: Array<{ name: string; value: number }>
   workshop_registrations: Array<{ name: string; value: number }>
   total_bookings_last_month: number
   total_revenue_last_month: number
   meca_commission_last_month: number
+  bookings_completed: number
+  bookings_cancelled: number
 }
-
-const COLORS = ['#00c977', '#252940', '#f59e0b', '#ef4444', '#3b82f6']
 
 const DEFAULT_METRICS: DashboardMetrics = {
   total_customers: 0,
@@ -51,33 +56,28 @@ const DEFAULT_METRICS: DashboardMetrics = {
   active_workshops: 0,
   oficinas_by_status: {},
   revenue_this_month: 0,
+  meca_take: 0,
+  pagbank_fee: 0,
+  meca_revenue: 0,
   customer_registrations: [],
   workshop_registrations: [],
   total_bookings_last_month: 0,
   total_revenue_last_month: 0,
   meca_commission_last_month: 0,
+  bookings_completed: 0,
+  bookings_cancelled: 0,
 }
 
 export default function DashboardPage() {
   const router = useRouter()
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
   const [loading, setLoading] = useState(true)
+  const [period, setPeriod] = useState('30d')
 
-  useEffect(() => {
-    const token = localStorage.getItem('meca_admin_token')
-    if (!token) {
-      showToast.error('Não autenticado', 'Faça login para continuar')
-      router.push('/login')
-      return
-    }
-    apiClient.setToken(token)
-    loadMetrics()
-  }, [router])
-
-  const loadMetrics = async () => {
+  const loadMetrics = useCallback(async (p: string) => {
     setLoading(true)
     try {
-      const { data: response, error } = await apiClient.getDashboardMetrics()
+      const { data: response, error } = await apiClient.getDashboardMetrics(p)
 
       if (error) {
         showToast.error('Erro ao carregar métricas', error || 'Não foi possível carregar os dados')
@@ -86,7 +86,6 @@ export default function DashboardPage() {
         return
       }
 
-      // A API retorna { success: true, data: { customers: {...}, workshops: {...}, charts: {...} } }
       const rawData = (response && typeof response === 'object' && 'data' in response)
         ? (response as { data?: any }).data
         : response
@@ -97,14 +96,12 @@ export default function DashboardPage() {
         return
       }
 
-      // Mapear estrutura aninhada da API para estrutura plana do frontend
       const customers = rawData.customers || {}
       const workshops = rawData.workshops || {}
       const bookings = rawData.bookings || {}
       const payments = rawData.payments || {}
       const charts = rawData.charts || {}
 
-      // Converter chart data para formato esperado
       const customerRegistrations = Array.isArray(charts.customer_registrations)
         ? charts.customer_registrations.map((item: any) => ({
             name: item.month || item.name || '',
@@ -119,7 +116,6 @@ export default function DashboardPage() {
           }))
         : []
 
-      // Montar métricas finais
       const finalMetrics: DashboardMetrics = {
         ...DEFAULT_METRICS,
         total_customers: Number(customers.total || 0),
@@ -135,23 +131,39 @@ export default function DashboardPage() {
           aprovado: Number(workshops.by_status?.aprovado || 0),
           rejeitado: Number(workshops.by_status?.rejeitado || 0),
         },
-        revenue_this_month: Number(payments.total || payments.revenue_this_month || 0),
+        revenue_this_month: Number(payments.revenue_this_month || 0),
+        meca_take: Number(payments.meca_take || 0),
+        pagbank_fee: Number(payments.pagbank_fee || 0),
+        meca_revenue: Number(payments.meca_revenue || 0),
         customer_registrations: customerRegistrations,
         workshop_registrations: workshopRegistrations,
         total_bookings_last_month: Number(bookings.last_month || bookings.total_last_month || 0),
         total_revenue_last_month: Number(payments.last_month || payments.revenue_last_month || 0),
         meca_commission_last_month: Number(payments.commission_last_month || payments.meca_commission_last_month || 0),
+        bookings_completed: Number(bookings.completed || 0),
+        bookings_cancelled: Number(bookings.cancelled || 0),
       }
-      
+
       setMetrics(finalMetrics)
-    } catch (error) {
-      console.error('Erro na requisição:', error)
+    } catch (err) {
+      console.error('Erro na requisição:', err)
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
       setMetrics(null)
     }
 
     setLoading(false)
-  }
+  }, [])
+
+  useEffect(() => {
+    const token = localStorage.getItem('meca_admin_token')
+    if (!token) {
+      showToast.error('Não autenticado', 'Faça login para continuar')
+      router.push('/login')
+      return
+    }
+    apiClient.setToken(token)
+    loadMetrics(period)
+  }, [period, loadMetrics, router])
 
   const handleApproveWorkshops = () => {
     router.push('/dashboard/workshops?status=pending')
@@ -205,6 +217,9 @@ export default function DashboardPage() {
         <motion.div variants={itemVariants} className="mb-4 sm:mb-6" data-onboard="dashboard">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white mb-1 sm:mb-2">Dashboard</h1>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Acompanhe as principais métricas do marketplace</p>
+          <div className="mt-3">
+            <PeriodSelector value={period} onChange={setPeriod} />
+          </div>
         </motion.div>
 
         {/* Seção de Ações Rápidas */}
@@ -322,7 +337,7 @@ export default function DashboardPage() {
             </div>
           </motion.div>
           
-          {/* Card 3 - Receita do Mês */}
+          {/* Card 3 - Receita MECA do Mês */}
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
@@ -335,12 +350,29 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita do Mês</h3>
-              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">
-                R$ {(metrics.revenue_this_month || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Receita MECA do Mês</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#00c977] dark:text-[#00c977]">
+                R$ {(metrics.meca_revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
-              <div className="pt-3">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Total de pagamentos aprovados</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Pagamentos</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">
+                    R$ {(metrics.revenue_this_month || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Taxa MECA (12%)</span>
+                  <span className="font-semibold text-[#252940] dark:text-white">
+                    R$ {(metrics.meca_take || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">Taxa PagBank (3.39%)</span>
+                  <span className="font-semibold text-red-500 dark:text-red-400">
+                    - R$ {(metrics.pagbank_fee || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -369,10 +401,34 @@ export default function DashboardPage() {
           
         </div>
 
-        {/* Gráficos e demais cards */}
+        {/* Agendamentos card (5th) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <motion.div variants={itemVariants} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Agendamentos do Período</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">{metrics.total_bookings_last_month || 0}</p>
+              <div className="pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[#00c977]">Concluídos</span>
+                  <span className="font-semibold">{metrics.bookings_completed || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-red-400">Cancelados</span>
+                  <span className="font-semibold">{metrics.bookings_cancelled || 0}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
 
+        {/* Gráficos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          {/* Chart 1 - Registro de Clientes (últimos 6 meses) */}
+          {/* Chart 1 - Registro de Clientes */}
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
@@ -382,38 +438,29 @@ export default function DashboardPage() {
           >
             <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Clientes (6 meses)</h2>
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={metrics.customer_registrations && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
+              <AreaChart data={metrics.customer_registrations && metrics.customer_registrations.length > 0 ? metrics.customer_registrations.map((item: any) => ({
                 name: item.name || item.month || 'N/A',
                 value: item.value || item.count || 0
               })) : [
-                { name: 'Jan', value: 0 },
-                { name: 'Fev', value: 0 },
-                { name: 'Mar', value: 0 },
-                { name: 'Abr', value: 0 },
-                { name: 'Mai', value: 0 },
-                { name: 'Jun', value: 0 },
+                { name: 'Jan', value: 0 }, { name: 'Fev', value: 0 }, { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 }, { name: 'Mai', value: 0 }, { name: 'Jun', value: 0 },
               ]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
-                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
-                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
-                <Tooltip
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(229, 231, 235, 0.5)', 
-                    borderRadius: '12px',
-                    padding: '8px 12px',
-                    color: '#111827'
-                  }}
-                  labelStyle={{ color: '#6b7280', fontWeight: 600 }}
-                  itemStyle={{ color: '#111827' }}
-                />
-                <Bar dataKey="value" name="Clientes" fill="#00c977" radius={[12, 12, 0, 0]} />
-              </BarChart>
+                <defs>
+                  <linearGradient id="colorClientes" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#00c977" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#00c977" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" fontSize={12} />
+                <YAxis stroke="#6b7280" fontSize={12} />
+                <Tooltip contentStyle={{ backgroundColor: 'rgba(15,20,30,0.9)', border: 'none', borderRadius: '12px', color: '#fff' }} />
+                <Area type="monotone" dataKey="value" name="Clientes" stroke="#00c977" fill="url(#colorClientes)" strokeWidth={2} />
+              </AreaChart>
             </ResponsiveContainer>
           </motion.div>
 
-          {/* Chart 2 - Registro de Oficinas (últimos 6 meses) */}
+          {/* Chart 2 - Registro de Oficinas */}
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.01, y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
@@ -422,37 +469,27 @@ export default function DashboardPage() {
           >
             <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Registro de Oficinas (6 meses)</h2>
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={metrics.workshop_registrations && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
+              <AreaChart data={metrics.workshop_registrations && metrics.workshop_registrations.length > 0 ? metrics.workshop_registrations.map((item: any) => ({
                 name: item.name || item.month || 'N/A',
                 value: item.value || item.count || 0
               })) : [
-                { name: 'Jan', value: 0 },
-                { name: 'Fev', value: 0 },
-                { name: 'Mar', value: 0 },
-                { name: 'Abr', value: 0 },
-                { name: 'Mai', value: 0 },
-                { name: 'Jun', value: 0 },
+                { name: 'Jan', value: 0 }, { name: 'Fev', value: 0 }, { name: 'Mar', value: 0 },
+                { name: 'Abr', value: 0 }, { name: 'Mai', value: 0 }, { name: 'Jun', value: 0 },
               ]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" opacity={0.5} />
-                <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
-                <YAxis stroke="#6b7280" className="dark:stroke-gray-400" fontSize={12} />
-                <Tooltip
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(229, 231, 235, 0.5)', 
-                    borderRadius: '12px',
-                    padding: '8px 12px',
-                    color: '#111827'
-                  }}
-                  labelStyle={{ color: '#6b7280', fontWeight: 600 }}
-                  itemStyle={{ color: '#111827' }}
-                />
-                <Bar dataKey="value" name="Oficinas" fill="#252940" radius={[12, 12, 0, 0]} />
-              </BarChart>
+                <defs>
+                  <linearGradient id="colorOficinas" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
+                <XAxis dataKey="name" stroke="#6b7280" fontSize={12} />
+                <YAxis stroke="#6b7280" fontSize={12} />
+                <Tooltip contentStyle={{ backgroundColor: 'rgba(15,20,30,0.9)', border: 'none', borderRadius: '12px', color: '#fff' }} />
+                <Area type="monotone" dataKey="value" name="Oficinas" stroke="#6366f1" fill="url(#colorOficinas)" strokeWidth={2} />
+              </AreaChart>
             </ResponsiveContainer>
           </motion.div>
-
         </div>
       </motion.div>
     </div>
