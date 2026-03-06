@@ -11,7 +11,9 @@ import {
   XCircle,
   Edit,
   Percent,
-  Trash2
+  Trash2,
+  CreditCard,
+  AlertTriangle
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
@@ -28,6 +30,9 @@ interface Workshop {
   created_at: string
   meca_fee_percentage?: number | null
   logo_url?: string | null
+  pagbank_account_status?: string | null
+  pagbank_verified?: boolean
+  pagbank_account_id?: string | null
 }
 
 interface WorkshopCardProps {
@@ -164,6 +169,28 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
                 </span>
               </div>
             )}
+            {/* Status PagBank: só "Vinculado" se tiver account_id + status aprovado (conta real no PagBank) */}
+            <div className="flex items-center gap-2 text-sm">
+              <CreditCard className="w-4 h-4 flex-shrink-0" />
+              {(() => {
+                const hasAccountId = !!(workshop.pagbank_account_id && String(workshop.pagbank_account_id).trim())
+                const statusOk = ['approved', 'active'].includes(workshop.pagbank_account_status?.toLowerCase() || '')
+                const isPagBankLinked = hasAccountId && statusOk
+                return isPagBankLinked ? (
+                  <span className="flex items-center gap-1">
+                    <span className="text-green-600 dark:text-green-400 font-medium">PagBank Vinculado</span>
+                    {workshop.pagbank_verified && (
+                      <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                    )}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span className="font-medium">PagBank não vinculado</span>
+                  </span>
+                )
+              })()}
+            </div>
           </div>
         </div>
 

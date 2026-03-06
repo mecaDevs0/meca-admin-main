@@ -7,9 +7,9 @@ import WorkshopCard from '@/components/workshops/WorkshopCard'
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
 import { motion } from 'framer-motion'
-import { AlertCircle, Building2, Clock } from 'lucide-react'
+import { AlertCircle, Building2, Clock, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface Workshop {
   id: string
@@ -22,33 +22,35 @@ interface Workshop {
   created_at: string
   meca_fee_percentage?: number | null
   logo_url?: string | null
+  pagbank_account_status?: string | null
+  pagbank_verified?: boolean
+  pagbank_account_id?: string | null
 }
 
 export default function WorkshopsPage() {
   const router = useRouter()
   const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [filter, setFilter] = useState<string>('all')
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [searchInput, setSearchInput] = useState<string>('') // valor do input (atualizado a cada tecla)
   const [loading, setLoading] = useState(true)
   const [rejectReason, setRejectReason] = useState('')
   const [selectedWorkshop, setSelectedWorkshop] = useState<string | null>(null)
   const [disableWorkshopId, setDisableWorkshopId] = useState<string | null>(null)
 
+  // Debounce da pesquisa: só envia "searchTerm" para a API após 400ms sem digitar
   useEffect(() => {
-    const token = localStorage.getItem('meca_admin_token')
-    if (!token) {
-      showToast.error('Não autenticado', 'Faça login para continuar')
-      router.push('/login')
-      return
-    }
-    apiClient.setToken(token)
-    loadWorkshops()
-  }, [filter, router])
+    const t = setTimeout(() => {
+      setSearchTerm(searchInput.trim())
+    }, 400)
+    return () => clearTimeout(t)
+  }, [searchInput])
 
-  const loadWorkshops = async () => {
+  const loadWorkshops = useCallback(async () => {
     setLoading(true)
     try {
       const status = filter === 'all' ? undefined : filter
-      const { data: response, error } = await apiClient.getWorkshops(status)
+      const { data: response, error } = await apiClient.getWorkshops(status, searchTerm || undefined)
 
       if (error) {
         showToast.error('Erro ao carregar oficinas', error || 'Não foi possível carregar os dados')
@@ -119,9 +121,25 @@ export default function WorkshopsPage() {
             : workshop.meca_fee_percentage !== null && workshop.meca_fee_percentage !== undefined
               ? Number(workshop.meca_fee_percentage)
               : null,
+        pagbank_account_status: workshop.pagbank_account_status || null,
+        pagbank_verified: workshop.pagbank_verified === true,
+        pagbank_account_id: workshop.pagbank_account_id || null,
       }))
-      
-      setWorkshops(mappedWorkshops)
+
+      // Filtro no cliente também: garante que a lista filtra ao digitar (nome, email, CNPJ, telefone, endereço)
+      const term = (searchTerm || '').trim().toLowerCase()
+      const toShow = term
+        ? mappedWorkshops.filter(
+            (w) =>
+              (w.name || '').toLowerCase().includes(term) ||
+              (w.email || '').toLowerCase().includes(term) ||
+              (w.cnpj || '').replace(/\D/g, '').includes(term.replace(/\D/g, '')) ||
+              (w.phone || '').replace(/\D/g, '').includes(term.replace(/\D/g, '')) ||
+              (w.address || '').toLowerCase().includes(term)
+          )
+        : mappedWorkshops
+
+      setWorkshops(toShow)
     } catch (error) {
       showToast.error('Erro', 'Ocorreu um erro ao carregar as oficinas')
       console.error('Erro na requisição:', error)
@@ -129,7 +147,18 @@ export default function WorkshopsPage() {
     }
     
     setLoading(false)
-  }
+  }, [filter, searchTerm])
+
+  useEffect(() => {
+    const token = localStorage.getItem('meca_admin_token')
+    if (!token) {
+      showToast.error('Não autenticado', 'Faça login para continuar')
+      router.push('/login')
+      return
+    }
+    apiClient.setToken(token)
+    loadWorkshops()
+  }, [loadWorkshops, router, searchTerm])
 
   const handleApprove = async (id: string) => {
     const loadingToast = showToast.loading('Aprovando oficina...')
@@ -235,6 +264,29 @@ export default function WorkshopsPage() {
           </div>
         </div>
 
+        {/* Barra de pesquisa */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+            <input
+              type="text"
+              placeholder="Pesquisar por nome, email, telefone, CNPJ, cidade ou estado..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-[#00c977] focus:ring-2 focus:ring-[#00c977]/20 focus:outline-none transition-all shadow-sm"
+            />
+            {(searchInput || searchTerm) && (
+              <button
+                type="button"
+                onClick={() => { setSearchInput(''); setSearchTerm('') }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-medium"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+        </div>
+
         <FilterButtons activeFilter={filter} onFilterChange={setFilter} />
 
         {loading ? (
@@ -251,7 +303,11 @@ export default function WorkshopsPage() {
               >
                 <AlertCircle className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhuma oficina encontrada</h3>
-                <p className="text-gray-500 dark:text-gray-400">Não há oficinas com o status selecionado no momento.</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {searchTerm
+                    ? `Nenhuma oficina corresponde à busca "${searchTerm}". Tente outro termo ou limpe o filtro.`
+                    : 'Não há oficinas com o status selecionado no momento.'}
+                </p>
               </motion.div>
             ) : (
               <>

@@ -3,7 +3,7 @@
 import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Building2, Mail, MapPin, Percent, Phone, Save, X, Check, Undo2, Upload, Trash2, Loader2, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Building2, Mail, MapPin, Percent, Phone, Save, X, Check, Undo2, Upload, Trash2, Loader2, ExternalLink, CreditCard, AlertTriangle, CheckCircle, Gift, ToggleLeft, ToggleRight } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect, useState, useRef, ChangeEvent } from 'react'
 
@@ -24,6 +24,15 @@ interface Workshop {
   rating?: number
   total_reviews?: number
   meca_fee_percentage?: number | null
+  pagbank_account_status?: string | null
+  pagbank_verified?: boolean
+  pagbank_account_id?: string | null
+  referral_code?: string | null
+  referred_by_id?: string | null
+  referred_by_name?: string | null
+  is_fee_reduced?: boolean
+  fee_reduced_until?: string | null
+  active_referrals_count?: number
 }
 
 const ALLOWED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
@@ -49,6 +58,7 @@ export default function EditWorkshopPage() {
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null)
   const logoInputRef = useRef<HTMLInputElement | null>(null)
   const [isFetchingCep, setIsFetchingCep] = useState(false)
+  const [togglingFeeReduced, setTogglingFeeReduced] = useState(false)
 
   const isAuthExpiredError = (message?: string) => {
     if (!message) {
@@ -251,6 +261,12 @@ export default function EditWorkshopPage() {
           workshopData.meca_fee_percentage !== undefined && workshopData.meca_fee_percentage !== null
             ? Number(workshopData.meca_fee_percentage)
             : null,
+        referral_code: workshopData.referral_code ?? null,
+        referred_by_id: workshopData.referred_by_id ?? null,
+        referred_by_name: workshopData.referred_by_name ?? null,
+        is_fee_reduced: workshopData.is_fee_reduced === true || workshopData.is_fee_reduced === 'true',
+        fee_reduced_until: workshopData.fee_reduced_until ?? null,
+        active_referrals_count: typeof workshopData.active_referrals_count === 'number' ? workshopData.active_referrals_count : (parseInt(String(workshopData.active_referrals_count || '0'), 10) || 0),
       }
       
       setWorkshop(normalizedData as Workshop)
@@ -554,6 +570,28 @@ export default function EditWorkshopPage() {
     }
     await uploadLogoFile(file)
     event.target.value = ''
+  }
+
+  const handleToggleFeeReduced = async () => {
+    if (!workshopId || !workshop) return
+    setTogglingFeeReduced(true)
+    try {
+      const effectiveActive = workshop.is_fee_reduced === true && workshop.fee_reduced_until && new Date(workshop.fee_reduced_until) > new Date()
+      const newValue = !effectiveActive
+      const { data: response, error, status } = await apiClient.updateWorkshop(workshopId, { is_fee_reduced: newValue })
+      if (handleApiAuthError(error, status)) return
+      if (error) {
+        showToast.error('Erro', error || 'Não foi possível alterar a taxa reduzida')
+        return
+      }
+      showToast.success(newValue ? 'Taxa reduzida ativada' : 'Taxa reduzida desativada', 'Alteração aplicada. Use com cuidado (suporte).')
+      await loadWorkshop()
+      await fetchMecaFeeSettings()
+    } catch (e) {
+      showToast.error('Erro', e instanceof Error ? e.message : 'Não foi possível alterar a taxa reduzida')
+    } finally {
+      setTogglingFeeReduced(false)
+    }
   }
 
   const handleLogoRemove = async () => {
@@ -999,6 +1037,134 @@ export default function EditWorkshopPage() {
                     )}
               </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Programa Indique e Ganhe */}
+            <div>
+              <h2 className="text-xl font-semibold text-[#252940] dark:text-white mb-4 flex items-center gap-2">
+                <Gift className="w-5 h-5" />
+                Programa Indique e Ganhe
+              </h2>
+              <div className="bg-white/60 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Código de indicação</p>
+                    <p className="font-mono font-semibold text-[#252940] dark:text-white">
+                      {workshop.referral_code || '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Indicada por</p>
+                    <p className="text-[#252940] dark:text-white">
+                      {workshop.referred_by_name
+                        ? workshop.referred_by_id
+                          ? (
+                              <a
+                                href={`/dashboard/workshops/edit/${workshop.referred_by_id}`}
+                                className="text-[#00c977] hover:underline"
+                              >
+                                {workshop.referred_by_name}
+                              </a>
+                            )
+                          : workshop.referred_by_name
+                        : workshop.referred_by_id
+                          ? workshop.referred_by_id
+                          : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Indicações ativas (1º serviço concluído)</p>
+                    <p className="text-[#252940] dark:text-white">
+                      {typeof workshop.active_referrals_count === 'number' ? workshop.active_referrals_count : 0} / 5
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Taxa reduzida (6%)</p>
+                    {(() => {
+                      const validUntil = workshop.fee_reduced_until ? new Date(workshop.fee_reduced_until) : null
+                      const effectiveActive = workshop.is_fee_reduced === true && validUntil && validUntil > new Date()
+                      return (
+                        <>
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm font-medium ${effectiveActive ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
+                            {effectiveActive ? 'Ativa' : 'Inativa'}
+                          </span>
+                          {validUntil && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              Válida até: {validUntil.toLocaleDateString('pt-BR')} {validUntil.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={handleToggleFeeReduced}
+                            disabled={togglingFeeReduced}
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-[#00c977]/60 text-[#00c977] font-medium hover:bg-[#00c977]/10 transition disabled:opacity-50"
+                            title="Ativar/Desativar taxa reduzida manualmente (suporte). Ao ativar, vale por 1 mês."
+                          >
+                            {togglingFeeReduced ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : effectiveActive ? (
+                              <ToggleRight className="w-4 h-4" />
+                            ) : (
+                              <ToggleLeft className="w-4 h-4" />
+                            )}
+                            {togglingFeeReduced ? 'Salvando...' : effectiveActive ? 'Desativar taxa reduzida' : 'Ativar taxa reduzida (1 mês)'}
+                          </button>
+                        </>
+                      )
+                    })()}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  A taxa reduzida é concedida por 1 mês quando a oficina atinge 5 indicações ativas. Use o botão acima apenas para casos de suporte.
+                </p>
+              </div>
+            </div>
+
+            {/* Status PagBank */}
+            <div>
+              <h2 className="text-xl font-semibold text-[#252940] dark:text-white mb-4 flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                Status PagBank
+              </h2>
+
+              <div className="bg-white/60 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6">
+                {(() => {
+                  const hasAccountId = !!(workshop?.pagbank_account_id && String(workshop.pagbank_account_id).trim())
+                  const statusOk = ['approved', 'active'].includes(workshop?.pagbank_account_status?.toLowerCase() || '')
+                  const isPagBankLinked = hasAccountId && statusOk
+                  return isPagBankLinked ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                        Conta PagBank Vinculada
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {workshop?.pagbank_verified 
+                          ? 'Conta verificada e pronta para receber pagamentos'
+                          : 'Conta criada, aguardando verificação completa'}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+                      <AlertTriangle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
+                        PagBank Não Vinculado
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Esta oficina ainda não vinculou uma conta PagBank. Ela não aparecerá nas buscas dos motoristas.
+                      </p>
+                    </div>
+                  </div>
+                )
+                })()}
               </div>
             </div>
 
