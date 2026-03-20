@@ -31,7 +31,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
       
       const response = await fetch(`${API_URL}/admin/auth/send-code`, {
         method: 'POST',
@@ -71,7 +71,7 @@ export default function LoginPage() {
     }
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
       
       const response = await fetch(`${API_URL}/admin/auth/login-code`, {
         method: 'POST',
@@ -113,7 +113,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
       
       const response = await fetch(`${API_URL}/admin/auth/login`, {
         method: 'POST',
