@@ -68,30 +68,34 @@ export default function DashboardPage() {
         return
       }
 
-      const metricsData =
-        (data as { data?: DashboardMetrics }).data ?? (data as DashboardMetrics)
-      
-      // Log para debug
-      console.log('Dashboard Metrics:', metricsData)
-      console.log('Customer Registrations:', metricsData.customer_registrations)
-      console.log('Workshop Registrations:', metricsData.workshop_registrations)
-      
-      // Processar dados dos gráficos garantindo formato correto
-      const processChartData = (data: any[] | undefined): Array<{ name: string; value: number }> => {
-        if (!data || !Array.isArray(data)) {
-          return []
-        }
-        return data.map((item: any) => ({
+      // API retorna { success, data: { customers: {total,...}, workshops: {total,...}, payments: {...}, charts: {...} } }
+      // Mapear a estrutura aninhada para a interface flat DashboardMetrics
+      const rawData = (data as any).data ?? data
+
+      const processChartData = (arr: any[] | undefined): Array<{ name: string; value: number }> => {
+        if (!arr || !Array.isArray(arr)) return []
+        return arr.map((item: any) => ({
           name: item.name || item.month || 'N/A',
           value: parseInt(item.value || item.count || '0', 10)
-        })).filter(item => item.value >= 0) // Garantir que valores são válidos
+        })).filter(item => item.value >= 0)
       }
-      
-      // Garantir que os arrays de registros existam e estejam no formato correto
+
       const finalMetrics: DashboardMetrics = {
-        ...metricsData,
-        customer_registrations: processChartData(metricsData.customer_registrations),
-        workshop_registrations: processChartData(metricsData.workshop_registrations)
+        total_customers: rawData.customers?.total ?? rawData.total_customers ?? 0,
+        customers_this_week: rawData.customers?.this_week ?? rawData.customers_this_week ?? 0,
+        new_users_this_month: rawData.customers?.this_month ?? rawData.new_users_this_month ?? 0,
+        active_customers: rawData.customers?.active ?? rawData.active_customers ?? 0,
+        total_oficinas: rawData.workshops?.total ?? rawData.total_oficinas ?? 0,
+        workshops_this_week: rawData.workshops?.this_week ?? rawData.workshops_this_week ?? 0,
+        new_workshops_this_month: rawData.workshops?.this_month ?? rawData.new_workshops_this_month ?? 0,
+        active_workshops: rawData.workshops?.active ?? rawData.active_workshops ?? 0,
+        oficinas_by_status: rawData.workshops?.by_status ?? rawData.oficinas_by_status ?? {},
+        revenue_this_month: rawData.payments?.revenue_this_month ?? rawData.revenue_this_month ?? 0,
+        customer_registrations: processChartData(rawData.charts?.customer_registrations ?? rawData.customer_registrations),
+        workshop_registrations: processChartData(rawData.charts?.workshop_registrations ?? rawData.workshop_registrations),
+        total_bookings_last_month: rawData.bookings?.this_month ?? rawData.total_bookings_last_month ?? 0,
+        total_revenue_last_month: rawData.payments?.revenue_this_month ?? rawData.total_revenue_last_month ?? 0,
+        meca_commission_last_month: rawData.payments?.meca_revenue ?? rawData.meca_commission_last_month ?? 0,
       }
       
       setMetrics(finalMetrics)

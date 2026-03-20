@@ -19,6 +19,7 @@ interface Workshop {
   address: string
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
+  owner_name?: string
 }
 
 export default function WorkshopsPage() {
@@ -99,7 +100,8 @@ export default function WorkshopsPage() {
             ? `${workshop.address}, ${workshop.city || ''}, ${workshop.state || ''}`.trim().replace(/^,\s*|,\s*$/g, '')
             : 'Endereço não informado',
           status: normalizedStatus as 'pendente' | 'aprovado' | 'rejeitado',
-          created_at: workshop.created_at || new Date().toISOString()
+          created_at: workshop.created_at || new Date().toISOString(),
+          owner_name: workshop.owner_name || undefined
         }
       })
       

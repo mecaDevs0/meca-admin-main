@@ -8,9 +8,11 @@ import {
   Mail,
   MapPin,
   Phone,
+  User,
   XCircle,
   Edit
 } from 'lucide-react'
+import { showToast } from '@/lib/toast'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -24,6 +26,7 @@ interface Workshop {
   address: string
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
+  owner_name?: string
 }
 
 interface WorkshopCardProps {
@@ -82,9 +85,12 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
   }
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Não navegar se clicar nos botões
     const target = e.target as HTMLElement
-    if (target.closest('button') || target.closest('motion.button')) {
+    if (target.closest('button')) {
+      return
+    }
+    if (!workshop.id || workshop.id === 'undefined') {
+      showToast.error('Erro', 'ID da oficina inválido. Recarregue a página.')
       return
     }
     router.push(`/dashboard/workshops/edit/index?id=${workshop.id}`)
@@ -123,6 +129,12 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
               <FileText className="w-4 h-4 flex-shrink-0" />
               <span className="truncate">{workshop.cnpj}</span>
             </div>
+            {workshop.owner_name && (
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <User className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate font-medium">{workshop.owner_name}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Mail className="w-4 h-4 flex-shrink-0" />
               <span className="truncate">{workshop.email}</span>
