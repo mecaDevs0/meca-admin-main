@@ -87,7 +87,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
     if (target.closest('button') || target.closest('motion.button')) {
       return
     }
-    router.push(`/dashboard/workshops/edit/${workshop.id}`)
+    router.push(`/dashboard/workshops/edit/index?id=${workshop.id}`)
   }
 
   return (
@@ -145,7 +145,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
             whileTap={{ scale: 0.98 }}
             onClick={(e) => {
               e.stopPropagation()
-              router.push(`/dashboard/workshops/edit/${workshop.id}`)
+              router.push(`/dashboard/workshops/edit/index?id=${workshop.id}`)
             }}
             className="bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl dark:from-gray-700 dark:to-gray-800"
           >

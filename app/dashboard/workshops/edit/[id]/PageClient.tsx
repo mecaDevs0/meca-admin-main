@@ -4,8 +4,8 @@ import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Building2, Mail, MapPin, Percent, Phone, Save, X, Check, Undo2, Upload, Trash2, Loader2, ExternalLink, CreditCard, AlertTriangle, CheckCircle, Gift, ToggleLeft, ToggleRight } from 'lucide-react'
-import { useRouter, useParams } from 'next/navigation'
-import { useEffect, useState, useRef, ChangeEvent } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState, useRef, ChangeEvent, Suspense } from 'react'
 
 interface Workshop {
   id: string
@@ -38,11 +38,10 @@ interface Workshop {
 const ALLOWED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
 const MAX_LOGO_SIZE_BYTES = 5 * 1024 * 1024
 
-export default function EditWorkshopPage() {
+function EditWorkshopInner() {
   const router = useRouter()
-  const params = useParams()
-  const rawId = Array.isArray(params?.id) ? params.id[0] : (params?.id as string | undefined)
-  const workshopId = rawId && rawId !== 'undefined' ? rawId : ''
+  const searchParams = useSearchParams()
+  const workshopId = searchParams.get('id') ?? ''
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -1204,6 +1203,14 @@ export default function EditWorkshopPage() {
           </div>
       </div>
     </div>
+  )
+}
+
+export default function EditWorkshopPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-[#00c977] border-t-transparent rounded-full animate-spin" /></div>}>
+      <EditWorkshopInner />
+    </Suspense>
   )
 }
 
