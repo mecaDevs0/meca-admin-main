@@ -18,6 +18,7 @@ import {
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import { showToast } from '@/lib/toast'
 
 interface Workshop {
   id: string
@@ -94,9 +95,12 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
   }
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Não navegar se clicar nos botões
     const target = e.target as HTMLElement
-    if (target.closest('button') || target.closest('motion.button')) {
+    if (target.closest('button')) {
+      return
+    }
+    if (!workshop.id || workshop.id === 'undefined') {
+      showToast.error('Erro', 'ID da oficina inválido. Recarregue a página.')
       return
     }
     router.push(`/dashboard/workshops/edit/${workshop.id}`)
