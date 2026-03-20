@@ -72,23 +72,3 @@ const FilterButtons: React.FC<FilterButtonsProps> = ({ activeFilter, onFilterCha
 }
 
 export default FilterButtons
-
-  )
-}
-
-export default FilterButtons
-
-  )
-}
-
-export default FilterButtons
-
-  )
-}
-
-export default FilterButtons
-
-  )
-}
-
-export default FilterButtons

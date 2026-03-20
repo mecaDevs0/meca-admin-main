@@ -53,7 +53,14 @@ export default function UsersPage() {
       }
       
       // A API retorna { success: true, customers: [...] } ou { success: true, data: { customers: [...] } }
-      const usersData = data.customers || data.data?.customers || data.data || (Array.isArray(data) ? data : [])
+      const d = data as {
+        customers?: unknown[]
+        data?: { customers?: unknown[] } | unknown[]
+      }
+      const usersData =
+        d.customers ??
+        (Array.isArray(d.data) ? d.data : d.data?.customers) ??
+        []
       
       // Mapear dados da API para o formato esperado
       const mappedUsers = usersData.map((user: any) => ({
@@ -192,118 +199,6 @@ export default function UsersPage() {
                             <Phone className="w-4 h-4" />
                             <span>{user.phone}</span>
                           </div>
-                        )}
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(user.created_at)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      user.type === 'customer' 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
-                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-                    }`}>
-                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-      </div>
-    </div>
-  )
-}
-                        )}
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(user.created_at)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      user.type === 'customer' 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
-                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-                    }`}>
-                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-      </div>
-    </div>
-  )
-}
-                        )}
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(user.created_at)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      user.type === 'customer' 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
-                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-                    }`}>
-                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-      </div>
-    </div>
-  )
-}
-                        )}
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(user.created_at)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      user.type === 'customer' 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
-                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-                    }`}>
-                      {user.type === 'customer' ? 'Cliente' : 'Oficina'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-      </div>
-    </div>
-  )
-}
                         )}
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />

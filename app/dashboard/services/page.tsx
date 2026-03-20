@@ -52,7 +52,14 @@ export default function ServicesPage() {
       }
       
       // A API retorna { success: true, services: [...] } ou { success: true, data: { services: [...] } }
-      const servicesData = data.services || data.data?.services || (Array.isArray(data) ? data : data.data || [])
+      const d = data as {
+        services?: unknown[]
+        data?: { services?: unknown[] } | unknown[]
+      }
+      const servicesData =
+        d.services ??
+        (Array.isArray(d.data) ? d.data : d.data?.services) ??
+        []
       
       // Mapear dados reais da API para o formato esperado
       const mappedServices = servicesData.map((service: any) => ({

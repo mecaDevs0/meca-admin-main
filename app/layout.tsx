@@ -49,19 +49,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    </html>
-  );
-}
-
-    </html>
-  );
-}
-
-    </html>
-  );
-}
-
-    </html>
-  );
-}
