@@ -33,6 +33,7 @@ interface Workshop {
   is_fee_reduced?: boolean
   fee_reduced_until?: string | null
   active_referrals_count?: number
+  owner_name?: string | null
 }
 
 const ALLOWED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
@@ -750,6 +751,16 @@ function EditWorkshopInner() {
                     type="text"
                     value={formData.cnpj || ''}
                     onChange={(e) => handleChange('cnpj', e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all dark:bg-gray-900/50 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Responsável</label>
+                  <input
+                    type="text"
+                    value={formData.owner_name || ''}
+                    onChange={(e) => handleChange('owner_name', e.target.value)}
+                    placeholder="Nome do responsável"
                     className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all dark:bg-gray-900/50 dark:text-white"
                   />
                 </div>
