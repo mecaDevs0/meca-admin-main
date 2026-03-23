@@ -93,7 +93,7 @@ export default function ProfilePage() {
 
     setSaving(true)
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
       const token = localStorage.getItem('meca_admin_token')
 
       const response = await fetch(`${API_URL}/admin/profile/password`, {
@@ -144,7 +144,7 @@ export default function ProfilePage() {
 
     setCreatingAdmin(true)
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'}/admin/auth/create`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'}/admin/auth/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

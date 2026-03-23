@@ -34,6 +34,19 @@ interface Workshop {
   fee_reduced_until?: string | null
   active_referrals_count?: number
   owner_name?: string | null
+  workshop_payment_provider?: string | null
+  asaas_account_id?: string | null
+  asaas_wallet_id?: string | null
+  asaas_status?: string | null
+  asaas_pix_key?: string | null
+  asaas_pix_key_type?: string | null
+  bank_name?: string | null
+  bank_code?: string | null
+  agency?: string | null
+  account?: string | null
+  account_type?: string | null
+  pix_key?: string | null
+  pix_key_type?: string | null
 }
 
 const ALLOWED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
@@ -59,6 +72,7 @@ function EditWorkshopInner() {
   const logoInputRef = useRef<HTMLInputElement | null>(null)
   const [isFetchingCep, setIsFetchingCep] = useState(false)
   const [togglingFeeReduced, setTogglingFeeReduced] = useState(false)
+  const [switchingProvider, setSwitchingProvider] = useState(false)
 
   const isAuthExpiredError = (message?: string) => {
     if (!message) {
@@ -267,6 +281,19 @@ function EditWorkshopInner() {
         is_fee_reduced: workshopData.is_fee_reduced === true || workshopData.is_fee_reduced === 'true',
         fee_reduced_until: workshopData.fee_reduced_until ?? null,
         active_referrals_count: typeof workshopData.active_referrals_count === 'number' ? workshopData.active_referrals_count : (parseInt(String(workshopData.active_referrals_count || '0'), 10) || 0),
+        workshop_payment_provider: workshopData.workshop_payment_provider ?? 'pagbank',
+        asaas_account_id: workshopData.asaas_account_id ?? null,
+        asaas_wallet_id: workshopData.asaas_wallet_id ?? null,
+        asaas_status: workshopData.asaas_status ?? null,
+        asaas_pix_key: workshopData.asaas_pix_key ?? null,
+        asaas_pix_key_type: workshopData.asaas_pix_key_type ?? null,
+        bank_name: workshopData.bank_name ?? null,
+        bank_code: workshopData.bank_code ?? null,
+        agency: workshopData.agency ?? null,
+        account: workshopData.account ?? null,
+        account_type: workshopData.account_type ?? null,
+        pix_key: workshopData.pix_key ?? null,
+        pix_key_type: workshopData.pix_key_type ?? null,
       }
       
       setWorkshop(normalizedData as Workshop)
@@ -591,6 +618,39 @@ function EditWorkshopInner() {
       showToast.error('Erro', e instanceof Error ? e.message : 'Não foi possível alterar a taxa reduzida')
     } finally {
       setTogglingFeeReduced(false)
+    }
+  }
+
+  const handleSwitchProvider = async (newProvider: string) => {
+    if (!workshopId || !workshop) return
+    if (newProvider === (workshop.workshop_payment_provider ?? 'pagbank')) return
+
+    if (newProvider === 'asaas' && !workshop.asaas_account_id) {
+      showToast.error('Asaas não configurado', 'Esta oficina ainda não possui uma subconta Asaas criada. Configure antes de trocar o provedor.')
+      return
+    }
+
+    const providerLabel = newProvider === 'asaas' ? 'Asaas' : 'PagBank'
+    const confirmed = typeof window !== 'undefined'
+      ? window.confirm(`Tem certeza que deseja trocar o provedor de pagamento para ${providerLabel}? Isso afetará os próximos pagamentos desta oficina.`)
+      : true
+
+    if (!confirmed) return
+
+    setSwitchingProvider(true)
+    try {
+      const { data: response, error, status } = await apiClient.updateWorkshop(workshopId, { workshop_payment_provider: newProvider })
+      if (handleApiAuthError(error, status)) return
+      if (error) {
+        showToast.error('Erro ao trocar provedor', error || 'Não foi possível alterar o provedor de pagamento')
+        return
+      }
+      showToast.success(`Provedor alterado para ${providerLabel}`, 'O provedor de pagamento foi atualizado com sucesso.')
+      await loadWorkshop()
+    } catch (e) {
+      showToast.error('Erro', e instanceof Error ? e.message : 'Não foi possível trocar o provedor')
+    } finally {
+      setSwitchingProvider(false)
     }
   }
 
@@ -1131,50 +1191,144 @@ function EditWorkshopInner() {
               </div>
             </div>
 
-            {/* Status PagBank */}
+            {/* Provedor de Pagamento */}
             <div>
               <h2 className="text-xl font-semibold text-[#252940] dark:text-white mb-4 flex items-center gap-2">
                 <CreditCard className="w-5 h-5" />
-                Status PagBank
+                Provedor de Pagamento
               </h2>
 
-              <div className="bg-white/60 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6">
-                {(() => {
-                  const hasAccountId = !!(workshop?.pagbank_account_id && String(workshop.pagbank_account_id).trim())
-                  const statusOk = ['approved', 'active'].includes(workshop?.pagbank_account_status?.toLowerCase() || '')
-                  const isPagBankLinked = hasAccountId && statusOk
-                  return isPagBankLinked ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                      <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <div className="space-y-4">
+                {/* Provider badge + selector */}
+                <div className="bg-white/60 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Provedor atual</p>
+                      <div className="flex items-center gap-3">
+                        {(workshop.workshop_payment_provider ?? 'pagbank') === 'asaas' ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[#00C977]/15 text-[#00C977] border border-[#00C977]/30">
+                            <span className="w-2 h-2 rounded-full bg-[#00C977]" />
+                            Asaas
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700">
+                            <span className="w-2 h-2 rounded-full bg-amber-500" />
+                            PagBank
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Trocar provedor</label>
+                      <div className="relative" title={!workshop.asaas_account_id && (workshop.workshop_payment_provider ?? 'pagbank') !== 'asaas' ? 'Subconta Asaas não criada — configure antes de trocar' : ''}>
+                        <select
+                          value={workshop.workshop_payment_provider ?? 'pagbank'}
+                          onChange={(e) => handleSwitchProvider(e.target.value)}
+                          disabled={switchingProvider || (!workshop.asaas_account_id && (workshop.workshop_payment_provider ?? 'pagbank') !== 'asaas')}
+                          className="px-4 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 text-sm font-medium focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <option value="pagbank">PagBank</option>
+                          <option value="asaas" disabled={!workshop.asaas_account_id}>
+                            Asaas{!workshop.asaas_account_id ? ' (não configurado)' : ''}
+                          </option>
+                        </select>
+                        {switchingProvider && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <Loader2 className="w-4 h-4 animate-spin text-[#00c977]" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    A troca de provedor afeta apenas os próximos pagamentos. Transações em andamento não são impactadas.
+                  </p>
+                </div>
+
+                {/* Asaas status section — visible when provider is asaas OR asaas_account_id exists */}
+                {((workshop.workshop_payment_provider ?? 'pagbank') === 'asaas' || !!workshop.asaas_account_id) && (
+                  <div className="bg-white/60 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Subconta Asaas</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                      <div>
+                        <span className="text-gray-500 dark:text-gray-400">Status</span>
+                        <div className="mt-1">
+                          {workshop.asaas_status ? (
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              workshop.asaas_status.toUpperCase() === 'ACTIVE'
+                                ? 'bg-[#00C977]/15 text-[#00C977] border border-[#00C977]/30'
+                                : workshop.asaas_status.toUpperCase() === 'PENDING'
+                                ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700'
+                                : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                workshop.asaas_status.toUpperCase() === 'ACTIVE'
+                                  ? 'bg-[#00C977]'
+                                  : workshop.asaas_status.toUpperCase() === 'PENDING'
+                                  ? 'bg-amber-500'
+                                  : 'bg-red-500'
+                              }`} />
+                              {workshop.asaas_status}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 dark:text-gray-500">—</span>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 dark:text-gray-400">Account ID</span>
+                        <p className="mt-1 font-mono text-xs text-gray-800 dark:text-gray-200 break-all">{workshop.asaas_account_id || '—'}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 dark:text-gray-400">Wallet ID</span>
+                        <p className="mt-1 font-mono text-xs text-gray-800 dark:text-gray-200 break-all">{workshop.asaas_wallet_id || '—'}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 dark:text-gray-400">Chave PIX Asaas</span>
+                        <p className="mt-1 text-gray-800 dark:text-gray-200">
+                          {workshop.asaas_pix_key
+                            ? <span>{workshop.asaas_pix_key} <span className="text-xs text-gray-500 dark:text-gray-400">({workshop.asaas_pix_key_type || 'tipo desconhecido'})</span></span>
+                            : '—'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Banking details — always visible */}
+                <div className="bg-white/60 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Dados Bancários</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400">Banco</span>
+                      <p className="mt-1 text-gray-800 dark:text-gray-200">
+                        {workshop.bank_name
+                          ? <>{workshop.bank_name}{workshop.bank_code ? <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({workshop.bank_code})</span> : null}</>
+                          : '—'}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-                        Conta PagBank Vinculada
+                      <span className="text-gray-500 dark:text-gray-400">Agência</span>
+                      <p className="mt-1 text-gray-800 dark:text-gray-200">{workshop.agency || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400">Conta</span>
+                      <p className="mt-1 text-gray-800 dark:text-gray-200">
+                        {workshop.account
+                          ? <>{workshop.account}{workshop.account_type ? <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({workshop.account_type})</span> : null}</>
+                          : '—'}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {workshop?.pagbank_verified 
-                          ? 'Conta verificada e pronta para receber pagamentos'
-                          : 'Conta criada, aguardando verificação completa'}
+                    </div>
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400">Chave PIX</span>
+                      <p className="mt-1 text-gray-800 dark:text-gray-200">
+                        {workshop.pix_key
+                          ? <>{workshop.pix_key}{workshop.pix_key_type ? <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({workshop.pix_key_type})</span> : null}</>
+                          : '—'}
                       </p>
                     </div>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
-                      <AlertTriangle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
-                        PagBank Não Vinculado
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Esta oficina ainda não vinculou uma conta PagBank. Ela não aparecerá nas buscas dos motoristas.
-                      </p>
-                    </div>
-                  </div>
-                )
-                })()}
+                </div>
               </div>
             </div>
 

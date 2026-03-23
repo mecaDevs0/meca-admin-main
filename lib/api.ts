@@ -3,7 +3,7 @@
  * Cliente para comunicação com a API MECA
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-144-213-137.us-east-2.compute.amazonaws.com:9000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
 
 interface ApiResponse<T = any> {
   data?: T
@@ -234,6 +234,23 @@ class MecaApiClient {
   // API Health
   async checkHealth() {
     return this.request('/health')
+  }
+
+  // Payments
+  async getPayments(filters?: { status?: string; provider?: string; startDate?: string; endDate?: string }) {
+    const query = new URLSearchParams()
+    if (filters?.status) query.append('status', filters.status)
+    if (filters?.provider) query.append('provider', filters.provider)
+    if (filters?.startDate) query.append('start_date', filters.startDate)
+    if (filters?.endDate) query.append('end_date', filters.endDate)
+    const queryString = query.toString()
+    return this.request(`/admin/payments${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // Financial Analytics
+  async getFinancialAnalytics(period?: string) {
+    const query = period ? `?period=${period}` : ''
+    return this.request(`/admin/analytics/financial${query}`)
   }
 }
 

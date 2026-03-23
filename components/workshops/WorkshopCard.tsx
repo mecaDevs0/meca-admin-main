@@ -27,6 +27,7 @@ interface Workshop {
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
   owner_name?: string
+  workshop_payment_provider?: string
 }
 
 interface WorkshopCardProps {
@@ -120,6 +121,15 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
                   <StatusIcon className="w-3.5 h-3.5" />
                   {statusConfig.label}
                 </span>
+                {workshop.workshop_payment_provider && (
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                    workshop.workshop_payment_provider === 'asaas'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                  }`}>
+                    {workshop.workshop_payment_provider === 'asaas' ? 'Asaas' : 'PagBank'}
+                  </span>
+                )}
               </div>
             </div>
           </div>

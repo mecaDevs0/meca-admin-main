@@ -10,7 +10,10 @@ import {
   Users,
   Bell,
   Activity,
-  DollarSign
+  DollarSign,
+  Percent,
+  CreditCard,
+  TrendingUp
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -31,6 +34,9 @@ interface DashboardMetrics {
     rejeitado?: number
   }
   revenue_this_month: number
+  meca_take: number
+  gateway_fee: number
+  meca_revenue: number
   customer_registrations: Array<{ name: string; value: number }>
   workshop_registrations: Array<{ name: string; value: number }>
   total_bookings_last_month: number
@@ -91,6 +97,9 @@ export default function DashboardPage() {
         active_workshops: rawData.workshops?.active ?? rawData.active_workshops ?? 0,
         oficinas_by_status: rawData.workshops?.by_status ?? rawData.oficinas_by_status ?? {},
         revenue_this_month: rawData.payments?.revenue_this_month ?? rawData.revenue_this_month ?? 0,
+        meca_take: rawData.payments?.meca_take ?? 0,
+        gateway_fee: rawData.payments?.pagbank_fee ?? 0,
+        meca_revenue: rawData.payments?.meca_revenue ?? 0,
         customer_registrations: processChartData(rawData.charts?.customer_registrations ?? rawData.customer_registrations),
         workshop_registrations: processChartData(rawData.charts?.workshop_registrations ?? rawData.workshop_registrations),
         total_bookings_last_month: rawData.bookings?.this_month ?? rawData.total_bookings_last_month ?? 0,
@@ -131,6 +140,10 @@ export default function DashboardPage() {
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 }
+  }
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
   }
 
   if (loading) {
@@ -322,6 +335,63 @@ export default function DashboardPage() {
           
         </div>
         
+        {/* Seção Financeiro MECA */}
+        <motion.div variants={itemVariants} className="mb-4">
+          <h2 className="text-lg font-semibold text-[#252940] dark:text-white mb-4">Financeiro MECA</h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
+
+          {/* Card - Taxa MECA (12%) */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center">
+                <Percent className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Taxa MECA (12%)</p>
+            <p className="text-2xl font-bold text-[#252940] dark:text-white">{formatCurrency(metrics.meca_take)}</p>
+          </motion.div>
+
+          {/* Card - Custo Gateway */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-xl flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Custo Gateway</p>
+            <p className="text-2xl font-bold text-[#252940] dark:text-white">{formatCurrency(metrics.gateway_fee)}</p>
+          </motion.div>
+
+          {/* Card - Receita Líquida MECA */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 201, 119, 0.25)' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-[#00c977]/30 dark:border-[#00c977]/20 shadow-lg shadow-[#00c977]/5"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg shadow-[#00c977]/30">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Receita Líquida MECA</p>
+            <p className="text-2xl font-bold text-[#00c977]">{formatCurrency(metrics.meca_revenue)}</p>
+          </motion.div>
+
+        </div>
+
         {/* Row 2: 2 Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           
