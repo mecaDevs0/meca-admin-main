@@ -8,6 +8,7 @@ import {
   Mail,
   MapPin,
   Phone,
+  Trash2,
   User,
   XCircle,
   Edit
@@ -28,23 +29,27 @@ interface Workshop {
   created_at: string
   owner_name?: string
   workshop_payment_provider?: string
+  logo_url?: string
 }
 
 interface WorkshopCardProps {
   workshop: Workshop
   onApprove: (id: string) => void
   onReject: (id: string) => void
+  onDelete?: (id: string) => void
   delay?: number
 }
 
-const WorkshopCard: React.FC<WorkshopCardProps> = ({ 
-  workshop, 
-  onApprove, 
-  onReject
+const WorkshopCard: React.FC<WorkshopCardProps> = ({
+  workshop,
+  onApprove,
+  onReject,
+  onDelete
 }) => {
   const router = useRouter()
   const [isApproving, setIsApproving] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   const getStatusConfig = (status: string) => {
     const configs = {
@@ -110,9 +115,20 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
         {/* Informações Principais */}
         <div className="flex-1">
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
+            {workshop.logo_url && !logoError ? (
+              <img
+                src={workshop.logo_url}
+                alt={workshop.name}
+                onError={() => setLogoError(true)}
+                className="w-12 h-12 rounded-xl object-cover shadow-lg flex-shrink-0"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                <span className="text-white font-bold text-sm">
+                  {workshop.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
+                </span>
+              </div>
+            )}
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
@@ -197,7 +213,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
                   </>
                 )}
               </motion.button>
-              
+
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -209,6 +225,21 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
                 Rejeitar
               </motion.button>
             </>
+          )}
+
+          {workshop.status === 'rejeitado' && onDelete && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(workshop.id)
+              }}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl z-10"
+            >
+              <Trash2 className="w-4 h-4" />
+              Excluir
+            </motion.button>
           )}
         </div>
       </div>

@@ -139,6 +139,12 @@ class MecaApiClient {
     })
   }
 
+  async deleteWorkshop(id: string) {
+    return this.request(`/admin/workshops/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
   async uploadWorkshopLogo(workshopId: string, logoBase64DataUrl: string) {
     return this.request(`/workshop/${workshopId}/logo`, {
       method: 'POST',

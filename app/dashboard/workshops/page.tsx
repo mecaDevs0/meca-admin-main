@@ -20,6 +20,7 @@ interface Workshop {
   status: 'pendente' | 'aprovado' | 'rejeitado'
   created_at: string
   owner_name?: string
+  logo_url?: string
 }
 
 export default function WorkshopsPage() {
@@ -29,6 +30,8 @@ export default function WorkshopsPage() {
   const [loading, setLoading] = useState(true)
   const [rejectReason, setRejectReason] = useState('')
   const [selectedWorkshop, setSelectedWorkshop] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -101,7 +104,8 @@ export default function WorkshopsPage() {
             : 'Endereço não informado',
           status: normalizedStatus as 'pendente' | 'aprovado' | 'rejeitado',
           created_at: workshop.created_at || new Date().toISOString(),
-          owner_name: workshop.owner_name || undefined
+          owner_name: workshop.owner_name || undefined,
+          logo_url: workshop.logo_url || undefined
         }
       })
       
@@ -165,6 +169,35 @@ export default function WorkshopsPage() {
     } catch (err) {
       showToast.dismiss(loadingToast)
       showToast.error('Erro ao rejeitar', 'Ocorreu um erro inesperado')
+    }
+  }
+
+  const handleDeleteClick = (id: string) => {
+    const ws = workshops.find(w => w.id === id)
+    if (ws) setDeleteTarget({ id, name: ws.name })
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+    setIsDeleting(true)
+    const loadingToast = showToast.loading('Excluindo oficina...')
+
+    try {
+      const { data, error } = await apiClient.deleteWorkshop(deleteTarget.id)
+      showToast.dismiss(loadingToast)
+
+      if (!error && data) {
+        showToast.success('Oficina excluída com sucesso', `"${deleteTarget.name}" foi removida`)
+        setDeleteTarget(null)
+        setTimeout(() => loadWorkshops(), 500)
+      } else {
+        showToast.error('Erro ao excluir', error || 'Não foi possível excluir a oficina')
+      }
+    } catch (err) {
+      showToast.dismiss(loadingToast)
+      showToast.error('Erro ao excluir', 'Ocorreu um erro inesperado')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -232,6 +265,7 @@ export default function WorkshopsPage() {
                         workshop={workshop}
                         onApprove={handleApprove}
                         onReject={() => setSelectedWorkshop(workshop.id)}
+                        onDelete={handleDeleteClick}
                       />
                     </motion.div>
                   ))}
@@ -251,6 +285,38 @@ export default function WorkshopsPage() {
           reason={rejectReason}
           onReasonChange={setRejectReason}
         />
+
+        {/* Modal de confirmação de exclusão */}
+        {deleteTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4"
+            >
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Excluir oficina</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Tem certeza que deseja excluir a oficina <strong>&ldquo;{deleteTarget.name}&rdquo;</strong>? Esta ação não pode ser desfeita.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={isDeleting}
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? 'Excluindo...' : 'Excluir'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   )
