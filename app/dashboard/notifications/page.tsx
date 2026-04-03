@@ -62,9 +62,15 @@ export default function NotificationsPage() {
       }
 
       if (workshopsRes.data) {
-        const raw = workshopsRes.data as { data?: Workshop[] } | Workshop[]
-        const workshopsData = Array.isArray(raw) ? raw : raw.data ?? []
-        setWorkshops(workshopsData as Workshop[])
+        const raw = workshopsRes.data as { oficinas?: Workshop[]; data?: Workshop[] } | Workshop[]
+        let workshopsData: Workshop[] = []
+        if (Array.isArray(raw)) {
+          workshopsData = raw
+        } else {
+          const arr = raw.oficinas ?? raw.data ?? (raw as Record<string, unknown>)['oficinas'] ?? []
+          workshopsData = Array.isArray(arr) ? arr as Workshop[] : []
+        }
+        setWorkshops(workshopsData)
       }
     } catch (error) {
       showToast.error('Erro ao carregar dados', 'Não foi possível carregar usuários e oficinas')
@@ -148,8 +154,8 @@ export default function NotificationsPage() {
   )
 
   const filteredWorkshops = workshops.filter(w =>
-    w.name.toLowerCase().includes(searchWorkshops.toLowerCase()) ||
-    w.email.toLowerCase().includes(searchWorkshops.toLowerCase())
+    (w.name || '').toLowerCase().includes(searchWorkshops.toLowerCase()) ||
+    (w.email || '').toLowerCase().includes(searchWorkshops.toLowerCase())
   )
 
   const containerVariants = {
