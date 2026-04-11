@@ -37,10 +37,13 @@ jobs:
 
       - name: Instalar dependências
         run: |
-          npm ci
-          # Workaround npm#4828: lockfile gerado em macOS não inclui o binário
-          # linux-x64 do lightningcss (dep nativa do Tailwind 4). Força instalar.
-          npm install --no-save lightningcss-linux-x64-gnu || true
+          # Workaround npm#4828: lockfile gerado em macOS não inclui binários
+          # nativos linux-x64 dos optional deps do Tailwind 4 (lightningcss,
+          # @tailwindcss/oxide, etc). `npm ci` respeita o lockfile e omite
+          # essas deps, causando "Cannot find native binding" no build.
+          # Solução: descartar lockfile e deixar o npm resolver do zero em Linux.
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
 
       - name: Type check
         run: npx tsc --noEmit
@@ -64,10 +67,13 @@ jobs:
 
       - name: Instalar dependências
         run: |
-          npm ci
-          # Workaround npm#4828: lockfile gerado em macOS não inclui o binário
-          # linux-x64 do lightningcss (dep nativa do Tailwind 4). Força instalar.
-          npm install --no-save lightningcss-linux-x64-gnu || true
+          # Workaround npm#4828: lockfile gerado em macOS não inclui binários
+          # nativos linux-x64 dos optional deps do Tailwind 4 (lightningcss,
+          # @tailwindcss/oxide, etc). `npm ci` respeita o lockfile e omite
+          # essas deps, causando "Cannot find native binding" no build.
+          # Solução: descartar lockfile e deixar o npm resolver do zero em Linux.
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
 
       - name: Cache .next/cache
         uses: actions/cache@v4
