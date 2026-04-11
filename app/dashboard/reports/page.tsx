@@ -283,8 +283,8 @@ export default function ReportsPage() {
                     color: '#f9fafb',
                     fontSize: 12,
                   }}
-                  formatter={(value: number, name: string) => [
-                    formatCurrency(value),
+                  formatter={(value, name) => [
+                    formatCurrency(Number(value)),
                     name === 'revenue' ? 'Receita Bruta' : 'Receita MECA',
                   ]}
                   labelFormatter={(label) => `Data: ${label}`}
