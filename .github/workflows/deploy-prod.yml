@@ -1,9 +1,8 @@
 name: Deploy Admin MECA — Produção
 
-# meca-admin-nextjs é um Next.js 15 com App Router e SSR.
-# Deploy: build Docker → push ECR → ECS task separada OU S3 estático se next export for viável.
-# Por padrão tentamos next export (static). Se falhar (usa Server Components dinâmicos),
-# o job de build falha early e o log indica que é necessário container.
+# meca-admin-nextjs é Next.js 15 App Router com output: 'export' (static).
+# `npm run build` gera `out/` diretamente; o antigo `next export` foi removido
+# do Next 14+. Deploy: S3 sync + CloudFront invalidate.
 
 on:
   push:
@@ -83,56 +82,39 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # Tentar next export (SSG). Se o projeto usar SSR, este step falhará graciosamente.
-      - name: Tentar export estático
-        id: static-export
+      # `output: 'export'` já produz `out/` durante `next build`.
+      - name: Verificar diretório out/
         run: |
-          if npx next export -o out 2>/dev/null; then
-            echo "mode=static" >> $GITHUB_OUTPUT
-            echo "Export estático bem-sucedido — deploy para S3"
-          else
-            echo "mode=docker" >> $GITHUB_OUTPUT
-            echo "Export estático não disponível — app usa SSR. Necessário deploy em container."
+          if [ ! -d "out" ]; then
+            echo "ERRO: diretório out/ não existe após build. Verifique next.config.ts (output: 'export')."
+            exit 1
           fi
-        continue-on-error: true
+          echo "out/ contém $(find out -type f | wc -l) arquivos"
 
-      # Deploy S3 (apenas se export estático funcionou)
-      - name: Deploy para S3 (modo estático)
-        if: steps.static-export.outputs.mode == 'static'
+      - name: Deploy para S3
         run: |
+          # Assets com cache longo (imutáveis via hash no nome)
           aws s3 sync out/ s3://${{ env.S3_BUCKET }} \
             --delete \
             --cache-control "public, max-age=31536000, immutable" \
             --exclude "*.html" \
+            --exclude "*.txt" \
             --region ${{ env.AWS_REGION }}
 
-          # HTML sem cache (para SPA routing funcionar)
+          # HTML/txt sem cache (roteamento SPA e next-data)
           aws s3 sync out/ s3://${{ env.S3_BUCKET }} \
-            --delete \
             --cache-control "no-cache, no-store, must-revalidate" \
             --exclude "*" \
             --include "*.html" \
+            --include "*.txt" \
             --region ${{ env.AWS_REGION }}
 
-      - name: CloudFront invalidation (modo estático)
-        if: steps.static-export.outputs.mode == 'static' && env.CLOUDFRONT_DISTRIBUTION_ID != ''
+      - name: CloudFront invalidation
+        if: env.CLOUDFRONT_DISTRIBUTION_ID != ''
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*" \
-            --region us-east-1  # CloudFront API é sempre us-east-1
-
-      # Docker para SSR (se export estático falhou)
-      - name: Build Docker (modo SSR)
-        if: steps.static-export.outputs.mode == 'docker'
-        run: |
-          echo "## ATENÇÃO: Deploy em Container Necessário" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "O app Admin usa SSR e não pode ser exportado como estático." >> $GITHUB_STEP_SUMMARY
-          echo "Configure um ECS Service para meca-admin-nextjs similar ao meca-api-service-prod." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Consulte OPERATIONS.md para instruções de setup do container admin." >> $GITHUB_STEP_SUMMARY
-          exit 0  # Não falhar o workflow — apenas documentar
+            --paths "/*"
 
       - name: Smoke test
         run: |
@@ -146,5 +128,5 @@ jobs:
         run: |
           echo "## Admin Deploy" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Modo | ${{ steps.static-export.outputs.mode || 'N/A' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bucket | s3://${{ env.S3_BUCKET }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Hora | $(date -u +'%Y-%m-%d %H:%M UTC') |" >> $GITHUB_STEP_SUMMARY
