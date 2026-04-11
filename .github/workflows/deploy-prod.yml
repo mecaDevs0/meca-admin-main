@@ -36,7 +36,11 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Instalar dependências
-        run: npm ci
+        run: |
+          npm ci
+          # Workaround npm#4828: lockfile gerado em macOS não inclui o binário
+          # linux-x64 do lightningcss (dep nativa do Tailwind 4). Força instalar.
+          npm install --no-save lightningcss-linux-x64-gnu || true
 
       - name: Type check
         run: npx tsc --noEmit
@@ -59,7 +63,11 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Instalar dependências
-        run: npm ci
+        run: |
+          npm ci
+          # Workaround npm#4828: lockfile gerado em macOS não inclui o binário
+          # linux-x64 do lightningcss (dep nativa do Tailwind 4). Força instalar.
+          npm install --no-save lightningcss-linux-x64-gnu || true
 
       - name: Cache .next/cache
         uses: actions/cache@v4
