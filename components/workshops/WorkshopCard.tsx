@@ -75,6 +75,13 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
   const statusConfig = getStatusConfig(workshop.status)
   const StatusIcon = statusConfig.icon
 
+  const safeName = (workshop.name && String(workshop.name).trim()) || 'Sem nome'
+  const initials = (() => {
+    const words = safeName.split(/\s+/).filter(Boolean).slice(0, 2)
+    const chars = words.map((w) => (w && w[0]) || '').filter(Boolean).join('')
+    return (chars || 'OF').toUpperCase()
+  })()
+
   const handleApprove = async (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsApproving(true)
@@ -118,21 +125,19 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
             {workshop.logo_url && !logoError ? (
               <img
                 src={workshop.logo_url}
-                alt={workshop.name}
+                alt={safeName}
                 onError={() => setLogoError(true)}
                 className="w-12 h-12 rounded-xl object-cover shadow-lg flex-shrink-0"
               />
             ) : (
               <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                <span className="text-white font-bold text-sm">
-                  {workshop.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
-                </span>
+                <span className="text-white font-bold text-sm">{initials}</span>
               </div>
             )}
-            
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">{workshop.name}</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">{safeName}</h3>
                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${statusConfig.color}`}>
                   <StatusIcon className="w-3.5 h-3.5" />
                   {statusConfig.label}

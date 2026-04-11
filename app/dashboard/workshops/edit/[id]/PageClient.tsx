@@ -1,5 +1,6 @@
 'use client'
 
+import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
 import { motion } from 'framer-motion'
@@ -1152,7 +1153,8 @@ function EditWorkshopInner() {
                   <div className="flex items-center gap-3 flex-wrap">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Taxa reduzida (6%)</p>
                     {(() => {
-                      const validUntil = workshop.fee_reduced_until ? new Date(workshop.fee_reduced_until) : null
+                      const rawUntil = workshop.fee_reduced_until ? new Date(workshop.fee_reduced_until) : null
+                      const validUntil = rawUntil && !Number.isNaN(rawUntil.getTime()) ? rawUntil : null
                       const effectiveActive = workshop.is_fee_reduced === true && validUntil && validUntil > new Date()
                       return (
                         <>
@@ -1373,9 +1375,11 @@ function EditWorkshopInner() {
 
 export default function EditWorkshopPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-[#00c977] border-t-transparent rounded-full animate-spin" /></div>}>
-      <EditWorkshopInner />
-    </Suspense>
+    <ErrorBoundary label="Editar oficina">
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-[#00c977] border-t-transparent rounded-full animate-spin" /></div>}>
+        <EditWorkshopInner />
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 

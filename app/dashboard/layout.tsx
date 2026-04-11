@@ -13,9 +13,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
     if (!token) {
-      router.push('/login')
+      window.location.replace('/login/')
+      return
     }
-  }, [router])
+  }, [])
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">

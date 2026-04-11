@@ -1,5 +1,6 @@
 'use client'
 
+import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import FilterButtons from '@/components/workshops/FilterButtons'
 import RejectModal from '@/components/workshops/RejectModal'
 import WorkshopCard from '@/components/workshops/WorkshopCard'
@@ -24,6 +25,14 @@ interface Workshop {
 }
 
 export default function WorkshopsPage() {
+  return (
+    <ErrorBoundary label="Oficinas">
+      <WorkshopsPageInner />
+    </ErrorBoundary>
+  )
+}
+
+function WorkshopsPageInner() {
   const router = useRouter()
   const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [filter, setFilter] = useState<string>('all')
@@ -76,39 +85,52 @@ export default function WorkshopsPage() {
       }
 
       // A API retorna { success: true, oficinas: [...] } ou { success: true, data: { oficinas: [...] } }
-      const d = data as {
-        oficinas?: unknown[]
-        data?: { oficinas?: unknown[] } | unknown[]
+      const d = (data ?? {}) as {
+        oficinas?: unknown
+        data?: unknown
       }
-      const workshopsData =
-        d.oficinas ??
-        (Array.isArray(d.data) ? d.data : d.data?.oficinas) ??
+      const rawList: unknown =
+        (Array.isArray(d.oficinas) ? d.oficinas : undefined) ??
+        (Array.isArray(d.data) ? d.data : undefined) ??
+        (d.data && typeof d.data === 'object' && Array.isArray((d.data as any).oficinas)
+          ? (d.data as any).oficinas
+          : undefined) ??
         []
-      
-      // Mapear dados da API para o formato esperado
-      const mappedWorkshops = workshopsData.map((workshop: any) => {
-        // Normalizar status: 'pending' -> 'pendente', 'approved' -> 'aprovado', 'rejected' -> 'rejeitado'
-        let normalizedStatus = (workshop.status || 'pendente').toLowerCase()
-        if (normalizedStatus === 'pending') normalizedStatus = 'pendente'
-        if (normalizedStatus === 'approved') normalizedStatus = 'aprovado'
-        if (normalizedStatus === 'rejected') normalizedStatus = 'rejeitado'
-        
-        return {
-          id: workshop.id,
-          name: workshop.name || 'Sem nome',
-          cnpj: workshop.cnpj || 'Não informado',
-          email: workshop.email || 'Não informado',
-          phone: workshop.phone || 'Não informado',
-          address: workshop.address 
-            ? `${workshop.address}, ${workshop.city || ''}, ${workshop.state || ''}`.trim().replace(/^,\s*|,\s*$/g, '')
-            : 'Endereço não informado',
-          status: normalizedStatus as 'pendente' | 'aprovado' | 'rejeitado',
-          created_at: workshop.created_at || new Date().toISOString(),
-          owner_name: workshop.owner_name || undefined,
-          logo_url: workshop.logo_url || undefined
+      const workshopsData: any[] = Array.isArray(rawList) ? rawList : []
+
+      // Mapear dados da API para o formato esperado — cada item isolado em try/catch
+      // para que UMA oficina malformada não derrube a lista inteira
+      const mappedWorkshops: Workshop[] = []
+      for (const raw of workshopsData) {
+        try {
+          const w = (raw && typeof raw === 'object') ? raw as any : {}
+          // Normalizar status: aceita pending/approved/rejected + pendente/aprovado/rejeitado + null
+          let normalizedStatus = String(w.status ?? 'pendente').toLowerCase().trim()
+          if (normalizedStatus === 'pending' || normalizedStatus === '' || normalizedStatus === 'null') normalizedStatus = 'pendente'
+          if (normalizedStatus === 'approved') normalizedStatus = 'aprovado'
+          if (normalizedStatus === 'rejected') normalizedStatus = 'rejeitado'
+          if (!['pendente', 'aprovado', 'rejeitado'].includes(normalizedStatus)) normalizedStatus = 'pendente'
+
+          const addressParts = [w.address, w.city, w.state].filter((p) => p && String(p).trim().length > 0)
+          const addressStr = addressParts.length > 0 ? addressParts.join(', ') : 'Endereço não informado'
+
+          mappedWorkshops.push({
+            id: String(w.id ?? ''),
+            name: w.name ? String(w.name) : 'Sem nome',
+            cnpj: w.cnpj ? String(w.cnpj) : 'Não informado',
+            email: w.email ? String(w.email) : 'Não informado',
+            phone: w.phone ? String(w.phone) : 'Não informado',
+            address: addressStr,
+            status: normalizedStatus as 'pendente' | 'aprovado' | 'rejeitado',
+            created_at: w.created_at ? String(w.created_at) : new Date().toISOString(),
+            owner_name: w.owner_name ? String(w.owner_name) : undefined,
+            logo_url: w.logo_url ? String(w.logo_url) : undefined,
+          })
+        } catch (mapErr) {
+          console.warn('[workshops] item inválido ignorado:', raw, mapErr)
         }
-      })
-      
+      }
+
       setWorkshops(mappedWorkshops)
     } catch (error) {
       showToast.error('Erro', 'Ocorreu um erro ao carregar as oficinas')

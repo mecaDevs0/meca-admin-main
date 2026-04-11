@@ -54,8 +54,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
     if (!token) {
-      showToast.error('Não autenticado', 'Faça login para continuar')
-      router.push('/login')
+      window.location.replace('/login/')
       return
     }
     apiClient.setToken(token)
