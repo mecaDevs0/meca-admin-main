@@ -1257,14 +1257,14 @@ function EditWorkshopInner() {
                         <div className="mt-1">
                           {workshop.asaas_status ? (
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                              workshop.asaas_status.toUpperCase() === 'ACTIVE'
+                              workshop.asaas_status.toUpperCase() === 'ACTIVE' || workshop.asaas_status.toUpperCase() === 'APPROVED'
                                 ? 'bg-[#00C977]/15 text-[#00C977] border border-[#00C977]/30'
                                 : workshop.asaas_status.toUpperCase() === 'PENDING'
                                 ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700'
                                 : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700'
                             }`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${
-                                workshop.asaas_status.toUpperCase() === 'ACTIVE'
+                                workshop.asaas_status.toUpperCase() === 'ACTIVE' || workshop.asaas_status.toUpperCase() === 'APPROVED'
                                   ? 'bg-[#00C977]'
                                   : workshop.asaas_status.toUpperCase() === 'PENDING'
                                   ? 'bg-amber-500'
@@ -1382,4 +1382,3 @@ export default function EditWorkshopPage() {
     </ErrorBoundary>
   )
 }
-
