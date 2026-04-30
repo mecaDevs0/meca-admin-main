@@ -2,6 +2,7 @@
 
 import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
+import { formatPhone } from '@/lib/utils'
 import { Calendar, Mail, Phone, Search, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -197,7 +198,7 @@ export default function UsersPage() {
                         {user.phone && (
                           <div className="flex items-center gap-1">
                             <Phone className="w-4 h-4" />
-                            <span>{user.phone}</span>
+                            <span>{formatPhone(user.phone)}</span>
                           </div>
                         )}
                         <div className="flex items-center gap-1">

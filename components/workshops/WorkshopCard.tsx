@@ -14,6 +14,7 @@ import {
   Edit
 } from 'lucide-react'
 import { showToast } from '@/lib/toast'
+import { formatPhone, formatCnpj } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -158,7 +159,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <FileText className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate">{workshop.cnpj}</span>
+              <span className="truncate">{formatCnpj(workshop.cnpj)}</span>
             </div>
             {workshop.owner_name && (
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -172,7 +173,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Phone className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate">{workshop.phone}</span>
+              <span className="truncate">{formatPhone(workshop.phone)}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <MapPin className="w-4 h-4 flex-shrink-0" />

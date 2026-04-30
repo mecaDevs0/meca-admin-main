@@ -2,6 +2,7 @@
 
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
+import { formatPhone } from '@/lib/utils'
 import { AlertCircle, Calendar, CheckCircle, Clock, CreditCard, DollarSign, Wallet, XCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -334,7 +335,7 @@ export default function BookingsPage() {
                                 <p className="text-gray-600 dark:text-gray-400 text-xs">{booking.customer_email}</p>
                               )}
                               {booking.customer_phone && (
-                                <p className="text-gray-600 dark:text-gray-400 text-xs">{booking.customer_phone}</p>
+                                <p className="text-gray-600 dark:text-gray-400 text-xs">{formatPhone(booking.customer_phone)}</p>
                               )}
                             </div>
 
@@ -356,7 +357,7 @@ export default function BookingsPage() {
                                 <p className="text-gray-600 dark:text-gray-400 text-xs">{booking.oficina_email}</p>
                               )}
                               {booking.oficina_phone && (
-                                <p className="text-gray-600 dark:text-gray-400 text-xs">{booking.oficina_phone}</p>
+                                <p className="text-gray-600 dark:text-gray-400 text-xs">{formatPhone(booking.oficina_phone)}</p>
                               )}
                             </div>
 
