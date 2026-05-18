@@ -7,6 +7,7 @@ import {
   FileText,
   Mail,
   MapPin,
+  MessageCircle,
   Phone,
   Trash2,
   User,
@@ -196,6 +197,23 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
             <Edit className="w-4 h-4" />
             Editar
           </motion.button>
+
+          {workshop.phone && workshop.phone !== 'Não informado' && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                const digits = workshop.phone.replace(/\D/g, '')
+                const intl = digits.startsWith('55') ? digits : `55${digits}`
+                window.open(`https://wa.me/${intl}`, '_blank', 'noopener')
+              }}
+              className="bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#128C7E] hover:to-[#075E54] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl z-10"
+            >
+              <MessageCircle className="w-4 h-4" />
+              WhatsApp
+            </motion.button>
+          )}
 
           {workshop.status === 'pendente' && (
             <>
