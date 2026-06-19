@@ -13,7 +13,8 @@ import {
   DollarSign,
   Percent,
   CreditCard,
-  TrendingUp
+  TrendingUp,
+  CheckCircle
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -42,6 +43,8 @@ interface DashboardMetrics {
   total_bookings_last_month: number
   total_revenue_last_month: number
   meca_commission_last_month: number
+  total_completed_services: number
+  completed_services_this_month: number
 }
 
 const COLORS = ['#00c977', '#252940', '#f59e0b', '#ef4444', '#3b82f6']
@@ -104,6 +107,8 @@ export default function DashboardPage() {
         total_bookings_last_month: rawData.bookings?.this_month ?? rawData.total_bookings_last_month ?? 0,
         total_revenue_last_month: rawData.payments?.revenue_this_month ?? rawData.total_revenue_last_month ?? 0,
         meca_commission_last_month: rawData.payments?.meca_revenue ?? rawData.meca_commission_last_month ?? 0,
+        total_completed_services: rawData.services?.total_completed ?? 0,
+        completed_services_this_month: rawData.services?.completed_this_month ?? 0,
       }
       
       setMetrics(finalMetrics)
@@ -114,10 +119,6 @@ export default function DashboardPage() {
     }
 
     setLoading(false)
-  }
-
-  const handleApproveWorkshops = () => {
-    router.push('/dashboard/workshops?status=pending')
   }
 
   const handleSendNotifications = () => {
@@ -178,19 +179,19 @@ export default function DashboardPage() {
         <motion.div variants={itemVariants} className="mb-6" data-onboard="quick-actions">
           <h2 className="text-xl font-bold text-[#252940] dark:text-white mb-4">Ações Rápidas</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Card 1 - Aprovar Oficinas */}
+            {/* Card 1 - Serviços Realizados */}
             <motion.div
               whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-4 border-2 border-[#00c977]/50 dark:border-[#00c977]/50 shadow-lg flex items-center gap-4 cursor-pointer"
-              onClick={handleApproveWorkshops}
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-4 border-2 border-[#00c977]/50 dark:border-[#00c977]/50 shadow-lg flex items-center gap-4"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                <Clock className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-[#00c977] to-[#00b369] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                <CheckCircle className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-[#00c977] dark:text-[#00c977] truncate">Aprovar Oficinas</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">Gerencie oficinas pendentes</p>
+                <h3 className="text-base font-semibold text-[#00c977] dark:text-[#00c977] truncate">Serviços Realizados</h3>
+                <p className="text-2xl font-bold text-[#252940] dark:text-white">{metrics.total_completed_services}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{metrics.completed_services_this_month} este mês</p>
               </div>
             </motion.div>
 
@@ -315,7 +316,7 @@ export default function DashboardPage() {
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            onClick={handleApproveWorkshops}
+            onClick={() => router.push('/dashboard/workshops?status=pending')}
             className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-lg flex flex-col justify-between cursor-pointer"
           >
             <div className="flex items-start justify-between mb-3">

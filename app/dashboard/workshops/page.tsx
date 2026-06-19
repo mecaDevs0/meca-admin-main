@@ -22,6 +22,7 @@ interface Workshop {
   created_at: string
   owner_name?: string
   logo_url?: string
+  completed_services_count?: number
 }
 
 export default function WorkshopsPage() {
@@ -125,6 +126,7 @@ function WorkshopsPageInner() {
             created_at: w.created_at ? String(w.created_at) : new Date().toISOString(),
             owner_name: w.owner_name ? String(w.owner_name) : undefined,
             logo_url: w.logo_url ? String(w.logo_url) : undefined,
+            completed_services_count: parseInt(w.completed_services_count ?? '0', 10),
           })
         } catch (mapErr) {
           console.warn('[workshops] item inválido ignorado:', raw, mapErr)
@@ -260,16 +262,19 @@ function WorkshopsPageInner() {
             ) : (
               <>
                 {filter === 'pendente' || filter === 'all' ? (
-                  <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-2 border-yellow-300 dark:border-yellow-700/50 rounded-2xl p-4 mb-6">
+                  <div
+                    className="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-2 border-yellow-300 dark:border-yellow-700/50 rounded-2xl p-4 mb-6 cursor-pointer hover:border-yellow-400 transition-colors"
+                    onClick={() => setFilter('pendente')}
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
                         <Clock className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
-                          {workshops.filter(w => w.status === 'pendente').length} oficina{workshops.filter(w => w.status === 'pendente').length !== 1 ? 's' : ''} pendente{workshops.filter(w => w.status === 'pendente').length !== 1 ? 's' : ''}
+                          {workshops.filter(w => w.status === 'pendente').length} oficina{workshops.filter(w => w.status === 'pendente').length !== 1 ? 's' : ''} pendente{workshops.filter(w => w.status === 'pendente').length !== 1 ? 's' : ''} de aprovação
                         </h3>
-                        <p className="text-xs text-yellow-700 dark:text-yellow-300">Aprove ou rejeite as oficinas pendentes</p>
+                        <p className="text-xs text-yellow-700 dark:text-yellow-300">Clique para filtrar oficinas pendentes</p>
                       </div>
                     </div>
                   </div>

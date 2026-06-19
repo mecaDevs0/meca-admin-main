@@ -11,6 +11,7 @@ import {
   Phone,
   Trash2,
   User,
+  Wrench,
   XCircle,
   Edit
 } from 'lucide-react'
@@ -32,6 +33,7 @@ interface Workshop {
   owner_name?: string
   workshop_payment_provider?: string
   logo_url?: string
+  completed_services_count?: number
 }
 
 interface WorkshopCardProps {
@@ -153,6 +155,10 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
                     {workshop.workshop_payment_provider === 'asaas' ? 'Asaas' : 'PagBank'}
                   </span>
                 )}
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                  <Wrench className="w-3 h-3" />
+                  {workshop.completed_services_count ?? 0} serviços
+                </span>
               </div>
             </div>
           </div>
