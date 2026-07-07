@@ -5,7 +5,7 @@ import { apiClient } from '@/lib/api'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, Send, Users, Building2, CheckCircle2, X, Search, UserPlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Customer {
   id: string
@@ -35,6 +35,8 @@ export default function NotificationsPage() {
   const [selectedWorkshops, setSelectedWorkshops] = useState<string[]>([])
   const [searchCustomers, setSearchCustomers] = useState('')
   const [searchWorkshops, setSearchWorkshops] = useState('')
+  const [cooldown, setCooldown] = useState(0)
+  const cooldownRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -80,6 +82,22 @@ export default function NotificationsPage() {
     }
   }
 
+  const startCooldown = useCallback(() => {
+    setCooldown(5)
+    const tick = () => {
+      setCooldown(prev => {
+        if (prev <= 1) {
+          if (cooldownRef.current) clearInterval(cooldownRef.current)
+          cooldownRef.current = null
+          return 0
+        }
+        return prev - 1
+      })
+    }
+    if (cooldownRef.current) clearInterval(cooldownRef.current)
+    cooldownRef.current = setInterval(tick, 1000)
+  }, [])
+
   const handleSend = async () => {
     if (!title.trim() || !message.trim()) {
       showToast.error('Campos obrigatórios', 'Preencha o título e a mensagem')
@@ -91,6 +109,8 @@ export default function NotificationsPage() {
       return
     }
 
+    if (cooldown > 0) return
+
     setSending(true)
 
     try {
@@ -98,6 +118,7 @@ export default function NotificationsPage() {
         title: title.trim(),
         message: message.trim(),
         target,
+        idempotency_key: crypto.randomUUID(),
       }
 
       if (target === 'specific') {
@@ -117,10 +138,10 @@ export default function NotificationsPage() {
       }
 
       showToast.success('Notificação enviada!', 'A notificação foi enviada com sucesso')
-      
-      // Reset form
-        setTitle('')
-        setMessage('')
+      startCooldown()
+
+      setTitle('')
+      setMessage('')
       setTarget('all')
       setSelectedCustomers([])
       setSelectedWorkshops([])
@@ -257,10 +278,10 @@ export default function NotificationsPage() {
 
               {/* Send Button */}
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: cooldown > 0 ? 1 : 1.02 }}
+                whileTap={{ scale: cooldown > 0 ? 1 : 0.98 }}
                 onClick={handleSend}
-                disabled={sending || !title.trim() || !message.trim()}
+                disabled={sending || cooldown > 0 || !title.trim() || !message.trim()}
                 className="w-full px-6 py-4 bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white font-bold rounded-xl shadow-lg shadow-[#00c977]/25 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
               >
                 {sending ? (
@@ -269,6 +290,11 @@ export default function NotificationsPage() {
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                   />
+                ) : cooldown > 0 ? (
+                  <>
+                    <CheckCircle2 className="w-5 h-5" />
+                    Enviada! ({cooldown}s)
+                  </>
                 ) : (
                   <>
                     <Send className="w-5 h-5" />
