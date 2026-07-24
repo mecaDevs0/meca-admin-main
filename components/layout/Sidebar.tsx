@@ -16,6 +16,7 @@ import {
     LogOut,
     Megaphone,
     Ticket,
+    UserPlus,
     ScrollText,
     Settings,
     Star,
@@ -91,6 +92,12 @@ export default function Sidebar() {
       path: '/dashboard/promo-codes',
       icon: Ticket,
       onboardKey: 'promo-codes',
+    },
+    {
+      name: 'Indicações',
+      path: '/dashboard/referrals',
+      icon: UserPlus,
+      onboardKey: 'referrals',
     },
     {
       name: 'Usuários',

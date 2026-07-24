@@ -407,6 +407,11 @@ class MecaApiClient {
     })
   }
 
+  // Referrals (B2C)
+  async getReferralStats() {
+    return this.request('/admin/referrals/stats')
+  }
+
   // Audit Log
   async getAuditLog(params?: { page?: number; action?: string; admin?: string; from?: string; to?: string }) {
     const qs = new URLSearchParams()
