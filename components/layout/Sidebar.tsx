@@ -15,6 +15,7 @@ import {
     LayoutDashboard,
     LogOut,
     Megaphone,
+    Ticket,
     ScrollText,
     Settings,
     Star,
@@ -84,6 +85,12 @@ export default function Sidebar() {
       path: '/dashboard/campaigns',
       icon: Megaphone,
       onboardKey: 'campaigns',
+    },
+    {
+      name: 'Cupons',
+      path: '/dashboard/promo-codes',
+      icon: Ticket,
+      onboardKey: 'promo-codes',
     },
     {
       name: 'Usuários',

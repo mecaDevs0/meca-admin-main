@@ -302,6 +302,41 @@ class MecaApiClient {
     return this.request(`/admin/notifications${queryString ? `?${queryString}` : ''}`)
   }
 
+  // Promo Codes
+  async getPromoCodes(page = 1, limit = 20, active?: boolean) {
+    const qs = new URLSearchParams({ page: String(page), limit: String(limit) })
+    if (active !== undefined) qs.set('active', String(active))
+    return this.request(`/admin/promo-codes?${qs}`)
+  }
+
+  async getPromoCodeStats() {
+    return this.request('/admin/promo-codes/stats')
+  }
+
+  async createPromoCode(data: {
+    code: string; description?: string; type?: string; value: number;
+    max_uses?: number; min_booking_value?: number; valid_from?: string;
+    valid_until?: string; first_booking_only?: boolean
+  }) {
+    return this.request('/admin/promo-codes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updatePromoCode(id: number, data: Record<string, unknown>) {
+    return this.request(`/admin/promo-codes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async togglePromoCode(id: number) {
+    return this.request(`/admin/promo-codes/${id}/toggle`, {
+      method: 'PUT',
+    })
+  }
+
   // Push Campaigns
   async getPushCampaigns(page = 1, limit = 20) {
     return this.request(`/admin/push-campaigns?page=${page}&limit=${limit}`)
