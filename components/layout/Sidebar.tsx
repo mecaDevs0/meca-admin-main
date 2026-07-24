@@ -8,11 +8,16 @@ import {
     Activity,
     Bell,
     Building2,
+    CalendarCheck,
     ChevronLeft,
     ChevronRight,
     FileText,
     LayoutDashboard,
     LogOut,
+    Megaphone,
+    ScrollText,
+    Settings,
+    Star,
     User,
     Users,
     Wrench
@@ -62,27 +67,57 @@ export default function Sidebar() {
       icon: Wrench,
       onboardKey: 'services',
     },
-    { 
-      name: 'Notificações', 
-      path: '/dashboard/notifications', 
+    {
+      name: 'Agendamentos',
+      path: '/dashboard/bookings',
+      icon: CalendarCheck,
+      onboardKey: 'bookings',
+    },
+    {
+      name: 'Notificações',
+      path: '/dashboard/notifications',
       icon: Bell,
       onboardKey: 'notifications',
     },
-    { 
-      name: 'Usuários', 
-      path: '/dashboard/users', 
+    {
+      name: 'Campanhas',
+      path: '/dashboard/campaigns',
+      icon: Megaphone,
+      onboardKey: 'campaigns',
+    },
+    {
+      name: 'Usuários',
+      path: '/dashboard/users',
       icon: Users,
       onboardKey: 'users',
     },
-    { 
-      name: 'Relatórios', 
-      path: '/dashboard/reports', 
+    {
+      name: 'Relatórios',
+      path: '/dashboard/reports',
       icon: FileText,
       onboardKey: 'reports',
     },
-    { 
-      name: 'Status API', 
-      path: '/dashboard/api-status', 
+    {
+      name: 'Avaliações',
+      path: '/dashboard/reviews',
+      icon: Star,
+      onboardKey: 'reviews',
+    },
+    {
+      name: 'Audit Log',
+      path: '/dashboard/audit-log',
+      icon: ScrollText,
+      onboardKey: 'audit-log',
+    },
+    {
+      name: 'Configurações',
+      path: '/dashboard/settings',
+      icon: Settings,
+      onboardKey: 'settings',
+    },
+    {
+      name: 'Status API',
+      path: '/dashboard/api-status',
       icon: Activity,
       onboardKey: 'api-status',
     },
@@ -144,6 +179,7 @@ export default function Sidebar() {
         
         <motion.button
           onClick={() => setIsCollapsed(!isCollapsed)}
+          aria-label={isCollapsed ? 'Expandir menu' : 'Recolher menu'}
           className={`p-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 ${
             mounted && theme === 'dark'
               ? 'bg-white/10 hover:bg-white/20'
@@ -171,6 +207,7 @@ export default function Sidebar() {
             <Link
               href={item.path}
               data-onboard={item.onboardKey}
+              aria-label={item.name}
               className={`flex items-center gap-4 px-5 py-4 rounded-3xl text-sm font-semibold transition-all duration-300 ${
                 isActive(item.path)
                   ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-xl shadow-[#00c977]/40'
@@ -232,6 +269,7 @@ export default function Sidebar() {
       }`}>
         <motion.button
           onClick={handleLogout}
+          aria-label="Sair"
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium backdrop-blur-sm transition-all duration-200 ${isCollapsed ? 'justify-center' : ''} ${
             mounted && theme === 'dark'
               ? 'text-white/70 hover:bg-white/10 hover:text-white'

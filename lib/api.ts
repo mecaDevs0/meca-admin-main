@@ -24,7 +24,7 @@ class MecaApiClient {
     this.token = token
   }
 
-  private async request<T>(
+  private async request<T = any>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
@@ -41,6 +41,13 @@ class MecaApiClient {
       })
 
       if (!response.ok) {
+        const isAuthEndpoint = endpoint.startsWith('/admin/auth/')
+        if (response.status === 401 && !isAuthEndpoint && typeof window !== 'undefined') {
+          localStorage.removeItem('meca_admin_token')
+          this.token = null
+          window.location.href = '/login'
+          return { error: 'Sessão expirada', success: false, status: 401 }
+        }
         const errorData = await response.json().catch(() => ({ error: response.statusText }))
         return {
           error: errorData.error || errorData.message || 'Request failed',
@@ -99,9 +106,24 @@ class MecaApiClient {
     })
   }
 
+  async changePassword(currentPassword: string, newPassword: string) {
+    return this.request('/admin/profile/password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    })
+  }
+
+  async createAdmin(data: { email: string; name: string }) {
+    return this.request('/admin/auth/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
   // Dashboard Metrics
-  async getDashboardMetrics() {
-    return this.request('/admin/dashboard-metrics')
+  async getDashboardMetrics(period?: string) {
+    const qs = period ? `?period=${period}` : ''
+    return this.request(`/admin/dashboard-metrics${qs}`)
   }
 
   // Workshops
@@ -117,6 +139,13 @@ class MecaApiClient {
   async getMecaFeeSettings(params: { workshopId: string }) {
     const q = new URLSearchParams({ workshopId: params.workshopId })
     return this.request(`/admin/settings/meca-fee?${q}`)
+  }
+
+  async updateMecaFeeSettings(data: { global_fee?: number; workshop_id?: number; workshop_fee?: number }) {
+    return this.request('/admin/settings/meca-fee', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
   }
 
   async updateWorkshop(id: string, data: any) {
@@ -141,6 +170,12 @@ class MecaApiClient {
 
   async deleteWorkshop(id: string) {
     return this.request(`/admin/workshops/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async hardDeleteWorkshop(id: string) {
+    return this.request(`/admin/workshops/${id}/hard-delete`, {
       method: 'DELETE',
     })
   }
@@ -215,6 +250,34 @@ class MecaApiClient {
     })
   }
 
+  async cancelBooking(id: string, reason: string) {
+    return this.request(`/bookings/${id}/cancel`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    })
+  }
+
+  async refundBooking(id: string, reason: string) {
+    return this.request(`/admin/bookings/${id}/refund`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    })
+  }
+
+  async toggleCustomerActive(customerId: string) {
+    return this.request(`/admin/customers/${customerId}/toggle-active`, {
+      method: 'PATCH',
+    })
+  }
+
+  async getCustomerVehicles(customerId: string) {
+    return this.request(`/vehicles/${customerId}`)
+  }
+
+  async getCustomerBookings(customerId: string) {
+    return this.request(`/bookings/${customerId}`)
+  }
+
   // Notifications
   async sendNotification(data: {
     title: string
@@ -229,12 +292,30 @@ class MecaApiClient {
     })
   }
 
-  async getNotifications(filters?: { limit?: number; offset?: number }) {
+  async getNotifications(filters?: { limit?: number; offset?: number; from?: string; to?: string }) {
     const query = new URLSearchParams()
     if (filters?.limit) query.append('limit', filters.limit.toString())
     if (filters?.offset) query.append('offset', filters.offset.toString())
+    if (filters?.from) query.append('from', filters.from)
+    if (filters?.to) query.append('to', filters.to)
     const queryString = query.toString()
     return this.request(`/admin/notifications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // Push Campaigns
+  async getPushCampaigns(page = 1, limit = 20) {
+    return this.request(`/admin/push-campaigns?page=${page}&limit=${limit}`)
+  }
+
+  async getPushCampaignSegments() {
+    return this.request('/admin/push-campaigns/segments')
+  }
+
+  async createPushCampaign(data: { title: string; message: string; segment: string }) {
+    return this.request('/admin/push-campaigns', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   }
 
   // API Health
@@ -257,6 +338,49 @@ class MecaApiClient {
   async getFinancialAnalytics(period?: string) {
     const query = period ? `?period=${period}` : ''
     return this.request(`/admin/analytics/financial${query}`)
+  }
+
+  // Reviews
+  async getReviews(params?: { page?: number; rating?: number; workshop_id?: string; from?: string; to?: string; hidden?: string }) {
+    const qs = new URLSearchParams()
+    if (params?.page) qs.set('page', String(params.page))
+    if (params?.rating) qs.set('rating', String(params.rating))
+    if (params?.workshop_id) qs.set('workshop_id', params.workshop_id)
+    if (params?.from) qs.set('from', params.from)
+    if (params?.to) qs.set('to', params.to)
+    if (params?.hidden) qs.set('hidden', params.hidden)
+    return this.request(`/admin/reviews?${qs}`)
+  }
+
+  async hideReview(id: number, reason: string) {
+    return this.request(`/admin/reviews/${id}/hide`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    })
+  }
+
+  async unhideReview(id: number) {
+    return this.request(`/admin/reviews/${id}/unhide`, {
+      method: 'PUT',
+    })
+  }
+
+  async respondToReview(id: number, response: string) {
+    return this.request(`/admin/reviews/${id}/respond`, {
+      method: 'PUT',
+      body: JSON.stringify({ response }),
+    })
+  }
+
+  // Audit Log
+  async getAuditLog(params?: { page?: number; action?: string; admin?: string; from?: string; to?: string }) {
+    const qs = new URLSearchParams()
+    if (params?.page) qs.set('page', String(params.page))
+    if (params?.action) qs.set('action', params.action)
+    if (params?.admin) qs.set('admin', params.admin)
+    if (params?.from) qs.set('from', params.from)
+    if (params?.to) qs.set('to', params.to)
+    return this.request(`/admin/audit-log?${qs}`)
   }
 }
 
