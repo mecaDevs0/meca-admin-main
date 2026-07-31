@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
-import { SentryProvider } from '@/components/providers/SentryProvider';
 import "./globals.css";
 
 const inter = Inter({
@@ -36,21 +35,19 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SentryProvider>
-            <Toaster
-              position="top-right"
-              richColors
-              closeButton
-              duration={4000}
-              toastOptions={{
-                style: {
-                  padding: '16px',
-                  fontSize: '14px',
-                },
-              }}
-            />
-            {children}
-          </SentryProvider>
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            duration={4000}
+            toastOptions={{
+              style: {
+                padding: '16px',
+                fontSize: '14px',
+              },
+            }}
+          />
+          {children}
         </ThemeProvider>
       </body>
     </html>
