@@ -1,11 +1,14 @@
 'use client'
 
+import Pagination from '@/components/ui/Pagination'
+import UserDetailModal from '@/components/users/UserDetailModal'
 import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
+import { exportCsv, csvFilename } from '@/lib/csv'
 import { formatPhone } from '@/lib/utils'
-import { Calendar, Mail, Phone, Search, Users } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Calendar, Download, Mail, Phone, Search, Users } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 
 interface User {
   id: string
@@ -17,11 +20,43 @@ interface User {
 }
 
 export default function UsersPage() {
+  return (
+    <Suspense>
+      <UsersPageInner />
+    </Suspense>
+  )
+}
+
+function UsersPageInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const PAGE_SIZE = 20
   const [users, setUsers] = useState<User[]>([])
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchInput(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setSearch(value)
+      handlePageChange(1)
+    }, 300)
+  }, [])
   const [filter, setFilter] = useState<'all' | 'customer' | 'workshop'>('all')
+  const [page, setPage] = useState(() => {
+    const p = searchParams.get('page')
+    return p ? Math.max(1, parseInt(p, 10) || 1) : 1
+  })
   const [loading, setLoading] = useState(true)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+
+  const handlePageChange = (p: number) => {
+    setPage(p)
+    const params = new URLSearchParams(window.location.search)
+    if (p > 1) params.set('page', String(p)); else params.delete('page')
+    router.replace(`?${params}`, { scroll: false })
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -76,8 +111,7 @@ export default function UsersPage() {
       }))
       
       setUsers(mappedUsers)
-    } catch (error) {
-      console.error('Erro na requisição:', error)
+    } catch {
       showToast.error('Erro', 'Ocorreu um erro ao carregar os usuários')
       setUsers([])
     }
@@ -85,11 +119,19 @@ export default function UsersPage() {
     setLoading(false)
   }
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(search.toLowerCase()) ||
-    user.email.toLowerCase().includes(search.toLowerCase()) ||
-    user.phone?.toLowerCase().includes(search.toLowerCase())
-  )
+  const normalize = (text: string) =>
+    (text || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9@.]/g, '')
+
+  const filteredUsers = users.filter(user => {
+    if (!search.trim()) return true
+    const q = normalize(search)
+    return (
+      normalize(user.name).includes(q) ||
+      normalize(user.email).includes(q) ||
+      (user.phone && user.phone.replace(/[^0-9]/g, '').includes(q.replace(/[^0-9]/g, '')))
+    )
+  })
+  const paginatedUsers = filteredUsers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR')
@@ -119,15 +161,29 @@ export default function UsersPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
               <input
                 type="text"
+                aria-label="Buscar usuários"
                 placeholder="Buscar por nome, email ou telefone..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#00c977] focus:border-transparent dark:bg-gray-900/50 dark:text-white"
               />
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => exportCsv(csvFilename('usuarios'), [
+                { header: 'Nome', accessor: (u: User) => u.name },
+                { header: 'Email', accessor: (u: User) => u.email },
+                { header: 'Telefone', accessor: (u: User) => formatPhone(u.phone) },
+                { header: 'Tipo', accessor: (u: User) => u.type === 'customer' ? 'Cliente' : 'Oficina' },
+                { header: 'Cadastro', accessor: (u: User) => new Date(u.created_at).toLocaleDateString('pt-BR') },
+              ], filteredUsers)}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              CSV
+            </button>
             <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -176,8 +232,21 @@ export default function UsersPage() {
               <p className="text-gray-500 dark:text-gray-400">Não há usuários com os filtros selecionados.</p>
             </div>
           ) : (
-            filteredUsers.map((user) => (
-              <div key={user.id} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl p-4 transition-all duration-300">
+            paginatedUsers.map((user) => (
+              <div
+                key={user.id}
+                onClick={() => setSelectedUser(user)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedUser(user);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Ver detalhes de ${user.name}`}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl p-4 transition-all duration-300 cursor-pointer"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -223,6 +292,12 @@ export default function UsersPage() {
             ))
           )}
         </div>
+      )}
+
+      <Pagination currentPage={page} totalItems={filteredUsers.length} pageSize={PAGE_SIZE} onPageChange={handlePageChange} />
+
+      {selectedUser && (
+        <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} />
       )}
       </div>
     </div>
