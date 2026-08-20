@@ -17,6 +17,39 @@ interface User {
   phone: string
   type: 'customer' | 'workshop'
   created_at: string
+  acquisition_source?: string | null
+}
+
+const SOURCE_BADGE_CONFIG: Record<string, { label: string; color: string }> = {
+  organic: { label: 'Orgânico', color: '#00C977' },
+  'Meta Ads': { label: 'Meta', color: '#1877F2' },
+  restricted: { label: 'Meta', color: '#1877F2' },
+  tiktokads: { label: 'TikTok', color: '#010101' },
+  googleadwords_int: { label: 'Google', color: '#FBBC04' },
+}
+
+function AcquisitionBadge({ source }: { source?: string | null }) {
+  if (!source) {
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+        —
+      </span>
+    )
+  }
+  const cfg = SOURCE_BADGE_CONFIG[source] || { label: source, color: '#6B7280' }
+  const isLight = source === 'googleadwords_int'
+  return (
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
+      style={{
+        backgroundColor: `${cfg.color}18`,
+        color: isLight ? '#92400E' : cfg.color,
+        border: `1px solid ${cfg.color}30`,
+      }}
+    >
+      {cfg.label}
+    </span>
+  )
 }
 
 export default function UsersPage() {
@@ -107,7 +140,8 @@ function UsersPageInner() {
         email: user.email || 'Não informado',
         phone: user.phone || 'Não informado',
         type: user.type || 'customer',
-        created_at: user.created_at || new Date().toISOString()
+        created_at: user.created_at || new Date().toISOString(),
+        acquisition_source: user.acquisition_source || null,
       }))
       
       setUsers(mappedUsers)
@@ -279,9 +313,10 @@ function UsersPageInner() {
                   </div>
                   
                   <div className="flex items-center gap-2">
+                    <AcquisitionBadge source={user.acquisition_source} />
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      user.type === 'customer' 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                      user.type === 'customer'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                         : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
                     }`}>
                       {user.type === 'customer' ? 'Cliente' : 'Oficina'}

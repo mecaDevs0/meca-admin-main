@@ -1,14 +1,17 @@
 'use client'
 
 import ErrorBoundary from '@/components/ui/ErrorBoundary'
+import Pagination from '@/components/ui/Pagination'
 import FilterButtons from '@/components/workshops/FilterButtons'
 import RejectModal from '@/components/workshops/RejectModal'
 import WorkshopCard from '@/components/workshops/WorkshopCard'
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
-import { AlertCircle, Building2, Clock } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { exportCsv, csvFilename } from '@/lib/csv'
+import { formatPhone, formatCnpj } from '@/lib/utils'
+import { AlertCircle, Building2, Clock, Download, Search, X } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
 interface Workshop {
@@ -23,20 +26,30 @@ interface Workshop {
   owner_name?: string
   logo_url?: string
   completed_services_count?: number
+  acquisition_source?: string | null
 }
 
 export default function WorkshopsPage() {
   return (
     <ErrorBoundary label="Oficinas">
-      <WorkshopsPageInner />
+      <Suspense>
+        <WorkshopsPageInner />
+      </Suspense>
     </ErrorBoundary>
   )
 }
 
 function WorkshopsPageInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const PAGE_SIZE = 20
   const [workshops, setWorkshops] = useState<Workshop[]>([])
   const [filter, setFilter] = useState<string>('all')
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(() => {
+    const p = searchParams.get('page')
+    return p ? Math.max(1, parseInt(p, 10) || 1) : 1
+  })
   const [loading, setLoading] = useState(true)
   const [rejectReason, setRejectReason] = useState('')
   const [selectedWorkshop, setSelectedWorkshop] = useState<string | null>(null)
@@ -52,13 +65,18 @@ function WorkshopsPageInner() {
     }
     apiClient.setToken(token)
     
-    // Verificar se há query param de status
-    const searchParams = new URLSearchParams(window.location.search)
     const statusParam = searchParams.get('status')
     if (statusParam && (statusParam === 'pending' || statusParam === 'pendente')) {
       setFilter('pendente')
     }
   }, [router])
+
+  const handlePageChange = (p: number) => {
+    setPage(p)
+    const params = new URLSearchParams(window.location.search)
+    if (p > 1) params.set('page', String(p)); else params.delete('page')
+    router.replace(`?${params}`, { scroll: false })
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -129,14 +147,13 @@ function WorkshopsPageInner() {
             completed_services_count: parseInt(w.completed_services_count ?? '0', 10),
           })
         } catch (mapErr) {
-          console.warn('[workshops] item inválido ignorado:', raw, mapErr)
+          void mapErr
         }
       }
 
       setWorkshops(mappedWorkshops)
-    } catch (error) {
+    } catch {
       showToast.error('Erro', 'Ocorreu um erro ao carregar as oficinas')
-      console.error('Erro na requisição:', error)
       setWorkshops([])
     }
     
@@ -225,6 +242,19 @@ function WorkshopsPageInner() {
     }
   }
 
+  const q = search.toLowerCase().trim()
+  const filtered = q
+    ? workshops.filter(w =>
+        w.name.toLowerCase().includes(q) ||
+        w.cnpj.toLowerCase().includes(q) ||
+        w.email.toLowerCase().includes(q) ||
+        w.phone.toLowerCase().includes(q) ||
+        w.address.toLowerCase().includes(q) ||
+        (w.owner_name ?? '').toLowerCase().includes(q)
+      )
+    : workshops
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6">
       <div className="max-w-7xl mx-auto">
@@ -239,6 +269,45 @@ function WorkshopsPageInner() {
               <p className="text-gray-600 dark:text-gray-400">Gerencie o cadastro e aprovação de oficinas</p>
             </div>
           </div>
+
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                aria-label="Buscar oficinas"
+                placeholder="Buscar por nome, CNPJ, email ou cidade..."
+                value={search}
+                onChange={e => { setSearch(e.target.value); handlePageChange(1) }}
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00c977]/40 focus:border-[#00c977] transition-all"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  aria-label="Limpar busca"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => exportCsv(csvFilename('oficinas'), [
+                { header: 'Nome', accessor: (w: Workshop) => w.name },
+                { header: 'CNPJ', accessor: (w: Workshop) => formatCnpj(w.cnpj) },
+                { header: 'Email', accessor: (w: Workshop) => w.email },
+                { header: 'Telefone', accessor: (w: Workshop) => formatPhone(w.phone) },
+                { header: 'Endereço', accessor: (w: Workshop) => w.address },
+                { header: 'Status', accessor: (w: Workshop) => w.status },
+                { header: 'Proprietário', accessor: (w: Workshop) => w.owner_name },
+                { header: 'Cadastro', accessor: (w: Workshop) => new Date(w.created_at).toLocaleDateString('pt-BR') },
+              ], filtered)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              CSV
+            </button>
+          </div>
         </div>
 
         <FilterButtons activeFilter={filter} onFilterChange={setFilter} />
@@ -249,7 +318,7 @@ function WorkshopsPageInner() {
           </div>
         ) : (
           <div className="space-y-4">
-            {workshops.length === 0 ? (
+            {filtered.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -257,7 +326,9 @@ function WorkshopsPageInner() {
               >
                 <AlertCircle className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhuma oficina encontrada</h3>
-                <p className="text-gray-500 dark:text-gray-400">Não há oficinas com o status selecionado no momento.</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {q ? 'Nenhuma oficina corresponde à busca.' : 'Não há oficinas com o status selecionado no momento.'}
+                </p>
               </motion.div>
             ) : (
               <>
@@ -265,6 +336,15 @@ function WorkshopsPageInner() {
                   <div
                     className="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-2 border-yellow-300 dark:border-yellow-700/50 rounded-2xl p-4 mb-6 cursor-pointer hover:border-yellow-400 transition-colors"
                     onClick={() => setFilter('pendente')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setFilter('pendente');
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Filtrar oficinas pendentes de aprovação"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
@@ -281,7 +361,7 @@ function WorkshopsPageInner() {
                 ) : null}
                 
                 <div className="grid gap-4">
-                  {workshops.map((workshop, index) => (
+                  {paginated.map((workshop, index) => (
                     <motion.div
                       key={workshop.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -301,6 +381,8 @@ function WorkshopsPageInner() {
             )}
           </div>
         )}
+
+        <Pagination currentPage={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={handlePageChange} />
 
         <RejectModal
           isOpen={!!selectedWorkshop}

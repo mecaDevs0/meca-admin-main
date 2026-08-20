@@ -3,6 +3,8 @@
  * Cliente para comunicação com a API MECA
  */
 
+import { Sentry } from './sentry'
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
 
 interface ApiResponse<T = any> {
@@ -47,6 +49,12 @@ class MecaApiClient {
           this.token = null
           window.location.href = '/login'
           return { error: 'Sessão expirada', success: false, status: 401 }
+        }
+        if (response.status >= 500) {
+          Sentry.captureException(new Error(`API ${response.status}: ${endpoint}`), {
+            tags: { api_status: response.status },
+            extra: { endpoint, method: options.method ?? 'GET' },
+          })
         }
         const errorData = await response.json().catch(() => ({ error: response.statusText }))
         return {
@@ -410,6 +418,34 @@ class MecaApiClient {
   // Referrals (B2C)
   async getReferralStats() {
     return this.request('/admin/referrals/stats')
+  }
+
+  // Marketing (AppsFlyer)
+  async getMarketingOverview(period?: string) {
+    const qs = period ? `?period=${period}` : ''
+    return this.request(`/admin/marketing/overview${qs}`)
+  }
+
+  async getMarketingFunnel(period?: string, source?: string) {
+    const params = new URLSearchParams()
+    if (period) params.set('period', period)
+    if (source) params.set('source', source)
+    const qs = params.toString()
+    return this.request(`/admin/marketing/funnel${qs ? `?${qs}` : ''}`)
+  }
+
+  async getMarketingChannels(period?: string) {
+    const qs = period ? `?period=${period}` : ''
+    return this.request(`/admin/marketing/channels${qs}`)
+  }
+
+  async getMarketingAttribution(entityId: string, type: 'customer' | 'workshop' = 'customer') {
+    return this.request(`/admin/marketing/attribution/${entityId}?type=${type}`)
+  }
+
+  async syncMarketingData(days?: number) {
+    const qs = days ? `?days=${days}` : ''
+    return this.request(`/admin/marketing/sync${qs}`, { method: 'POST' })
   }
 
   // Audit Log

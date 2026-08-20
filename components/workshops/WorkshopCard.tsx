@@ -34,6 +34,15 @@ interface Workshop {
   workshop_payment_provider?: string
   logo_url?: string
   completed_services_count?: number
+  acquisition_source?: string | null
+}
+
+const ACQ_SOURCE_CONFIG: Record<string, { label: string; color: string }> = {
+  organic: { label: 'Orgânico', color: '#00C977' },
+  'Meta Ads': { label: 'Meta', color: '#1877F2' },
+  restricted: { label: 'Meta', color: '#1877F2' },
+  tiktokads: { label: 'TikTok', color: '#010101' },
+  googleadwords_int: { label: 'Google', color: '#FBBC04' },
 }
 
 interface WorkshopCardProps {
@@ -120,6 +129,15 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
       transition={{ duration: 0.2 }}
       whileHover={{ scale: 1.01, y: -2 }}
       onClick={handleCardClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick(e as unknown as React.MouseEvent);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Ver detalhes de ${workshop.name}`}
       className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6 cursor-pointer"
     >
       <div className="flex flex-col lg:flex-row gap-6">
@@ -159,6 +177,22 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
                   <Wrench className="w-3 h-3" />
                   {workshop.completed_services_count ?? 0} serviços
                 </span>
+                {workshop.acquisition_source && (() => {
+                  const cfg = ACQ_SOURCE_CONFIG[workshop.acquisition_source!] || { label: workshop.acquisition_source, color: '#6B7280' }
+                  const isLight = workshop.acquisition_source === 'googleadwords_int'
+                  return (
+                    <span
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                      style={{
+                        backgroundColor: `${cfg.color}18`,
+                        color: isLight ? '#92400E' : cfg.color,
+                        border: `1px solid ${cfg.color}30`,
+                      }}
+                    >
+                      {cfg.label}
+                    </span>
+                  )
+                })()}
               </div>
             </div>
           </div>
