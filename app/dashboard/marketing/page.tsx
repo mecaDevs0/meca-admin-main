@@ -369,7 +369,7 @@ export default function MarketingPage() {
                 />
                 <YAxis stroke="#6b7280" fontSize={11} />
                 <Tooltip
-                  labelFormatter={(v) => new Date(v).toLocaleDateString('pt-BR')}
+                  labelFormatter={(v) => new Date(String(v)).toLocaleDateString('pt-BR')}
                   contentStyle={{
                     backgroundColor: 'rgba(255,255,255,0.95)',
                     backdropFilter: 'blur(10px)',
