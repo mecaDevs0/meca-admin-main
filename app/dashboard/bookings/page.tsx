@@ -1,11 +1,14 @@
 'use client'
 
+import Pagination from '@/components/ui/Pagination'
 import { apiClient } from '@/lib/api'
+import { exportCsv, csvFilename } from '@/lib/csv'
 import { showToast } from '@/lib/toast'
 import { formatPhone } from '@/lib/utils'
-import { AlertCircle, Calendar, CheckCircle, Clock, CreditCard, DollarSign, Wallet, XCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { AlertCircle, Calendar, CheckCircle, Clock, CreditCard, DollarSign, Download, RotateCcw, Wallet, XCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 
 interface Booking {
   id: string
@@ -29,6 +32,8 @@ interface Booking {
   oficina_name?: string
   oficina_email?: string
   oficina_phone?: string
+  walk_in_customer_name?: string
+  walk_in_customer_phone?: string
   created_at: string
   payment_status?: string
   quote_total?: number
@@ -48,22 +53,53 @@ interface Payment {
   split_amount?: number
   fee_amount?: number
   created_at: string
+  updated_at?: string
   appointment_date?: string
   first_name?: string
   last_name?: string
   plate?: string
   oficina_name?: string
+  installments_count?: number
+  installments?: number
 }
 
 export default function BookingsPage() {
+  return (
+    <Suspense>
+      <BookingsPageInner />
+    </Suspense>
+  )
+}
+
+function BookingsPageInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const PAGE_SIZE = 20
   const [bookings, setBookings] = useState<Booking[]>([])
   const [filter, setFilter] = useState<string>('all')
+  const [bookingPage, setBookingPage] = useState(() => {
+    const p = searchParams.get('page')
+    return p ? Math.max(1, parseInt(p, 10) || 1) : 1
+  })
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'bookings' | 'payments'>('bookings')
   const [payments, setPayments] = useState<Payment[]>([])
   const [paymentFilter, setPaymentFilter] = useState<string>('all')
+  const [paymentPage, setPaymentPage] = useState(1)
+
+  const handleBookingPageChange = (p: number) => {
+    setBookingPage(p)
+    const params = new URLSearchParams(window.location.search)
+    if (p > 1) params.set('page', String(p)); else params.delete('page')
+    router.replace(`?${params}`, { scroll: false })
+  }
   const [loadingPayments, setLoadingPayments] = useState(false)
+  const [cancelTarget, setCancelTarget] = useState<{ id: string; name: string } | null>(null)
+  const [cancelReason, setCancelReason] = useState('')
+  const [cancelling, setCancelling] = useState(false)
+  const [refundTarget, setRefundTarget] = useState<{ id: string; name: string } | null>(null)
+  const [refundReason, setRefundReason] = useState('')
+  const [refunding, setRefunding] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -91,11 +127,9 @@ export default function BookingsPage() {
         const raw = (data as any).data ?? data
         setBookings(Array.isArray(raw) ? raw : [])
       } else {
-        console.error('Erro ao carregar agendamentos:', error)
         setBookings([])
       }
-    } catch (error) {
-      console.error('Erro na requisição:', error)
+    } catch {
       setBookings([])
     }
     setLoading(false)
@@ -114,8 +148,8 @@ export default function BookingsPage() {
         const raw = (data as any).data ?? data
         setPayments(Array.isArray(raw) ? raw : [])
       }
-    } catch (e) {
-      console.error('Erro:', e)
+    } catch {
+      // handled silently
     }
     setLoadingPayments(false)
   }
@@ -144,6 +178,8 @@ export default function BookingsPage() {
       case 'cancelled':
       case 'cancelado':
         return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700'
+      case 'aguardando_pagamento':
+        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-700'
       default:
         return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border-gray-300 dark:border-gray-700'
     }
@@ -164,6 +200,8 @@ export default function BookingsPage() {
       case 'cancelled':
       case 'cancelado':
         return <XCircle className="w-4 h-4" />
+      case 'aguardando_pagamento':
+        return <Wallet className="w-4 h-4" />
       default:
         return <Clock className="w-4 h-4" />
     }
@@ -201,6 +239,46 @@ export default function BookingsPage() {
     }
   }
 
+  const confirmCancel = async () => {
+    if (!cancelTarget || !cancelReason.trim()) return
+    setCancelling(true)
+    try {
+      const { error } = await apiClient.cancelBooking(cancelTarget.id, cancelReason.trim())
+      if (error) {
+        showToast.error('Erro ao cancelar', error)
+      } else {
+        showToast.success('Agendamento cancelado', `"${cancelTarget.name}" foi cancelado`)
+        setCancelTarget(null)
+        setCancelReason('')
+        loadBookings()
+      }
+    } catch {
+      showToast.error('Erro', 'Não foi possível cancelar o agendamento')
+    } finally {
+      setCancelling(false)
+    }
+  }
+
+  const confirmRefund = async () => {
+    if (!refundTarget || !refundReason.trim()) return
+    setRefunding(true)
+    try {
+      const { error } = await apiClient.refundBooking(refundTarget.id, refundReason.trim())
+      if (error) {
+        showToast.error('Erro ao estornar', error)
+      } else {
+        showToast.success('Estorno realizado', `Pagamento de "${refundTarget.name}" foi estornado`)
+        setRefundTarget(null)
+        setRefundReason('')
+        loadBookings()
+      }
+    } catch {
+      showToast.error('Erro', 'Não foi possível realizar o estorno')
+    } finally {
+      setRefunding(false)
+    }
+  }
+
   const formatStatus = (status: string) => {
     const normalizedStatus = status?.toLowerCase() || ''
     const statusMap: Record<string, string> = {
@@ -214,7 +292,8 @@ export default function BookingsPage() {
       'completed': 'Finalizado',
       'finalizado': 'Finalizado',
       'cancelled': 'Cancelado',
-      'cancelado': 'Cancelado'
+      'cancelado': 'Cancelado',
+      'aguardando_pagamento': 'Aguardando Pagamento'
     }
     return statusMap[normalizedStatus] || status
   }
@@ -266,6 +345,26 @@ export default function BookingsPage() {
           <>
             {/* Filters */}
             <div className="mb-6 flex gap-2 flex-wrap">
+              <button
+                onClick={() => exportCsv(csvFilename('agendamentos'), [
+                  { header: 'Serviço', accessor: (b: Booking) => b.service_name },
+                  { header: 'Cliente', accessor: (b: Booking) => [b.first_name, b.last_name].filter(Boolean).join(' ') || 'N/A' },
+                  { header: 'Email Cliente', accessor: (b: Booking) => b.customer_email },
+                  { header: 'Tel Cliente', accessor: (b: Booking) => formatPhone(b.customer_phone) },
+                  { header: 'Oficina', accessor: (b: Booking) => b.oficina_name },
+                  { header: 'Veículo', accessor: (b: Booking) => [b.brand, b.model, b.year].filter(Boolean).join(' ') },
+                  { header: 'Placa', accessor: (b: Booking) => b.plate },
+                  { header: 'Data', accessor: (b: Booking) => new Date(b.appointment_date).toLocaleDateString('pt-BR') },
+                  { header: 'Status', accessor: (b: Booking) => formatStatus(b.status) },
+                  { header: 'Pagamento', accessor: (b: Booking) => b.payment_status },
+                  { header: 'Valor (R$)', accessor: (b: Booking) => b.quote_final != null ? (b.quote_final / 100).toFixed(2) : '' },
+                  { header: 'Criado em', accessor: (b: Booking) => new Date(b.created_at).toLocaleDateString('pt-BR') },
+                ], bookings)}
+                className="px-4 py-2 rounded-xl text-sm font-medium bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                CSV
+              </button>
               {[
                 { value: 'all', label: 'Todos' },
                 { value: 'pending', label: 'Pendentes' },
@@ -301,7 +400,7 @@ export default function BookingsPage() {
                     <p className="text-gray-500 dark:text-gray-400">Não há agendamentos com o filtro selecionado no momento.</p>
                   </div>
                 ) : (
-                  bookings.map((booking) => (
+                  bookings.slice((bookingPage - 1) * PAGE_SIZE, bookingPage * PAGE_SIZE).map((booking) => (
                     <div
                       key={booking.id}
                       className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl p-6 transition-all duration-300"
@@ -327,9 +426,9 @@ export default function BookingsPage() {
                             <div>
                               <p className="text-gray-500 dark:text-gray-400 mb-1">Cliente</p>
                               <p className="font-medium text-gray-900 dark:text-white">
-                                {booking.first_name && booking.last_name
-                                  ? `${booking.first_name} ${booking.last_name}`
-                                  : 'Não informado'}
+                                {booking.first_name
+                                  ? `${booking.first_name}${booking.last_name ? ` ${booking.last_name}` : ''}`
+                                  : booking.walk_in_customer_name || 'Não informado'}
                               </p>
                               {booking.customer_email && (
                                 <p className="text-gray-600 dark:text-gray-400 text-xs">{booking.customer_email}</p>
@@ -398,6 +497,27 @@ export default function BookingsPage() {
                               <p className="text-sm text-gray-700 dark:text-gray-300">{booking.customer_notes}</p>
                             </div>
                           )}
+
+                          {!['cancelled', 'cancelado'].includes(booking.status.toLowerCase()) && (
+                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex gap-2">
+                              {!['completed', 'finalizado'].includes(booking.status.toLowerCase()) && (
+                                <button
+                                  onClick={() => setCancelTarget({ id: booking.id, name: booking.service_name || 'Agendamento' })}
+                                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors flex items-center gap-1.5"
+                                >
+                                  <XCircle className="w-3.5 h-3.5" />
+                                  Cancelar
+                                </button>
+                              )}
+                              <button
+                                onClick={() => setRefundTarget({ id: booking.id, name: booking.service_name || 'Agendamento' })}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors flex items-center gap-1.5"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                                Estornar
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -405,6 +525,8 @@ export default function BookingsPage() {
                 )}
               </div>
             )}
+
+            <Pagination currentPage={bookingPage} totalItems={bookings.length} pageSize={PAGE_SIZE} onPageChange={handleBookingPageChange} />
           </>
         )}
 
@@ -445,7 +567,7 @@ export default function BookingsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {payments.map((payment) => (
+                {payments.slice((paymentPage - 1) * PAGE_SIZE, paymentPage * PAGE_SIZE).map((payment) => (
                   <div
                     key={payment.id}
                     className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl p-6 transition-all duration-300"
@@ -470,7 +592,7 @@ export default function BookingsPage() {
                         </div>
                         <div>
                           <p className="text-gray-500 dark:text-gray-400 mb-1">Data</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{formatDate(payment.created_at)}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{formatDate(payment.updated_at || payment.created_at)}</p>
                         </div>
                       </div>
 
@@ -486,16 +608,22 @@ export default function BookingsPage() {
                         </div>
 
                         {/* Method badge */}
-                        {payment.payment_method && (
-                          <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                            payment.payment_method?.toLowerCase().includes('pix')
-                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                              : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                          }`}>
-                            <CreditCard className="w-3 h-3" />
-                            {payment.payment_method?.toLowerCase().includes('pix') ? 'PIX' : 'Cartão'}
-                          </span>
-                        )}
+                        {payment.payment_method && (() => {
+                          const method = (payment.payment_method || '').toUpperCase()
+                          const isPix = method === 'PIX'
+                          const installments = payment.installments_count || payment.installments || 1
+                          const label = isPix ? 'PIX' : installments > 1 ? `Cartão ${installments}x` : 'Cartão'
+                          return (
+                            <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+                              isPix
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                                : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                            }`}>
+                              <CreditCard className="w-3 h-3" />
+                              {label}
+                            </span>
+                          )
+                        })()}
 
                         {/* Provider badge */}
                         {payment.payment_provider && (
@@ -524,9 +652,91 @@ export default function BookingsPage() {
                 ))}
               </div>
             )}
+
+            <Pagination currentPage={paymentPage} totalItems={payments.length} pageSize={PAGE_SIZE} onPageChange={setPaymentPage} />
           </>
         )}
       </div>
+
+      {/* Cancel confirmation modal */}
+      {cancelTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4"
+          >
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Cancelar agendamento</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Tem certeza que deseja cancelar <strong>&ldquo;{cancelTarget.name}&rdquo;</strong>?
+            </p>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Motivo do cancelamento *</label>
+            <textarea
+              value={cancelReason}
+              onChange={e => setCancelReason(e.target.value)}
+              placeholder="Informe o motivo..."
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm resize-none dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 mb-4"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setCancelTarget(null); setCancelReason('') }}
+                disabled={cancelling}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={confirmCancel}
+                disabled={cancelling || !cancelReason.trim()}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {cancelling ? 'Cancelando...' : 'Confirmar Cancelamento'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Refund confirmation modal */}
+      {refundTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4"
+          >
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Estornar pagamento</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Tem certeza que deseja estornar o pagamento de <strong>&ldquo;{refundTarget.name}&rdquo;</strong>? Esta ação não pode ser desfeita.
+            </p>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Motivo do estorno *</label>
+            <textarea
+              value={refundReason}
+              onChange={e => setRefundReason(e.target.value)}
+              placeholder="Ex: Serviço não realizado, cliente solicitou..."
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm resize-none dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 mb-4"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setRefundTarget(null); setRefundReason('') }}
+                disabled={refunding}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={confirmRefund}
+                disabled={refunding || !refundReason.trim()}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-colors disabled:opacity-50"
+              >
+                {refunding ? 'Estornando...' : 'Confirmar Estorno'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }
