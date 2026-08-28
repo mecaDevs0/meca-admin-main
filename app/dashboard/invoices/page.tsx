@@ -336,9 +336,7 @@ export default function AdminInvoicesPage() {
                             <AlertCircle
                               className="w-4 h-4 text-red-500 dark:text-red-400"
                               aria-label={inv.error_message ?? 'Erro na emissão'}
-                            >
-                              <title>{inv.error_message ?? 'Erro na emissão'}</title>
-                            </AlertCircle>
+                            />
                           )}
                           {!inv.pdf_url && inv.asaas_status !== 'ERROR' && (
                             <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
