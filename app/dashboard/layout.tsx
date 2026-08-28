@@ -20,11 +20,18 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-[#00c977] focus:text-white focus:font-semibold"
+      >
+        Pular para o conteúdo
+      </a>
       <OnboardingTour />
       <Sidebar />
-      <main 
+      <main
+        id="main-content"
         className="flex-1 overflow-x-hidden transition-all duration-300"
-        style={{ marginLeft: isCollapsed ? '80px' : '240px' }}
+        style={{ marginLeft: isCollapsed ? '72px' : '230px' }}
       >
         {children}
       </main>

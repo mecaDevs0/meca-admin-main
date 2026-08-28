@@ -1,6 +1,7 @@
 'use client'
 
 import Logo from '@/components/ui/Logo'
+import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, Eye, EyeOff, Lock, Mail, KeyRound } from 'lucide-react'
@@ -31,29 +32,18 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
-      
-      const response = await fetch(`${API_URL}/admin/auth/send-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
+      const { data, error: apiError } = await apiClient.sendLoginCode(email)
 
-      const result = await response.json()
-
-      if (response.ok && result.success) {
+      if (data?.success) {
         setCodeSent(true)
         showToast.success('Código enviado!', 'Verifique seu email para receber o código de acesso')
       } else {
-        showToast.error('Erro ao enviar código', result.error || 'Não foi possível enviar o código')
-        setError(result.error || 'Erro ao enviar código')
+        showToast.error('Erro ao enviar código', apiError || 'Não foi possível enviar o código')
+        setError(apiError || 'Erro ao enviar código')
       }
-    } catch (error) {
+    } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
       setError('Erro de conexão. Verifique se a API está rodando.')
-      console.error('Erro:', error)
     }
 
     setSendingCode(false)
@@ -71,21 +61,11 @@ export default function LoginPage() {
     }
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
-      
-      const response = await fetch(`${API_URL}/admin/auth/login-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, code }),
-      })
+      const { data, error: apiError } = await apiClient.loginWithCode(email, code)
 
-      const result = await response.json()
-
-      if (response.ok && result.success) {
-        if (result.data?.token) {
-          localStorage.setItem('meca_admin_token', result.data.token)
+      if (data?.success) {
+        if (data.data?.token) {
+          localStorage.setItem('meca_admin_token', data.data.token)
           showToast.success('Login realizado!', 'Redirecionando...')
           setTimeout(() => {
             router.push('/dashboard')
@@ -95,13 +75,12 @@ export default function LoginPage() {
           setError('Token não recebido. Tente novamente.')
         }
       } else {
-        showToast.error('Código inválido', result.error || 'O código informado está incorreto ou expirado')
-        setError(result.error || 'Código inválido ou expirado')
+        showToast.error('Código inválido', apiError || 'O código informado está incorreto ou expirado')
+        setError(apiError || 'Código inválido ou expirado')
       }
-    } catch (error) {
+    } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
       setError('Erro de conexão. Verifique se a API está rodando.')
-      console.error('Erro:', error)
     }
     
     setLoading(false)
@@ -113,21 +92,11 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
-      
-      const response = await fetch(`${API_URL}/admin/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      const { data, error: apiError } = await apiClient.login(email, password)
 
-      const result = await response.json()
-
-      if (response.ok && result.success) {
-        if (result.data?.token) {
-          localStorage.setItem('meca_admin_token', result.data.token)
+      if (data?.success) {
+        if (data.data?.token) {
+          localStorage.setItem('meca_admin_token', data.data.token)
           showToast.success('Login realizado!', 'Redirecionando...')
           setTimeout(() => {
             router.push('/dashboard')
@@ -137,18 +106,17 @@ export default function LoginPage() {
           setError('Token não recebido. Tente novamente.')
         }
       } else {
-        if (result.requires_setup) {
+        if (data?.requires_setup) {
           showToast.warning('Senha não configurada', 'Verifique seu email para criar sua senha')
           setError('Sua senha ainda não foi configurada. Verifique seu email para criar sua senha.')
         } else {
-          showToast.error('Credenciais inválidas', result.error || 'Email ou senha incorretos')
-          setError(result.error || 'Credenciais inválidas')
+          showToast.error('Credenciais inválidas', apiError || 'Email ou senha incorretos')
+          setError(apiError || 'Credenciais inválidas')
         }
       }
-    } catch (error) {
+    } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
       setError('Erro de conexão. Verifique se a API está rodando.')
-      console.error('Erro:', error)
     }
     
     setLoading(false)
@@ -290,7 +258,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-400"
-                      placeholder="admin@meca.com"
+                      placeholder="seu@email.com"
                       required
                     />
                   </div>
@@ -312,12 +280,14 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-400"
                       placeholder="••••••••"
+                      aria-label="Senha"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -390,7 +360,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-400"
-                      placeholder="admin@meca.com"
+                      placeholder="seu@email.com"
                       required
                       disabled={codeSent}
                     />
@@ -506,16 +476,6 @@ export default function LoginPage() {
               )}
             </AnimatePresence>
 
-            <motion.div
-              variants={itemVariants}
-              className="mt-8 p-4 bg-gray-50 rounded-2xl"
-            >
-              <p className="text-xs text-center text-gray-500 font-medium">
-                <span className="font-bold">Credenciais de teste:</span><br />
-                <span className="text-[#00c977] font-semibold">admin@meca.com</span> /{' '}
-                <span className="text-[#00c977] font-semibold">admin123</span>
-              </p>
-            </motion.div>
 
           </motion.div>
         </motion.div>

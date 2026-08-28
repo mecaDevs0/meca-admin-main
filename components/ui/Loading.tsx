@@ -11,9 +11,7 @@ interface LoadingProps {
 export function Loading({ message, size = 120 }: LoadingProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px]">
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+      <div
         className="relative"
         style={{ width: size, height: size }}
       >
@@ -25,7 +23,7 @@ export function Loading({ message, size = 120 }: LoadingProps) {
           className="w-full h-full object-contain"
           unoptimized
         />
-      </motion.div>
+      </div>
       {message && (
         <motion.p
           initial={{ opacity: 0, y: 10 }}

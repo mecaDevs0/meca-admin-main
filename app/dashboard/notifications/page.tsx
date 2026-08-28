@@ -1,9 +1,10 @@
 'use client'
 
+import Pagination from '@/components/ui/Pagination'
 import { showToast } from '@/lib/toast'
 import { apiClient } from '@/lib/api'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, Send, Users, Building2, CheckCircle2, X, Search, UserPlus } from 'lucide-react'
+import { Bell, Clock, Send, Users, Building2, CheckCircle2, X, Search, UserPlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -21,10 +22,30 @@ interface Workshop {
 }
 
 type NotificationTarget = 'all' | 'customers' | 'workshops' | 'specific'
+type PageTab = 'send' | 'history'
+
+interface NotificationHistoryItem {
+  id: number
+  admin_email: string
+  title: string
+  message: string
+  type: string
+  is_read: boolean
+  created_at: string
+  metadata?: { workshop_name?: string; customer_name?: string; booking_id?: string }
+}
 
 export default function NotificationsPage() {
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState<PageTab>('send')
   const [loading, setLoading] = useState(false)
+  const [historyItems, setHistoryItems] = useState<NotificationHistoryItem[]>([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyTotal, setHistoryTotal] = useState(0)
+  const [historyPage, setHistoryPage] = useState(1)
+  const [historyDateFrom, setHistoryDateFrom] = useState('')
+  const [historyDateTo, setHistoryDateTo] = useState('')
+  const HISTORY_PAGE_SIZE = 20
   const [sending, setSending] = useState(false)
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
@@ -37,6 +58,7 @@ export default function NotificationsPage() {
   const [searchWorkshops, setSearchWorkshops] = useState('')
   const [cooldown, setCooldown] = useState(0)
   const cooldownRef = useRef<NodeJS.Timeout | null>(null)
+  const idempotencyKeyRef = useRef(crypto.randomUUID())
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -74,12 +96,47 @@ export default function NotificationsPage() {
         }
         setWorkshops(workshopsData)
       }
-    } catch (error) {
+    } catch {
       showToast.error('Erro ao carregar dados', 'Não foi possível carregar usuários e oficinas')
-      console.error('Erro:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadHistory = async (pg = historyPage) => {
+    setHistoryLoading(true)
+    try {
+      const offset = (pg - 1) * HISTORY_PAGE_SIZE
+      const { data, error } = await apiClient.getNotifications({
+        limit: HISTORY_PAGE_SIZE,
+        offset,
+        ...(historyDateFrom && { from: historyDateFrom }),
+        ...(historyDateTo && { to: historyDateTo }),
+      })
+      if (!error && data) {
+        const d = data as { data?: { notifications?: NotificationHistoryItem[]; total?: number } }
+        setHistoryItems(d.data?.notifications ?? [])
+        setHistoryTotal(d.data?.total ?? 0)
+      }
+    } catch {
+      showToast.error('Erro', 'Não foi possível carregar o histórico')
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === 'history') loadHistory(1)
+  }, [activeTab])
+
+  const handleHistoryPageChange = (pg: number) => {
+    setHistoryPage(pg)
+    loadHistory(pg)
+  }
+
+  const handleHistoryFilter = () => {
+    setHistoryPage(1)
+    loadHistory(1)
   }
 
   const startCooldown = useCallback(() => {
@@ -118,7 +175,7 @@ export default function NotificationsPage() {
         title: title.trim(),
         message: message.trim(),
         target,
-        idempotency_key: crypto.randomUUID(),
+        idempotency_key: idempotencyKeyRef.current,
       }
 
       if (target === 'specific') {
@@ -137,6 +194,7 @@ export default function NotificationsPage() {
         return
       }
 
+      idempotencyKeyRef.current = crypto.randomUUID()
       showToast.success('Notificação enviada!', 'A notificação foi enviada com sucesso')
       startCooldown()
 
@@ -145,9 +203,8 @@ export default function NotificationsPage() {
       setTarget('all')
       setSelectedCustomers([])
       setSelectedWorkshops([])
-    } catch (error) {
-      showToast.error('Erro', 'Ocorreu um erro ao enviar a notificação')
-      console.error('Erro:', error)
+    } catch {
+      showToast.error('Possível erro de rede', 'A notificação pode já ter sido enviada. Verifique antes de tentar novamente.')
     } finally {
       setSending(false)
     }
@@ -207,12 +264,39 @@ export default function NotificationsPage() {
               <Bell className="w-6 h-6 text-white" />
           </div>
           <div>
-              <h1 className="text-3xl font-bold text-[#252940] dark:text-white">Enviar Notificações</h1>
-              <p className="text-gray-600 dark:text-gray-400">Envie notificações para usuários ou grupos específicos</p>
+              <h1 className="text-3xl font-bold text-[#252940] dark:text-white">Notificações</h1>
+              <p className="text-gray-600 dark:text-gray-400">Envie e acompanhe notificações da plataforma</p>
             </div>
           </div>
         </motion.div>
 
+        {/* Tabs */}
+        <div className="mb-6 flex gap-2">
+          <button
+            onClick={() => setActiveTab('send')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+              activeTab === 'send'
+                ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-lg'
+                : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Send className="w-4 h-4" />
+            Enviar
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+              activeTab === 'history'
+                ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-lg'
+                : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Clock className="w-4 h-4" />
+            Histórico {historyTotal > 0 && `(${historyTotal})`}
+          </button>
+        </div>
+
+        {activeTab === 'send' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Form */}
           <motion.div
@@ -328,6 +412,7 @@ export default function NotificationsPage() {
                     value={searchCustomers}
                     onChange={(e) => setSearchCustomers(e.target.value)}
                     placeholder="Buscar clientes..."
+                    aria-label="Buscar clientes"
                     className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none dark:bg-gray-900/50 dark:text-white"
                   />
                 </div>
@@ -373,6 +458,7 @@ export default function NotificationsPage() {
                     value={searchWorkshops}
                     onChange={(e) => setSearchWorkshops(e.target.value)}
                     placeholder="Buscar oficinas..."
+                    aria-label="Buscar oficinas"
                     className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none dark:bg-gray-900/50 dark:text-white"
                   />
                 </div>
@@ -403,6 +489,103 @@ export default function NotificationsPage() {
             </motion.div>
           )}
         </div>
+        )}
+
+        {activeTab === 'history' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            {/* Date filter */}
+            <div className="flex flex-wrap items-end gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">De</label>
+                <input
+                  type="date"
+                  value={historyDateFrom}
+                  onChange={e => setHistoryDateFrom(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Até</label>
+                <input
+                  type="date"
+                  value={historyDateTo}
+                  onChange={e => setHistoryDateTo(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white"
+                />
+              </div>
+              <button
+                onClick={handleHistoryFilter}
+                className="px-4 py-1.5 rounded-lg bg-[#00c977] text-white text-sm font-medium hover:bg-[#00b36b] transition-colors"
+              >
+                Filtrar
+              </button>
+              {(historyDateFrom || historyDateTo) && (
+                <button
+                  onClick={() => { setHistoryDateFrom(''); setHistoryDateTo(''); setHistoryPage(1); setTimeout(() => loadHistory(1), 0) }}
+                  className="px-3 py-1.5 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+
+            {historyLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-4 border-[#00c977] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : historyItems.length === 0 ? (
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-12 text-center">
+                <Bell className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhuma notificação</h3>
+                <p className="text-gray-500 dark:text-gray-400">Ainda não há notificações no histórico.</p>
+              </div>
+            ) : (
+              <>
+                {historyItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg hover:shadow-xl p-5 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                            item.type === 'new_workshop' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                              : item.type === 'new_booking' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}>
+                            {item.type === 'new_workshop' ? 'Nova Oficina'
+                              : item.type === 'new_booking' ? 'Novo Agendamento'
+                              : item.type === 'notification' ? 'Enviada'
+                              : item.type}
+                          </span>
+                          {!item.is_read && (
+                            <span className="w-2 h-2 rounded-full bg-[#00c977]" />
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white truncate">{item.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{item.message}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(item.created_at).toLocaleDateString('pt-BR')}
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                          {new Date(item.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <Pagination currentPage={historyPage} totalItems={historyTotal} pageSize={HISTORY_PAGE_SIZE} onPageChange={handleHistoryPageChange} />
+              </>
+            )}
+          </motion.div>
+        )}
       </motion.div>
     </div>
   )

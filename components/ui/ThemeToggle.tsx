@@ -24,6 +24,7 @@ export function ThemeToggle() {
   return (
     <motion.button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      aria-label={isDark ? 'Ativar tema claro' : 'Ativar tema escuro'}
       className={`
         relative w-12 h-7 rounded-full p-1 transition-colors duration-300
         ${isDark ? 'bg-gradient-to-r from-[#252940] to-[#1B1D2E]' : 'bg-gradient-to-r from-[#00c977] to-[#00b369]'}

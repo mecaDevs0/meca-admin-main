@@ -67,10 +67,9 @@ function ResetPasswordContent() {
           router.push('/login')
         }, 2000)
       }
-    } catch (error) {
+    } catch {
       showToast.error('Erro de conexão', 'Tente novamente')
       setError('Erro de conexão. Tente novamente.')
-      console.error('Erro:', error)
     }
 
     setLoading(false)
@@ -182,6 +181,7 @@ function ResetPasswordContent() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
                     placeholder="Mínimo 6 caracteres"
+                    aria-label="Nova senha"
                     required
                     minLength={6}
                   />
@@ -189,6 +189,7 @@ function ResetPasswordContent() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -211,6 +212,7 @@ function ResetPasswordContent() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
                     placeholder="Confirme sua senha"
+                    aria-label="Confirmar nova senha"
                     required
                     minLength={6}
                   />
@@ -218,6 +220,7 @@ function ResetPasswordContent() {
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
                   >
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>

@@ -2,7 +2,8 @@
 
 import { apiClient } from '@/lib/api'
 import { Loading } from '@/components/ui/Loading'
-import { FileText, DollarSign, TrendingUp, CreditCard, ShoppingBag, Percent } from 'lucide-react'
+import { FileText, DollarSign, TrendingUp, CreditCard, ShoppingBag, Percent, Download } from 'lucide-react'
+import { exportCsv, csvFilename } from '@/lib/csv'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
@@ -25,7 +26,8 @@ interface FinancialAnalytics {
     paid_bookings: number
     conversion_rate: number
   }
-  timeseries: Array<{ date: string; revenue: number; meca_revenue: number }>
+  timeseries?: Array<{ date: string; revenue: number; meca_revenue: number }>
+  chart_series?: Array<{ date: string; revenue: number; meca_revenue: number }>
   top_workshops: Array<{
     id: string
     name: string
@@ -61,7 +63,6 @@ export default function ReportsPage() {
 
   useEffect(() => {
     loadAnalytics()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period])
 
   const loadAnalytics = async () => {
@@ -76,12 +77,13 @@ export default function ReportsPage() {
       const { data, error } = await apiClient.getFinancialAnalytics(period)
       if (data && !error) {
         const raw = (data as any).data ?? data
+        if (!raw.timeseries && raw.chart_series) {
+          raw.timeseries = raw.chart_series
+        }
         setAnalytics(raw)
-      } else {
-        console.error('Erro ao carregar analytics:', error)
       }
-    } catch (e) {
-      console.error('Erro na requisição de analytics:', e)
+    } catch {
+      // handled silently
     }
     setLoading(false)
   }
@@ -96,6 +98,17 @@ export default function ReportsPage() {
   const formatDate = (dateStr: string) => {
     const [year, month, day] = dateStr.split('-')
     return `${day}/${month}`
+  }
+
+  const handleExportCSV = () => {
+    if (!analytics) return
+    exportCsv(csvFilename(`relatorio_financeiro_${period}`), [
+      { header: 'Oficina', accessor: (r: typeof topWorkshops[number]) => r.name },
+      { header: 'Bookings', accessor: (r) => r.bookings },
+      { header: 'Receita (R$)', accessor: (r) => r.revenue.toFixed(2) },
+      { header: 'Comissao MECA (R$)', accessor: (r) => r.meca_commission.toFixed(2) },
+      { header: 'Ticket Medio (R$)', accessor: (r) => r.avg_ticket.toFixed(2) },
+    ], topWorkshops)
   }
 
   const containerVariants = {
@@ -146,7 +159,7 @@ export default function ReportsPage() {
         },
         {
           label: 'Taxa de Conversão',
-          value: `${(analytics.kpis.conversion_rate * 100).toFixed(1)}%`,
+          value: `${(analytics.kpis.conversion_rate * 100).toFixed(1)}%`,  // API returns fraction (0.5 = 50%)
           icon: Percent,
           gradient: 'from-yellow-500 to-yellow-600',
         },
@@ -186,21 +199,33 @@ export default function ReportsPage() {
               </div>
             </div>
 
-            {/* Period selector */}
-            <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-1 border border-white/20 dark:border-gray-700/50 shadow">
-              {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+            {/* Period selector + export */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-1 border border-white/20 dark:border-gray-700/50 shadow">
+                {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPeriod(p)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      period === p
+                        ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-[#252940] dark:hover:text-white'
+                    }`}
+                  >
+                    {PERIOD_LABELS[p]}
+                  </button>
+                ))}
+              </div>
+              {analytics && topWorkshops.length > 0 && (
                 <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    period === p
-                      ? 'bg-gradient-to-r from-[#00c977] to-[#00b369] text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-[#252940] dark:hover:text-white'
-                  }`}
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 shadow text-gray-600 dark:text-gray-400 hover:text-[#252940] dark:hover:text-white transition-all"
+                  aria-label="Exportar CSV"
                 >
-                  {PERIOD_LABELS[p]}
+                  <Download className="w-4 h-4" />
+                  CSV
                 </button>
-              ))}
+              )}
             </div>
           </div>
         </motion.div>

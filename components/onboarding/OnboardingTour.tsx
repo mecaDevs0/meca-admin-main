@@ -21,8 +21,8 @@ export function OnboardingTour() {
       if (driverObj.current) {
         try {
           driverObj.current.destroy()
-        } catch (e) {
-          console.error('Erro ao fechar tour:', e)
+        } catch {
+          // driver.js cleanup may fail silently
         }
       }
     }

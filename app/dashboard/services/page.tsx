@@ -2,6 +2,7 @@
 
 import ServiceCard from '@/components/services/ServiceCard'
 import ServiceModal from '@/components/services/ServiceModal'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
 import { AlertCircle, Plus } from 'lucide-react'
@@ -22,6 +23,7 @@ export default function ServicesPage() {
   const [showModal, setShowModal] = useState(false)
   const [editingService, setEditingService] = useState<MasterService | null>(null)
   const [formData, setFormData] = useState({ title: '', description: '', category: '' })
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('meca_admin_token')
@@ -70,8 +72,7 @@ export default function ServicesPage() {
       }))
       
       setServices(mappedServices)
-    } catch (error) {
-      console.error('Erro na requisição:', error)
+    } catch {
       showToast.error('Erro', 'Ocorreu um erro ao carregar os serviços')
       setServices([])
     }
@@ -115,19 +116,20 @@ export default function ServicesPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    // Criar modal de confirmação customizado com Sonner
-    showToast.warning('Confirmar exclusão?', 'Esta ação não pode ser desfeita')
-    
-    // Por enquanto mantém o confirm nativo, mas pode ser substituído por um modal customizado
-    if (!confirm('Tem certeza que deseja excluir este serviço?')) return
-    
+  const handleDelete = (id: string) => {
+    setDeleteTarget(id)
+  }
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return
+    const id = deleteTarget
+    setDeleteTarget(null)
     await showToast.promise(
       apiClient.deleteService(id),
       {
         loading: 'Excluindo serviço...',
         success: 'Serviço excluído com sucesso!',
-        error: (err) => err || 'Erro ao excluir serviço',
+        error: (err: string) => err || 'Erro ao excluir serviço',
       }
     )
     loadServices()
@@ -214,6 +216,16 @@ export default function ServicesPage() {
         formData={formData}
         onFormChange={setFormData}
         isEditing={!!editingService}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Excluir serviço"
+        description="Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        variant="danger"
+        onConfirm={executeDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
       </div>
     </div>

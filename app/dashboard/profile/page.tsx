@@ -48,28 +48,22 @@ export default function ProfilePage() {
       // Buscar email do token (pode ser decodificado do JWT)
       const token = localStorage.getItem('meca_admin_token')
       if (token) {
-        // Decodificar token para pegar email
         try {
           const payload = JSON.parse(atob(token.split('.')[1]))
+          if (!payload.email) throw new Error('Token sem email')
           setProfile({
-            email: payload.email || 'admin@meca.com.br',
-            name: payload.name || 'Administrador MECA',
+            email: payload.email,
+            name: payload.name || payload.email.split('@')[0],
             role: 'Administrador',
             created_at: payload.created_at || new Date().toISOString(),
             last_login: new Date().toISOString()
           })
         } catch {
-          setProfile({
-            email: 'admin@meca.com.br',
-            name: 'Administrador MECA',
-            role: 'Administrador',
-            created_at: new Date().toISOString(),
-            last_login: new Date().toISOString()
-          })
+          setProfile(null)
+          showToast.error('Erro ao carregar perfil', 'Token inválido — faça login novamente')
         }
       }
-    } catch (error) {
-      console.error('Erro ao carregar perfil:', error)
+    } catch {
       showToast.error('Erro', 'Ocorreu um erro ao carregar o perfil')
     }
     setLoading(false)
@@ -93,31 +87,21 @@ export default function ProfilePage() {
 
     setSaving(true)
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'
       const token = localStorage.getItem('meca_admin_token')
+      if (token) apiClient.setToken(token)
 
-      const response = await fetch(`${API_URL}/admin/profile/password`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        })
-      })
+      const { data, error: apiError } = await apiClient.changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword
+      )
 
-      const data = await response.json()
-
-      if (data.success) {
+      if (data?.success) {
         showToast.success('Senha alterada!', 'Sua senha foi alterada com sucesso')
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
       } else {
-        showToast.error('Erro', data.error || 'Não foi possível alterar a senha')
+        showToast.error('Erro', apiError || 'Não foi possível alterar a senha')
       }
-    } catch (error) {
-      console.error('Erro ao alterar senha:', error)
+    } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
     }
     setSaving(false)
@@ -144,28 +128,21 @@ export default function ProfilePage() {
 
     setCreatingAdmin(true)
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.mecabr.com'}/admin/auth/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('meca_admin_token')}`
-        },
-        body: JSON.stringify({
-          email: newAdminData.email,
-          name: newAdminData.name || newAdminData.email.split('@')[0]
-        })
+      const token = localStorage.getItem('meca_admin_token')
+      if (token) apiClient.setToken(token)
+
+      const { data, error: apiError } = await apiClient.createAdmin({
+        email: newAdminData.email,
+        name: newAdminData.name || newAdminData.email.split('@')[0],
       })
 
-      const data = await response.json()
-
-      if (data.success) {
+      if (data?.success) {
         showToast.success('Admin criado!', 'As credenciais foram enviadas por email')
         setNewAdminData({ email: '', name: '' })
       } else {
-        showToast.error('Erro ao criar admin', data.error || 'Não foi possível criar o admin')
+        showToast.error('Erro ao criar admin', apiError || 'Não foi possível criar o admin')
       }
-    } catch (error) {
-      console.error('Erro ao criar admin:', error)
+    } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
     }
     setCreatingAdmin(false)
@@ -189,7 +166,22 @@ export default function ProfilePage() {
   }
 
   if (!profile) {
-    return null
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-6 flex items-center justify-center">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-8 text-center max-w-md">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Erro ao carregar perfil</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Não foi possível decodificar o token de autenticação.</p>
+          <div className="flex gap-3 justify-center">
+            <button onClick={loadProfile} className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#00c977] hover:bg-[#00b369] transition-colors">
+              Tentar novamente
+            </button>
+            <button onClick={handleLogout} className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              Fazer login novamente
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
