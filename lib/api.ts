@@ -448,6 +448,17 @@ class MecaApiClient {
     return this.request(`/admin/marketing/sync${qs}`, { method: 'POST' })
   }
 
+  // Invoices (NFs)
+  async getInvoices(params?: { workshopId?: string; issuerType?: string; status?: string; page?: number; limit?: number }) {
+    const qs = new URLSearchParams()
+    if (params?.workshopId) qs.set('workshopId', params.workshopId)
+    if (params?.issuerType) qs.set('issuerType', params.issuerType)
+    if (params?.status) qs.set('status', params.status)
+    if (params?.page) qs.set('page', String(params.page))
+    if (params?.limit) qs.set('limit', String(params.limit))
+    return this.request(`/admin/invoices?${qs}`)
+  }
+
   // Audit Log
   async getAuditLog(params?: { page?: number; action?: string; admin?: string; from?: string; to?: string }) {
     const qs = new URLSearchParams()

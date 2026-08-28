@@ -15,6 +15,7 @@ import {
     LayoutDashboard,
     LogOut,
     Megaphone,
+    Receipt,
     Ticket,
     TrendingUp,
     UserPlus,
@@ -67,6 +68,7 @@ const MENU_SECTIONS: MenuSection[] = [
       { name: 'Usuários', path: '/dashboard/users', icon: Users },
       { name: 'Avaliações', path: '/dashboard/reviews', icon: Star },
       { name: 'Relatórios', path: '/dashboard/reports', icon: FileText },
+      { name: 'Notas Fiscais', path: '/dashboard/invoices', icon: Receipt },
     ],
   },
   {
