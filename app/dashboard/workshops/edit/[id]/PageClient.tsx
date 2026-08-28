@@ -48,6 +48,8 @@ interface Workshop {
   account_type?: string | null
   pix_key?: string | null
   pix_key_type?: string | null
+  auto_anticipation_enabled?: boolean
+  auto_anticipation_enabled_at?: string | null
 }
 
 const ALLOWED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
@@ -1292,6 +1294,25 @@ function EditWorkshopInner() {
                             ? <span>{workshop.asaas_pix_key} <span className="text-xs text-gray-500 dark:text-gray-400">({workshop.asaas_pix_key_type || 'tipo desconhecido'})</span></span>
                             : '—'}
                         </p>
+                      </div>
+                    </div>
+
+                    {/* Auto-anticipation status */}
+                    <div className="flex items-center gap-2 mt-3 p-3 rounded-lg" style={{ background: workshop.auto_anticipation_enabled ? 'rgba(34,197,94,0.08)' : 'rgba(107,114,128,0.08)' }}>
+                      {workshop.auto_anticipation_enabled ? (
+                        <ToggleRight size={18} className="text-green-400" />
+                      ) : (
+                        <ToggleLeft size={18} className="text-gray-400" />
+                      )}
+                      <div>
+                        <span className="text-xs font-medium" style={{ color: workshop.auto_anticipation_enabled ? '#22C55E' : '#6B7280' }}>
+                          Antecipação automática: {workshop.auto_anticipation_enabled ? 'Ativa' : 'Inativa'}
+                        </span>
+                        {workshop.auto_anticipation_enabled && workshop.auto_anticipation_enabled_at && (
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            Desde {new Date(workshop.auto_anticipation_enabled_at).toLocaleDateString('pt-BR')}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
