@@ -89,7 +89,7 @@ export default function DashboardPage() {
         oficinas_by_status: rawData.workshops?.by_status ?? rawData.oficinas_by_status ?? {},
         revenue_this_month: rawData.payments?.revenue_this_month ?? rawData.revenue_this_month ?? 0,
         meca_take: rawData.payments?.meca_take ?? 0,
-        gateway_fee: rawData.payments?.pagbank_fee ?? 0,
+        gateway_fee: rawData.payments?.gateway_fee ?? rawData.payments?.pagbank_fee ?? 0,
         meca_revenue: rawData.payments?.meca_revenue ?? 0,
         customer_registrations: processChartData(rawData.charts?.customer_registrations ?? rawData.customer_registrations),
         workshop_registrations: processChartData(rawData.charts?.workshop_registrations ?? rawData.workshop_registrations),

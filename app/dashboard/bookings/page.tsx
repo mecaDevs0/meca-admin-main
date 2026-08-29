@@ -484,7 +484,7 @@ function BookingsPageInner() {
                                       ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                                       : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
                                   }`}>
-                                    {booking.payment_provider === 'asaas' ? 'Asaas' : 'PagBank'}
+                                    {booking.payment_provider === 'asaas' ? 'Asaas' : (booking.payment_provider || 'Asaas')}
                                   </span>
                                 )}
                               </div>
@@ -632,7 +632,7 @@ function BookingsPageInner() {
                               ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                               : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
                           }`}>
-                            {payment.payment_provider === 'asaas' ? 'Asaas' : 'PagBank'}
+                            {payment.payment_provider === 'asaas' ? 'Asaas' : (payment.payment_provider || 'Asaas')}
                           </span>
                         )}
 

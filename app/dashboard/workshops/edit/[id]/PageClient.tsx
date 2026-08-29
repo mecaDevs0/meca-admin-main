@@ -25,9 +25,6 @@ interface Workshop {
   rating?: number
   total_reviews?: number
   meca_fee_percentage?: number | null
-  pagbank_account_status?: string | null
-  pagbank_verified?: boolean
-  pagbank_account_id?: string | null
   referral_code?: string | null
   referred_by_id?: string | null
   referred_by_name?: string | null
@@ -284,7 +281,7 @@ function EditWorkshopInner() {
         is_fee_reduced: workshopData.is_fee_reduced === true || workshopData.is_fee_reduced === 'true',
         fee_reduced_until: workshopData.fee_reduced_until ?? null,
         active_referrals_count: typeof workshopData.active_referrals_count === 'number' ? workshopData.active_referrals_count : (parseInt(String(workshopData.active_referrals_count || '0'), 10) || 0),
-        workshop_payment_provider: workshopData.workshop_payment_provider ?? 'pagbank',
+        workshop_payment_provider: workshopData.workshop_payment_provider ?? 'asaas',
         asaas_account_id: workshopData.asaas_account_id ?? null,
         asaas_wallet_id: workshopData.asaas_wallet_id ?? null,
         asaas_status: workshopData.asaas_status ?? null,
@@ -626,14 +623,14 @@ function EditWorkshopInner() {
 
   const handleSwitchProvider = async (newProvider: string) => {
     if (!workshopId || !workshop) return
-    if (newProvider === (workshop.workshop_payment_provider ?? 'pagbank')) return
+    if (newProvider === (workshop.workshop_payment_provider ?? 'asaas')) return
 
     if (newProvider === 'asaas' && !workshop.asaas_account_id) {
       showToast.error('Asaas não configurado', 'Esta oficina ainda não possui uma subconta Asaas criada. Configure antes de trocar o provedor.')
       return
     }
 
-    const providerLabel = newProvider === 'asaas' ? 'Asaas' : 'PagBank'
+    const providerLabel = 'Asaas'
     const confirmed = typeof window !== 'undefined'
       ? window.confirm(`Tem certeza que deseja trocar o provedor de pagamento para ${providerLabel}? Isso afetará os próximos pagamentos desta oficina.`)
       : true
@@ -1209,48 +1206,17 @@ function EditWorkshopInner() {
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Provedor atual</p>
                       <div className="flex items-center gap-3">
-                        {(workshop.workshop_payment_provider ?? 'pagbank') === 'asaas' ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[#00C977]/15 text-[#00C977] border border-[#00C977]/30">
-                            <span className="w-2 h-2 rounded-full bg-[#00C977]" />
-                            Asaas
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700">
-                            <span className="w-2 h-2 rounded-full bg-amber-500" />
-                            PagBank
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Trocar provedor</label>
-                      <div className="relative" title={!workshop.asaas_account_id && (workshop.workshop_payment_provider ?? 'pagbank') !== 'asaas' ? 'Subconta Asaas não criada — configure antes de trocar' : ''}>
-                        <select
-                          value={workshop.workshop_payment_provider ?? 'pagbank'}
-                          onChange={(e) => handleSwitchProvider(e.target.value)}
-                          disabled={switchingProvider || (!workshop.asaas_account_id && (workshop.workshop_payment_provider ?? 'pagbank') !== 'asaas')}
-                          className="px-4 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 text-sm font-medium focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <option value="pagbank">PagBank</option>
-                          <option value="asaas" disabled={!workshop.asaas_account_id}>
-                            Asaas{!workshop.asaas_account_id ? ' (não configurado)' : ''}
-                          </option>
-                        </select>
-                        {switchingProvider && (
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <Loader2 className="w-4 h-4 animate-spin text-[#00c977]" />
-                          </div>
-                        )}
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[#00C977]/15 text-[#00C977] border border-[#00C977]/30">
+                          <span className="w-2 h-2 rounded-full bg-[#00C977]" />
+                          Asaas
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                    A troca de provedor afeta apenas os próximos pagamentos. Transações em andamento não são impactadas.
-                  </p>
                 </div>
 
                 {/* Asaas status section — visible when provider is asaas OR asaas_account_id exists */}
-                {((workshop.workshop_payment_provider ?? 'pagbank') === 'asaas' || !!workshop.asaas_account_id) && (
+                {((workshop.workshop_payment_provider ?? 'asaas') === 'asaas' || !!workshop.asaas_account_id) && (
                   <div className="bg-white/60 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6">
                     <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Subconta Asaas</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
@@ -1298,18 +1264,26 @@ function EditWorkshopInner() {
                     </div>
 
                     {/* Auto-anticipation status */}
-                    <div className="flex items-center gap-2 mt-3 p-3 rounded-lg" style={{ background: workshop.auto_anticipation_enabled ? 'rgba(34,197,94,0.08)' : 'rgba(107,114,128,0.08)' }}>
+                    <div className={`flex items-center gap-3 mt-3 px-4 py-3 rounded-xl border ${
+                      workshop.auto_anticipation_enabled
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/50'
+                        : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700/50'
+                    }`}>
                       {workshop.auto_anticipation_enabled ? (
-                        <ToggleRight size={18} className="text-green-400" />
+                        <ToggleRight size={20} className="text-green-500 dark:text-green-400 flex-shrink-0" />
                       ) : (
-                        <ToggleLeft size={18} className="text-gray-400" />
+                        <ToggleLeft size={20} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
                       )}
                       <div>
-                        <span className="text-xs font-medium" style={{ color: workshop.auto_anticipation_enabled ? '#22C55E' : '#6B7280' }}>
+                        <span className={`text-sm font-medium ${
+                          workshop.auto_anticipation_enabled
+                            ? 'text-green-700 dark:text-green-300'
+                            : 'text-gray-600 dark:text-gray-300'
+                        }`}>
                           Antecipação automática: {workshop.auto_anticipation_enabled ? 'Ativa' : 'Inativa'}
                         </span>
                         {workshop.auto_anticipation_enabled && workshop.auto_anticipation_enabled_at && (
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                             Desde {new Date(workshop.auto_anticipation_enabled_at).toLocaleDateString('pt-BR')}
                           </p>
                         )}
