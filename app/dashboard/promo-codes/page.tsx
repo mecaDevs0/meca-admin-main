@@ -94,15 +94,27 @@ export default function PromoCodesPage() {
       return
     }
 
+    const numValue = parseFloat(formValue)
+    if (formType === 'percentage' && (numValue <= 0 || numValue > 10)) {
+      showToast.error('Valor inválido', 'Percentual deve ser entre 1% e 10%')
+      return
+    }
+    if (formType === 'fixed' && numValue <= 0) {
+      showToast.error('Valor inválido', 'Valor fixo deve ser maior que R$0')
+      return
+    }
+
+    const minBookingCents = formMinBooking ? Math.round(parseFloat(formMinBooking) * 100) : undefined
+
     setCreating(true)
     try {
       const { data, error } = await apiClient.createPromoCode({
         code: formCode.trim().toUpperCase(),
         description: formDescription.trim() || undefined,
         type: formType,
-        value: parseFloat(formValue),
+        value: numValue,
         max_uses: formMaxUses ? parseInt(formMaxUses) : undefined,
-        min_booking_value: formMinBooking ? parseFloat(formMinBooking) : undefined,
+        min_booking_value: minBookingCents,
         valid_until: formValidUntil || undefined,
         first_booking_only: formFirstOnly,
       })
@@ -269,18 +281,30 @@ export default function PromoCodesPage() {
             {/* Value */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {formType === 'percentage' ? 'Desconto (%) — máx 10%' : 'Desconto (R$)'}
+                {formType === 'percentage' ? 'Desconto (%) — máx 10%' : 'Desconto em Reais (R$)'}
               </label>
-              <input
-                type="number"
-                value={formValue}
-                onChange={(e) => setFormValue(e.target.value)}
-                placeholder={formType === 'percentage' ? 'Ex: 15' : 'Ex: 10.00'}
-                min="0"
-                max={formType === 'percentage' ? '10' : undefined}
-                step={formType === 'percentage' ? '1' : '0.01'}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#00c977] focus:ring-1 focus:ring-[#00c977] outline-none text-sm"
-              />
+              <div className="relative">
+                {formType === 'fixed' && (
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">R$</span>
+                )}
+                <input
+                  type="number"
+                  value={formValue}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (formType === 'percentage' && parseFloat(v) > 10) return
+                    setFormValue(v)
+                  }}
+                  placeholder={formType === 'percentage' ? 'Ex: 5' : 'Ex: 100.00'}
+                  min="0"
+                  max={formType === 'percentage' ? '10' : undefined}
+                  step={formType === 'percentage' ? '1' : '0.01'}
+                  className={`w-full py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#00c977] focus:ring-1 focus:ring-[#00c977] outline-none text-sm ${formType === 'fixed' ? 'pl-10 pr-4' : 'px-4'}`}
+                />
+              </div>
+              {formType === 'percentage' && (
+                <p className="text-xs text-gray-400 mt-1">MECA absorve o desconto — máximo 10% para não sair no prejuízo</p>
+              )}
             </div>
 
             {/* Description */}
@@ -310,15 +334,20 @@ export default function PromoCodesPage() {
 
             {/* Min Booking Value */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor mínimo (centavos)</label>
-              <input
-                type="number"
-                value={formMinBooking}
-                onChange={(e) => setFormMinBooking(e.target.value)}
-                placeholder="Ex: 5000 (= R$50)"
-                min="0"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#00c977] focus:ring-1 focus:ring-[#00c977] outline-none text-sm"
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor mínimo do serviço (R$)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">R$</span>
+                <input
+                  type="number"
+                  value={formMinBooking}
+                  onChange={(e) => setFormMinBooking(e.target.value)}
+                  placeholder="Ex: 700.00"
+                  min="0"
+                  step="0.01"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#00c977] focus:ring-1 focus:ring-[#00c977] outline-none text-sm"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Vazio = sem valor mínimo. Cupom só vale para serviços acima deste valor.</p>
             </div>
 
             {/* Valid Until */}
