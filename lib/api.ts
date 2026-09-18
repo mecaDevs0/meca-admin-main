@@ -345,6 +345,24 @@ class MecaApiClient {
     })
   }
 
+  async createFlashCoupon(data: {
+    discountPercent: number; serviceType?: string; maxUses?: number;
+    durationHours?: number; minBookingValue?: number
+  }) {
+    return this.request('/admin/promo-codes/flash', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getFlashStats() {
+    return this.request('/admin/promo-codes/flash/stats')
+  }
+
+  async getReactivationStats() {
+    return this.request('/admin/reactivation/stats')
+  }
+
   // Push Campaigns
   async getPushCampaigns(page = 1, limit = 20) {
     return this.request(`/admin/push-campaigns?page=${page}&limit=${limit}`)
