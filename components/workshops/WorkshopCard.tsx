@@ -119,7 +119,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
       showToast.error('Erro', 'ID da oficina inválido. Recarregue a página.')
       return
     }
-    router.push(`/dashboard/workshops/edit/index?id=${workshop.id}`)
+    router.push(`/dashboard/workshops/${workshop.id}`)
   }
 
   return (

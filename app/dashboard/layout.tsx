@@ -1,6 +1,7 @@
 'use client'
 
 import Sidebar from '@/components/layout/Sidebar'
+import { CommandPalette } from '@/components/ui/CommandPalette'
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext'
 import { useRouter } from 'next/navigation'
@@ -27,6 +28,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         Pular para o conteúdo
       </a>
       <OnboardingTour />
+      <CommandPalette />
       <Sidebar />
       <main
         id="main-content"

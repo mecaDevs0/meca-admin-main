@@ -26,7 +26,7 @@ class MecaApiClient {
     this.token = token
   }
 
-  private async request<T = any>(
+  async request<T = any>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
@@ -486,6 +486,21 @@ class MecaApiClient {
     if (params?.from) qs.set('from', params.from)
     if (params?.to) qs.set('to', params.to)
     return this.request(`/admin/audit-log?${qs}`)
+  }
+
+  async getNotificationDiagnostic() {
+    return this.request('/admin/notifications/diagnostic')
+  }
+
+  async getCustomerSavedCards(customerId: string) {
+    return this.request(`/admin/saved-cards/by-customer/${customerId}`)
+  }
+
+  async updateCustomerBilling(customerId: string, data: Record<string, string>) {
+    return this.request(`/admin/customers/${customerId}/billing`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
   }
 }
 

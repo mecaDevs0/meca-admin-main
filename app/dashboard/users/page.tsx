@@ -18,6 +18,10 @@ interface User {
   type: 'customer' | 'workshop'
   created_at: string
   acquisition_source?: string | null
+  billing_email?: string
+  billing_phone?: string
+  billing_cep?: string
+  billing_address_number?: string
 }
 
 const SOURCE_BADGE_CONFIG: Record<string, { label: string; color: string }> = {
@@ -142,6 +146,10 @@ function UsersPageInner() {
         type: user.type || 'customer',
         created_at: user.created_at || new Date().toISOString(),
         acquisition_source: user.acquisition_source || null,
+        billing_email: user.billing_email,
+        billing_phone: user.billing_phone,
+        billing_cep: user.billing_cep,
+        billing_address_number: user.billing_address_number,
       }))
       
       setUsers(mappedUsers)
@@ -332,7 +340,7 @@ function UsersPageInner() {
       <Pagination currentPage={page} totalItems={filteredUsers.length} pageSize={PAGE_SIZE} onPageChange={handlePageChange} />
 
       {selectedUser && (
-        <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} />
+        <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} onStatusChange={loadUsers} />
       )}
       </div>
     </div>

@@ -6,12 +6,15 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import {
     Activity,
+    BarChart3,
     Bell,
     Building2,
     CalendarCheck,
+    Car,
     ChevronLeft,
     ChevronRight,
     FileText,
+    Heart,
     LayoutDashboard,
     LogOut,
     Megaphone,
@@ -24,7 +27,8 @@ import {
     Star,
     User,
     Users,
-    Wrench
+    Wrench,
+    Filter,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -55,8 +59,11 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     label: 'Crescimento',
     items: [
+      { name: 'Growth', path: '/dashboard/growth', icon: BarChart3 },
       { name: 'Marketing', path: '/dashboard/marketing', icon: TrendingUp },
+      { name: 'Funil', path: '/dashboard/marketing/funnel', icon: Filter },
       { name: 'Campanhas', path: '/dashboard/campaigns', icon: Megaphone },
+      { name: 'Engajamento', path: '/dashboard/engagement', icon: Heart },
       { name: 'Cupons', path: '/dashboard/promo-codes', icon: Ticket },
       { name: 'Indicações', path: '/dashboard/referrals', icon: UserPlus },
     ],
@@ -67,6 +74,7 @@ const MENU_SECTIONS: MenuSection[] = [
       { name: 'Notificações', path: '/dashboard/notifications', icon: Bell },
       { name: 'Usuários', path: '/dashboard/users', icon: Users },
       { name: 'Avaliações', path: '/dashboard/reviews', icon: Star },
+      { name: 'Veículos', path: '/dashboard/vehicles', icon: Car },
       { name: 'Relatórios', path: '/dashboard/reports', icon: FileText },
       { name: 'Notas Fiscais', path: '/dashboard/invoices', icon: Receipt },
     ],

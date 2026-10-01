@@ -3,7 +3,10 @@
 import { apiClient } from '@/lib/api'
 import { formatPhone } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Car, ClipboardList, Copy, Mail, Phone, ShieldCheck, ShieldOff, X } from 'lucide-react'
+import {
+  Calendar, Car, ClipboardList, Copy, CreditCard, Mail, Phone,
+  ShieldCheck, ShieldOff, X, Globe, Edit3, Check,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 interface Vehicle {
@@ -24,10 +27,48 @@ interface Booking {
   quote_final?: number
 }
 
+interface SavedCard {
+  id: string
+  last_digits: string
+  card_brand: string
+  expiry_month: number
+  expiry_year: number
+  holder_name: string
+}
+
 interface Props {
-  user: { id: string; name: string; email: string; phone: string; type: string; created_at: string; is_active?: boolean }
+  user: {
+    id: string
+    name: string
+    email: string
+    phone: string
+    type: string
+    created_at: string
+    is_active?: boolean
+    acquisition_source?: string | null
+    billing_email?: string
+    billing_phone?: string
+    billing_cep?: string
+    billing_address_number?: string
+  }
   onClose: () => void
   onStatusChange?: () => void
+}
+
+const SOURCE_BADGE: Record<string, { label: string; color: string }> = {
+  organic: { label: 'Orgânico', color: '#00C977' },
+  'Meta Ads': { label: 'Meta Ads', color: '#1877F2' },
+  restricted: { label: 'Meta Ads', color: '#1877F2' },
+  tiktokads: { label: 'TikTok', color: '#FF0050' },
+  googleadwords_int: { label: 'Google', color: '#FBBC04' },
+  referral: { label: 'Indicação', color: '#8B5CF6' },
+}
+
+const CARD_BRAND_COLOR: Record<string, string> = {
+  visa: '#1A1F71',
+  mastercard: '#EB001B',
+  elo: '#00A4E0',
+  amex: '#2E77BC',
 }
 
 function copyToClipboard(text: string) {
@@ -37,9 +78,17 @@ function copyToClipboard(text: string) {
 export default function UserDetailModal({ user, onClose, onStatusChange }: Props) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [cards, setCards] = useState<SavedCard[]>([])
   const [loading, setLoading] = useState(true)
   const [isActive, setIsActive] = useState(user.is_active !== false)
   const [toggling, setToggling] = useState(false)
+
+  const [editingBilling, setEditingBilling] = useState(false)
+  const [billingEmail, setBillingEmail] = useState(user.billing_email ?? '')
+  const [billingPhone, setBillingPhone] = useState(user.billing_phone ?? '')
+  const [billingCep, setBillingCep] = useState(user.billing_cep ?? '')
+  const [billingAddrNum, setBillingAddrNum] = useState(user.billing_address_number ?? '')
+  const [savingBilling, setSavingBilling] = useState(false)
 
   useEffect(() => {
     loadDetails()
@@ -47,21 +96,30 @@ export default function UserDetailModal({ user, onClose, onStatusChange }: Props
 
   const loadDetails = async () => {
     setLoading(true)
-    const [vehiclesRes, bookingsRes] = await Promise.all([
+    const [vehiclesRes, bookingsRes, cardsRes] = await Promise.all([
       apiClient.getCustomerVehicles(user.id).catch(() => ({ data: null, error: null })),
       apiClient.getCustomerBookings(user.id).catch(() => ({ data: null, error: null })),
+      user.type === 'customer'
+        ? apiClient.getCustomerSavedCards(user.id).catch(() => ({ data: null, error: null }))
+        : Promise.resolve({ data: null, error: null }),
     ])
 
     if (vehiclesRes.data) {
       const raw = vehiclesRes.data as any
-      const arr = raw?.vehicles ?? raw?.data?.vehicles ?? raw?.data ?? []
+      const arr = (raw?.vehicles ?? raw?.data?.vehicles ?? raw?.data ?? []) as Vehicle[]
       setVehicles(Array.isArray(arr) ? arr : [])
     }
 
     if (bookingsRes.data) {
       const raw = bookingsRes.data as any
-      const arr = raw?.appointments ?? raw?.bookings ?? raw?.data?.appointments ?? raw?.data ?? []
+      const arr = (raw?.appointments ?? raw?.bookings ?? raw?.data?.appointments ?? raw?.data ?? []) as Booking[]
       setBookings(Array.isArray(arr) ? arr : [])
+    }
+
+    if (cardsRes.data) {
+      const raw = cardsRes.data as any
+      const arr = (raw?.cards ?? raw?.data ?? []) as SavedCard[]
+      setCards(Array.isArray(arr) ? arr : [])
     }
 
     setLoading(false)
@@ -80,9 +138,26 @@ export default function UserDetailModal({ user, onClose, onStatusChange }: Props
     onStatusChange?.()
   }
 
+  const handleSaveBilling = async () => {
+    setSavingBilling(true)
+    try {
+      await apiClient.updateCustomerBilling(user.id, {
+        billing_email: billingEmail,
+        billing_phone: billingPhone,
+        billing_cep: billingCep,
+        billing_address_number: billingAddrNum,
+      })
+      setEditingBilling(false)
+    } catch { /* silent */ }
+    setSavingBilling(false)
+  }
+
   const totalSpent = bookings
     .filter(b => b.status === 'COMPLETED' || b.status === 'completed')
     .reduce((sum, b) => sum + (b.quote_final ?? 0), 0)
+
+  const source = user.acquisition_source
+  const sourceCfg = source ? (SOURCE_BADGE[source] ?? { label: source, color: '#6B7280' }) : null
 
   return (
     <AnimatePresence>
@@ -97,10 +172,19 @@ export default function UserDetailModal({ user, onClose, onStatusChange }: Props
           {/* Header */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-start justify-between">
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
                 {user.name}
                 {!isActive && (
                   <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">Inativo</span>
+                )}
+                {sourceCfg && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                    style={{ backgroundColor: `${sourceCfg.color}18`, color: sourceCfg.color, border: `1px solid ${sourceCfg.color}30` }}
+                  >
+                    <Globe className="w-3 h-3" />
+                    {sourceCfg.label}
+                  </span>
                 )}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -138,7 +222,7 @@ export default function UserDetailModal({ user, onClose, onStatusChange }: Props
           {/* Content */}
           <div className="p-6 overflow-y-auto flex-1 space-y-6">
             {/* Contact info */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3">
                 <Mail className="w-4 h-4 text-gray-400 shrink-0" />
                 <span className="text-sm text-gray-900 dark:text-white truncate">{user.email}</span>
@@ -178,6 +262,141 @@ export default function UserDetailModal({ user, onClose, onStatusChange }: Props
                     </p>
                   </div>
                 </div>
+
+                {/* Saved Cards */}
+                {cards.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-3">
+                      <CreditCard className="w-4 h-4" /> Cartões Salvos
+                    </h3>
+                    <div className="space-y-2">
+                      {cards.map(c => {
+                        const brandColor = CARD_BRAND_COLOR[c.card_brand?.toLowerCase()] ?? '#6B7280'
+                        return (
+                          <div key={c.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 rounded-xl px-4 py-2.5">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className="w-8 h-5 rounded flex items-center justify-center"
+                                style={{ backgroundColor: `${brandColor}18`, border: `1px solid ${brandColor}30` }}
+                              >
+                                <span className="text-[8px] font-bold uppercase" style={{ color: brandColor }}>
+                                  {c.card_brand || '?'}
+                                </span>
+                              </div>
+                              <span className="text-sm font-mono text-gray-900 dark:text-white">
+                                •••• {c.last_digits}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {String(c.expiry_month).padStart(2, '0')}/{c.expiry_year}
+                              </span>
+                              {c.holder_name && (
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate max-w-[140px]">
+                                  {c.holder_name}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Billing info (editable) */}
+                {user.type === 'customer' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                        <Edit3 className="w-4 h-4" /> Dados de Cobrança
+                      </h3>
+                      {!editingBilling ? (
+                        <button
+                          onClick={() => setEditingBilling(true)}
+                          className="text-xs text-[#00c977] hover:text-[#00b369] font-medium transition-colors"
+                        >
+                          Editar
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setEditingBilling(false)}
+                            className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium transition-colors"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            onClick={handleSaveBilling}
+                            disabled={savingBilling}
+                            className="flex items-center gap-1 text-xs text-[#00c977] hover:text-[#00b369] font-medium transition-colors disabled:opacity-50"
+                          >
+                            {savingBilling ? (
+                              <div className="w-3 h-3 border-2 border-[#00c977] border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <Check className="w-3 h-3" />
+                            )}
+                            Salvar
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {editingBilling ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">Email de cobrança</label>
+                          <input
+                            type="email"
+                            value={billingEmail}
+                            onChange={e => setBillingEmail(e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/50 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#00c977] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">Telefone</label>
+                          <input
+                            type="text"
+                            value={billingPhone}
+                            onChange={e => setBillingPhone(e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/50 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#00c977] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">CEP</label>
+                          <input
+                            type="text"
+                            value={billingCep}
+                            onChange={e => setBillingCep(e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/50 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#00c977] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">Número</label>
+                          <input
+                            type="text"
+                            value={billingAddrNum}
+                            onChange={e => setBillingAddrNum(e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/50 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#00c977] outline-none"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { label: 'Email', value: billingEmail || user.email },
+                          { label: 'Telefone', value: billingPhone || user.phone },
+                          { label: 'CEP', value: billingCep || '—' },
+                          { label: 'Número', value: billingAddrNum || '—' },
+                        ].map(f => (
+                          <div key={f.label} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2.5">
+                            <p className="text-[10px] text-gray-400 dark:text-gray-500">{f.label}</p>
+                            <p className="text-xs text-gray-900 dark:text-white font-medium truncate">{f.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Vehicles */}
                 {vehicles.length > 0 && (

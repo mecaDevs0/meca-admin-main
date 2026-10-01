@@ -6,7 +6,7 @@ import { Loading } from '@/components/ui/Loading'
 import { motion } from 'framer-motion'
 import {
   TrendingUp, DollarSign, Target, Users, RefreshCw,
-  ArrowDownRight, ArrowUpRight, ChevronDown,
+  ArrowDownRight, ArrowUpRight, ChevronDown, ExternalLink,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -393,9 +393,17 @@ export default function MarketingPage() {
             className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-sm"
           >
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-semibold text-[#252940] dark:text-white">
-                Funil de Conversão
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-base font-semibold text-[#252940] dark:text-white">
+                  Funil de Conversão
+                </h2>
+                <button
+                  onClick={() => router.push('/dashboard/marketing/funnel')}
+                  className="flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                >
+                  Ver detalhado <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
               <div className="relative">
                 <select
                   value={funnelSource}
