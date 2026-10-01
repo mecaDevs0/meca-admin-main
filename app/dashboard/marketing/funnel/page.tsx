@@ -498,7 +498,7 @@ export default function MarketingFunnelPage() {
                   width={90}
                 />
                 <Tooltip
-                  formatter={(value: number) => [formatCurrency(value), 'CAC']}
+                  formatter={(value) => [formatCurrency(Number(value)), 'CAC']}
                   contentStyle={{
                     backgroundColor: 'rgba(255,255,255,0.95)',
                     backdropFilter: 'blur(10px)',
