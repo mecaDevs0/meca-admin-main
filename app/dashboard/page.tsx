@@ -47,11 +47,13 @@ interface DashboardMetrics {
 }
 
 interface GrowthData {
-  wau?: number
-  mau?: number
-  retention_d7?: number
-  retention_d30?: number
-  churn_rate?: number
+  new_customers: number
+  new_customers_prev: number
+  new_workshops: number
+  new_workshops_prev: number
+  retained_customers: number
+  inactive_30d: number
+  inactive_90d: number
 }
 
 const itemVariants = {
@@ -136,7 +138,15 @@ export default function DashboardPage() {
 
     if (growthRes.data) {
       const gd = (growthRes.data as any).data ?? growthRes.data
-      setGrowth(gd)
+      setGrowth({
+        new_customers: gd.kpis?.new_customers ?? 0,
+        new_customers_prev: gd.kpis?.new_customers_prev ?? 0,
+        new_workshops: gd.kpis?.new_workshops ?? 0,
+        new_workshops_prev: gd.kpis?.new_workshops_prev ?? 0,
+        retained_customers: gd.kpis?.retained_customers ?? 0,
+        inactive_30d: gd.churn?.inactive_30d ?? 0,
+        inactive_90d: gd.churn?.inactive_90d ?? 0,
+      })
     }
 
     if (reviewsRes.data) {
@@ -496,11 +506,11 @@ export default function DashboardPage() {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {[
-                { label: 'WAU', value: growth.wau ?? 0, icon: Eye },
-                { label: 'MAU', value: growth.mau ?? 0, icon: Users },
-                { label: 'Retenção D7', value: growth.retention_d7 ? `${growth.retention_d7.toFixed(1)}%` : '—', icon: UserPlus },
-                { label: 'Retenção D30', value: growth.retention_d30 ? `${growth.retention_d30.toFixed(1)}%` : '—', icon: TrendingUp },
-                { label: 'Churn Rate', value: growth.churn_rate ? `${growth.churn_rate.toFixed(1)}%` : '—', icon: ShieldAlert },
+                { label: 'Novos Clientes', value: growth.new_customers, icon: UserPlus },
+                { label: 'Novas Oficinas', value: growth.new_workshops, icon: Building2 },
+                { label: 'Retidos', value: growth.retained_customers, icon: Users },
+                { label: 'Inativos 30d', value: growth.inactive_30d, icon: Clock },
+                { label: 'Inativos 90d', value: growth.inactive_90d, icon: ShieldAlert },
               ].map((g) => (
                 <div
                   key={g.label}
