@@ -387,23 +387,23 @@ export default function MarketingPage() {
         )}
 
         {/* Funnel */}
-        {funnel && (
-          <motion.div
-            variants={itemVariants}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-sm"
-          >
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-3">
-                <h2 className="text-base font-semibold text-[#252940] dark:text-white">
-                  Funil de Conversão
-                </h2>
-                <button
-                  onClick={() => router.push('/dashboard/marketing/funnel')}
-                  className="flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
-                >
-                  Ver detalhado <ExternalLink className="w-3 h-3" />
-                </button>
-              </div>
+        <motion.div
+          variants={itemVariants}
+          className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/50 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <h2 className="text-base font-semibold text-[#252940] dark:text-white">
+                Funil de Conversão
+              </h2>
+              <button
+                onClick={() => router.push('/dashboard/marketing/funnel')}
+                className="flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              >
+                Ver detalhado <ExternalLink className="w-3 h-3" />
+              </button>
+            </div>
+            {funnel && funnelSteps.length > 0 && (
               <div className="relative">
                 <select
                   value={funnelSource}
@@ -416,49 +416,69 @@ export default function MarketingPage() {
                 </select>
                 <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               </div>
-            </div>
+            )}
+          </div>
 
-            <div className="space-y-3">
-              {funnelSteps.map((step, i) => (
-                <div key={step.label} className="flex items-center gap-4">
-                  <div className="w-24 text-right">
-                    <span className="text-sm font-medium text-[#252940] dark:text-white">{step.label}</span>
-                  </div>
-                  <div className="flex-1 relative">
-                    <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-8 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.max((step.value / maxFunnelValue) * 100, 2)}%` }}
-                        transition={{ duration: 0.6, delay: i * 0.1 }}
-                        className="h-full rounded-full flex items-center justify-end pr-3"
-                        style={{ backgroundColor: rateBarColor(step.rate) }}
-                      >
-                        <span className="text-xs font-bold text-white drop-shadow-sm">
-                          {formatCompact(step.value)}
+          {!funnel || (funnel.installs === 0 && funnel.registrations === 0 && funnel.bookings === 0 && funnel.payments === 0) ? (
+            <div className="flex flex-col items-center justify-center py-10">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
+                <Target className="w-6 h-6 text-gray-400" />
+              </div>
+              <p className="text-sm font-medium text-[#252940] dark:text-white mb-1">Sem dados de atribuição</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center max-w-xs mb-3">
+                Os dados do funil dependem da integração com o AppsFlyer.
+              </p>
+              <button
+                onClick={() => router.push('/dashboard/marketing/funnel')}
+                className="flex items-center gap-1 text-xs font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              >
+                Ver detalhado <ExternalLink className="w-3 h-3" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-3">
+                {funnelSteps.map((step, i) => (
+                  <div key={step.label} className="flex items-center gap-4">
+                    <div className="w-24 text-right">
+                      <span className="text-sm font-medium text-[#252940] dark:text-white">{step.label}</span>
+                    </div>
+                    <div className="flex-1 relative">
+                      <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-8 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.max((step.value / maxFunnelValue) * 100, 2)}%` }}
+                          transition={{ duration: 0.6, delay: i * 0.1 }}
+                          className="h-full rounded-full flex items-center justify-end pr-3"
+                          style={{ backgroundColor: rateBarColor(step.rate) }}
+                        >
+                          <span className="text-xs font-bold text-white drop-shadow-sm">
+                            {formatCompact(step.value)}
+                          </span>
+                        </motion.div>
+                      </div>
+                    </div>
+                    <div className="w-16 text-right">
+                      {i > 0 ? (
+                        <span className={`text-sm font-semibold ${rateColor(step.rate)}`}>
+                          {step.rate}%
                         </span>
-                      </motion.div>
+                      ) : (
+                        <span className="text-sm font-semibold text-gray-400">100%</span>
+                      )}
                     </div>
                   </div>
-                  <div className="w-16 text-right">
-                    {i > 0 ? (
-                      <span className={`text-sm font-semibold ${rateColor(step.rate)}`}>
-                        {step.rate}%
-                      </span>
-                    ) : (
-                      <span className="text-sm font-semibold text-gray-400">100%</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {funnel.conversion_rates.overall > 0 && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 text-right">
-                Conversão geral (install → pagamento): <span className="font-semibold text-[#252940] dark:text-white">{funnel.conversion_rates.overall}%</span>
-              </p>
-            )}
-          </motion.div>
-        )}
+              {funnel.conversion_rates.overall > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 text-right">
+                  Conversão geral (install → pagamento): <span className="font-semibold text-[#252940] dark:text-white">{funnel.conversion_rates.overall}%</span>
+                </p>
+              )}
+            </>
+          )}
+        </motion.div>
 
         {/* Channels Table */}
         {channels.length > 0 && (

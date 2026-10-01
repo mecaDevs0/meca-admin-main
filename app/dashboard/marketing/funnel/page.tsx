@@ -198,7 +198,79 @@ export default function MarketingFunnelPage() {
     visible: { y: 0, opacity: 1 },
   }
 
+  const isFunnelEmpty = !funnel || (funnel.installs === 0 && funnel.registrations === 0 && funnel.bookings === 0 && funnel.payments === 0)
+  const isChannelsEmpty = channels.length === 0
+  const isOverviewEmpty = !overview || (overview.total_installs === 0)
+
   if (loading) return <Loading message="Carregando funil de marketing..." size={200} />
+
+  if (isFunnelEmpty && isChannelsEmpty && isOverviewEmpty) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-3 sm:p-4 md:p-6">
+        <div className="max-w-[1920px] mx-auto space-y-6">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push('/dashboard/marketing')}
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+            </button>
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Filter className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#252940] dark:text-white">Funil de Marketing</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Conversão completa por etapa e canal</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
+              Sincronizar
+            </button>
+            {PERIODS.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setPeriod(p.value)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  period === p.value
+                    ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 dark:border-gray-700/50 shadow-lg">
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-16 h-16 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
+                <Filter className="w-8 h-8 text-purple-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#252940] dark:text-white mb-2">
+                Dados de atribuição ainda não disponíveis
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md mb-4">
+                Esta página utiliza dados do AppsFlyer para construir o funil de aquisição.
+                Configure a integração e o webhook para começar a visualizar os dados de conversão.
+              </p>
+              <button
+                onClick={handleSync}
+                disabled={syncing}
+                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+              >
+                {syncing ? 'Sincronizando...' : 'Tentar sincronizar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-3 sm:p-4 md:p-6">

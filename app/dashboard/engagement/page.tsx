@@ -6,19 +6,41 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { showToast } from '@/lib/toast'
 import { motion } from 'framer-motion'
 import {
-  Heart, RefreshCw, Star, Bell, Users, TrendingUp,
-  Play, Zap, CheckCircle, Clock, AlertCircle,
+  Heart, RefreshCw, Star, Bell, Users,
+  Play, AlertCircle,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-interface LoyaltyStats { total_eligible: number; total_redeemed: number; conversion_rate: number }
-interface ReactivationStats { total_inactive: number; total_reactivated: number; reactivation_rate: number }
-interface ReviewIncentiveStats { total_eligible: number; total_reviewed: number; review_rate: number }
-interface MaintenanceStats { total_due: number; total_notified: number; response_rate: number }
+interface LoyaltyStats {
+  active_members: number
+  total_points_outstanding: number
+  total_points_ever_earned: number
+  total_points_redeemed: number
+  total_redemptions: number
+}
+
+interface ReactivationStats {
+  total_sent: number
+  total_used: number
+  conversion_rate: number
+}
+
+interface ReviewIncentiveStats {
+  total_pushes: number
+  reviews_received: number
+  conversion_rate: number
+}
+
+interface MaintenanceStats {
+  total_sent: number
+  conversions: number
+  conversion_rate: number
+}
 
 interface EngagementData {
   loyalty: LoyaltyStats | null
   reactivation: ReactivationStats | null
+  reactivationError: boolean
   reviewIncentives: ReviewIncentiveStats | null
   maintenance: MaintenanceStats | null
 }
@@ -37,9 +59,10 @@ interface ProgramCardProps {
   actionLabel?: string
   onAction?: () => void
   loading?: boolean
+  unavailable?: boolean
 }
 
-function ProgramCard({ title, description, icon: Icon, gradient, stats, actionLabel, onAction, loading }: ProgramCardProps) {
+function ProgramCard({ title, description, icon: Icon, gradient, stats, actionLabel, onAction, loading, unavailable }: ProgramCardProps) {
   return (
     <motion.div
       variants={itemVariants}
@@ -66,20 +89,33 @@ function ProgramCard({ title, description, icon: Icon, gradient, stats, actionLa
           </button>
         )}
       </div>
-      <div className="grid grid-cols-3 gap-3">
-        {stats.map((s) => (
-          <div key={s.label} className="text-center">
-            <p className="text-lg font-bold text-[#252940] dark:text-white">{s.value}</p>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500">{s.label}</p>
-          </div>
-        ))}
-      </div>
+      {unavailable ? (
+        <div className="flex items-center gap-2 py-3 px-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30">
+          <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+          <p className="text-xs text-amber-700 dark:text-amber-400">Dados temporariamente indisponíveis</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-3">
+          {stats.map((s) => (
+            <div key={s.label} className="text-center">
+              <p className="text-lg font-bold text-[#252940] dark:text-white">{s.value}</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   )
 }
 
 export default function EngagementPage() {
-  const [data, setData] = useState<EngagementData>({ loyalty: null, reactivation: null, reviewIncentives: null, maintenance: null })
+  const [data, setData] = useState<EngagementData>({
+    loyalty: null,
+    reactivation: null,
+    reactivationError: false,
+    reviewIncentives: null,
+    maintenance: null,
+  })
   const [loading, setLoading] = useState(true)
   const [processingLoyalty, setProcessingLoyalty] = useState(false)
   const [processingReview, setProcessingReview] = useState(false)
@@ -96,16 +132,47 @@ export default function EngagementPage() {
     setLoading(true)
     const [loyaltyRes, reactivationRes, reviewRes, maintenanceRes] = await Promise.all([
       apiClient.request<any>('/admin/loyalty/stats').catch(() => ({ data: null })),
-      apiClient.request<any>('/admin/reactivation/stats').catch(() => ({ data: null })),
+      apiClient.request<any>('/admin/reactivation/stats').catch(() => ({ data: null, error: 'unavailable' })),
       apiClient.request<any>('/admin/review-incentives/stats').catch(() => ({ data: null })),
       apiClient.request<any>('/admin/maintenance-reminders/stats').catch(() => ({ data: null })),
     ])
 
+    const parseLoyalty = (raw: any): LoyaltyStats | null => {
+      if (!raw) return null
+      const d = raw.data ?? raw
+      if (d.active_members === undefined) return null
+      return d
+    }
+
+    const parseReactivation = (raw: any): { stats: ReactivationStats | null; error: boolean } => {
+      if (!raw || raw.error) return { stats: null, error: true }
+      const d = raw.data ?? raw
+      if (d.total_sent === undefined) return { stats: null, error: true }
+      return { stats: d, error: false }
+    }
+
+    const parseReview = (raw: any): ReviewIncentiveStats | null => {
+      if (!raw) return null
+      const d = raw.data ?? raw
+      if (d.total_pushes === undefined) return null
+      return d
+    }
+
+    const parseMaintenance = (raw: any): MaintenanceStats | null => {
+      if (!raw) return null
+      const d = raw.data ?? raw
+      if (d.total_sent === undefined) return null
+      return d
+    }
+
+    const reactivation = parseReactivation(reactivationRes)
+
     setData({
-      loyalty: loyaltyRes.data ? (loyaltyRes.data as any).data ?? loyaltyRes.data : null,
-      reactivation: reactivationRes.data ? (reactivationRes.data as any).data ?? reactivationRes.data : null,
-      reviewIncentives: reviewRes.data ? (reviewRes.data as any).data ?? reviewRes.data : null,
-      maintenance: maintenanceRes.data ? (maintenanceRes.data as any).data ?? maintenanceRes.data : null,
+      loyalty: parseLoyalty(loyaltyRes),
+      reactivation: reactivation.stats,
+      reactivationError: reactivation.error,
+      reviewIncentives: parseReview(reviewRes),
+      maintenance: parseMaintenance(maintenanceRes),
     })
     setLoading(false)
   }
@@ -165,9 +232,9 @@ export default function EngagementPage() {
             icon={Heart}
             gradient="from-pink-500 to-rose-600"
             stats={[
-              { label: 'Elegíveis', value: data.loyalty?.total_eligible ?? '—' },
-              { label: 'Resgataram', value: data.loyalty?.total_redeemed ?? '—' },
-              { label: 'Conversão', value: data.loyalty?.conversion_rate ? `${data.loyalty.conversion_rate.toFixed(1)}%` : '—' },
+              { label: 'Participantes', value: data.loyalty?.active_members ?? '—' },
+              { label: 'Resgates', value: data.loyalty?.total_redemptions ?? '—' },
+              { label: 'Pts Resgatados', value: data.loyalty?.total_points_redeemed ?? '—' },
             ]}
             actionLabel="Enviar Lembretes"
             onAction={processLoyalty}
@@ -179,10 +246,11 @@ export default function EngagementPage() {
             description="Clientes que não agendaram nos últimos 60 dias"
             icon={RefreshCw}
             gradient="from-amber-500 to-orange-600"
+            unavailable={data.reactivationError && !data.reactivation}
             stats={[
-              { label: 'Inativos', value: data.reactivation?.total_inactive ?? '—' },
-              { label: 'Reativados', value: data.reactivation?.total_reactivated ?? '—' },
-              { label: 'Taxa', value: data.reactivation?.reactivation_rate ? `${data.reactivation.reactivation_rate.toFixed(1)}%` : '—' },
+              { label: 'Enviados', value: data.reactivation?.total_sent ?? '—' },
+              { label: 'Utilizados', value: data.reactivation?.total_used ?? '—' },
+              { label: 'Conversão', value: data.reactivation?.conversion_rate != null ? `${data.reactivation.conversion_rate.toFixed(1)}%` : '—' },
             ]}
           />
 
@@ -192,9 +260,9 @@ export default function EngagementPage() {
             icon={Star}
             gradient="from-yellow-500 to-amber-600"
             stats={[
-              { label: 'Elegíveis', value: data.reviewIncentives?.total_eligible ?? '—' },
-              { label: 'Avaliaram', value: data.reviewIncentives?.total_reviewed ?? '—' },
-              { label: 'Taxa', value: data.reviewIncentives?.review_rate ? `${data.reviewIncentives.review_rate.toFixed(1)}%` : '—' },
+              { label: 'Enviados', value: data.reviewIncentives?.total_pushes ?? '—' },
+              { label: 'Reviews', value: data.reviewIncentives?.reviews_received ?? '—' },
+              { label: 'Conversão', value: data.reviewIncentives?.conversion_rate != null ? `${data.reviewIncentives.conversion_rate.toFixed(1)}%` : '—' },
             ]}
             actionLabel="Processar"
             onAction={processReviewIncentives}
@@ -207,9 +275,9 @@ export default function EngagementPage() {
             icon={Bell}
             gradient="from-blue-500 to-indigo-600"
             stats={[
-              { label: 'Pendentes', value: data.maintenance?.total_due ?? '—' },
-              { label: 'Notificados', value: data.maintenance?.total_notified ?? '—' },
-              { label: 'Resposta', value: data.maintenance?.response_rate ? `${data.maintenance.response_rate.toFixed(1)}%` : '—' },
+              { label: 'Enviados', value: data.maintenance?.total_sent ?? '—' },
+              { label: 'Convertidos', value: data.maintenance?.conversions ?? '—' },
+              { label: 'Taxa', value: data.maintenance?.conversion_rate != null ? `${data.maintenance.conversion_rate.toFixed(1)}%` : '—' },
             ]}
             actionLabel="Processar"
             onAction={processMaintenance}
