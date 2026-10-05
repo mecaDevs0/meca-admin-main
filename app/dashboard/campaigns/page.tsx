@@ -396,15 +396,19 @@ export default function CampaignsPage() {
                         <button
                           key={key}
                           onClick={() => setSelectedSegment(key)}
-                          className="p-4 rounded-2xl border-2 text-left transition-all"
-                          style={{
-                            borderColor: active ? color : 'transparent',
-                            background: active ? `${color}10` : 'var(--color-gray-100, rgba(0,0,0,0.04))',
-                          }}
+                          className={`p-4 rounded-2xl border-2 text-left transition-all ${
+                            active
+                              ? ''
+                              : 'border-transparent bg-gray-100 dark:bg-gray-700/50'
+                          }`}
+                          style={active ? {
+                            borderColor: color,
+                            background: `${color}10`,
+                          } : undefined}
                         >
                           <div
                             className="w-9 h-9 rounded-xl flex items-center justify-center mb-3"
-                            style={{ backgroundColor: `${color}18` }}
+                            style={{ backgroundColor: `${color}20` }}
                           >
                             <Icon className="w-4 h-4" style={{ color }} />
                           </div>
@@ -613,7 +617,7 @@ export default function CampaignsPage() {
                     <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-gray-400">
                       <span
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                        style={{ backgroundColor: `${color}15`, color }}
+                        style={{ backgroundColor: `${color}20`, color }}
                       >
                         <Icon className="w-3 h-3" />
                         {c.segment_label}
