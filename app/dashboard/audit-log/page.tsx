@@ -86,6 +86,15 @@ const formatDateTime = (dateString: string) => {
 const formatTarget = (entry: AuditLogEntry) => {
   if (entry.target_name) return entry.target_name
   if (entry.target_type && entry.target_id) return `${entry.target_type} #${entry.target_id}`
+  const d = (typeof entry.details === 'object' && entry.details) ? entry.details as Record<string, unknown> : null
+  if (d) {
+    if (d.title) return String(d.title)
+    if (d.code) return String(d.code)
+    if (d.workshop_name) return String(d.workshop_name)
+    if (d.name) return String(d.name)
+    if (d.count) return `${d.count} destinatários`
+  }
+  if (entry.target_type) return entry.target_type
   return '—'
 }
 
