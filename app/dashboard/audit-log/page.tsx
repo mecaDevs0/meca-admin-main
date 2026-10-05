@@ -16,7 +16,7 @@ interface AuditLogEntry {
   target_type: string | null
   target_id: string | null
   target_name: string | null
-  details: string | null
+  details: Record<string, unknown> | string | null
   ip_address: string | null
   created_at: string
 }
@@ -89,14 +89,18 @@ const formatTarget = (entry: AuditLogEntry) => {
   return '—'
 }
 
-function parseDetails(details: string | null): Record<string, unknown> | null {
+function parseDetails(details: unknown): Record<string, unknown> | null {
   if (!details) return null
-  try { return JSON.parse(details) } catch { return null }
+  if (typeof details === 'object' && !Array.isArray(details)) return details as Record<string, unknown>
+  if (typeof details === 'string') {
+    try { return JSON.parse(details) } catch { return null }
+  }
+  return null
 }
 
-function ExpandableDetails({ details }: { details: string | null }) {
+function ExpandableDetails({ details }: { details: unknown }) {
   const parsed = parseDetails(details)
-  if (!parsed) return <span className="text-sm text-gray-500 dark:text-gray-400">{details || '—'}</span>
+  if (!parsed) return <span className="text-sm text-gray-500 dark:text-gray-400">{typeof details === 'string' ? details : '—'}</span>
 
   return (
     <div className="space-y-1.5">
@@ -195,7 +199,7 @@ export default function AuditLogPage() {
       e.admin_email,
       formatAction(e.action),
       formatTarget(e),
-      (e.details || '').replace(/"/g, '""'),
+      (typeof e.details === 'string' ? e.details : JSON.stringify(e.details) || '').replace(/"/g, '""'),
       e.ip_address || '',
     ].map(c => `"${c}"`).join(','))
     const csv = [header, ...rows].join('\n')
