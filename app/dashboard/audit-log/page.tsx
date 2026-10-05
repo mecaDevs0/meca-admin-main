@@ -354,11 +354,11 @@ export default function AuditLogPage() {
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/30">
                     <th className="w-8 px-2" />
-                    <th className="text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Data/Hora</th>
-                    <th className="text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Admin</th>
-                    <th className="text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Ação</th>
-                    <th className="text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Alvo</th>
-                    <th className="text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">IP</th>
+                    <th className="text-center text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Data/Hora</th>
+                    <th className="text-center text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Admin</th>
+                    <th className="text-center text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Ação</th>
+                    <th className="text-center text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">Alvo</th>
+                    <th className="text-center text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-3">IP</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -379,25 +379,25 @@ export default function AuditLogPage() {
                                   : <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
                               ) : <div className={`w-1.5 h-1.5 rounded-full ${getActionDot(entry.action)}`} />}
                             </div>
-                            <div className="flex-none w-[140px] px-4 py-3">
+                            <div className="flex-none w-[140px] px-4 py-3 text-center">
                               <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                                 {formatDateTime(entry.created_at)}
                               </span>
                             </div>
-                            <div className="flex-1 min-w-[160px] px-4 py-3">
+                            <div className="flex-1 min-w-[160px] px-4 py-3 text-center">
                               <span className="text-sm font-medium text-[#252940] dark:text-white truncate block">
                                 {entry.admin_email}
                               </span>
                             </div>
-                            <div className="flex-none w-[200px] px-4 py-3">
+                            <div className="flex-none w-[200px] px-4 py-3 text-center">
                               <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${getActionColor(entry.action)}`}>
                                 {formatAction(entry.action)}
                               </span>
                             </div>
-                            <div className="flex-1 min-w-[140px] px-4 py-3">
+                            <div className="flex-1 min-w-[140px] px-4 py-3 text-center">
                               <span className="text-sm text-gray-700 dark:text-gray-300">{formatTarget(entry)}</span>
                             </div>
-                            <div className="flex-none w-[120px] px-4 py-3">
+                            <div className="flex-none w-[120px] px-4 py-3 text-center">
                               <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{entry.ip_address || '—'}</span>
                             </div>
                           </div>
