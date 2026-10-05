@@ -83,18 +83,30 @@ const formatDateTime = (dateString: string) => {
   return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 }
 
+const TARGET_TYPE_LABELS: Record<string, string> = {
+  promo_code: 'Cupom',
+  campaign: 'Campanha',
+  review: 'Avaliação',
+  workshop: 'Oficina',
+  customer: 'Cliente',
+  bulk: 'Em massa',
+}
+
 const formatTarget = (entry: AuditLogEntry) => {
   if (entry.target_name) return entry.target_name
-  if (entry.target_type && entry.target_id) return `${entry.target_type} #${entry.target_id}`
+  if (entry.target_type && entry.target_id) {
+    const label = TARGET_TYPE_LABELS[entry.target_type] || entry.target_type
+    return `${label} #${entry.target_id}`
+  }
   const d = (typeof entry.details === 'object' && entry.details) ? entry.details as Record<string, unknown> : null
   if (d) {
     if (d.title) return String(d.title)
-    if (d.code) return String(d.code)
+    if (d.code) return `Cupom ${d.code}`
     if (d.workshop_name) return String(d.workshop_name)
     if (d.name) return String(d.name)
     if (d.count) return `${d.count} destinatários`
   }
-  if (entry.target_type) return entry.target_type
+  if (entry.target_type) return TARGET_TYPE_LABELS[entry.target_type] || entry.target_type
   return '—'
 }
 
