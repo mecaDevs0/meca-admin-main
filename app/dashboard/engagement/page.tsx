@@ -8,7 +8,30 @@ import {
   Heart, RefreshCw, Star, Bell, Users, Target,
   Play, AlertCircle, TrendingUp, BarChart3, Filter,
 } from 'lucide-react'
-import { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, Component } from 'react'
+
+class EngagementErrorBoundary extends Component<{ children: React.ReactNode }, { error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { error: null }
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error }
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 max-w-xl">
+            <h2 className="text-lg font-bold text-red-700 dark:text-red-400 mb-2">Erro no Engajamento</h2>
+            <pre className="text-xs text-red-600 dark:text-red-300 whitespace-pre-wrap break-all">{this.state.error.message}{'\n'}{this.state.error.stack}</pre>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 interface LoyaltyStats {
   active_members: number
@@ -231,7 +254,7 @@ function FunnelChart({ steps }: { steps: FunnelStep[] }) {
   )
 }
 
-export default function EngagementPage() {
+function EngagementPageContent() {
   const [overview, setOverview] = useState<OverviewData | null>(null)
   const [overviewError, setOverviewError] = useState(false)
   const [cohorts, setCohorts] = useState<CohortRow[]>([])
@@ -508,7 +531,7 @@ export default function EngagementPage() {
             stats={[
               { label: 'Enviados', value: reactivation?.total_sent ?? '—' },
               { label: 'Utilizados', value: reactivation?.total_used ?? '—' },
-              { label: 'Conversão', value: reactivation?.conversion_rate != null ? `${reactivation.conversion_rate.toFixed(1)}%` : '—' },
+              { label: 'Conversão', value: reactivation?.conversion_rate != null ? `${Number(reactivation.conversion_rate).toFixed(1)}%` : '—' },
             ]}
           />
 
@@ -520,7 +543,7 @@ export default function EngagementPage() {
             stats={[
               { label: 'Enviados', value: reviewIncentives?.total_pushes ?? '—' },
               { label: 'Reviews', value: reviewIncentives?.reviews_received ?? '—' },
-              { label: 'Conversão', value: reviewIncentives?.conversion_rate != null ? `${reviewIncentives.conversion_rate.toFixed(1)}%` : '—' },
+              { label: 'Conversão', value: reviewIncentives?.conversion_rate != null ? `${Number(reviewIncentives.conversion_rate).toFixed(1)}%` : '—' },
             ]}
             actionLabel="Processar"
             onAction={processReviewIncentives}
@@ -536,7 +559,7 @@ export default function EngagementPage() {
             stats={[
               { label: 'Enviados', value: maintenance?.total_sent ?? '—' },
               { label: 'Convertidos', value: maintenance?.conversions ?? '—' },
-              { label: 'Taxa', value: maintenance?.conversion_rate != null ? `${maintenance.conversion_rate.toFixed(1)}%` : '—' },
+              { label: 'Taxa', value: maintenance?.conversion_rate != null ? `${Number(maintenance.conversion_rate).toFixed(1)}%` : '—' },
             ]}
             actionLabel="Processar"
             onAction={processMaintenance}
@@ -546,5 +569,13 @@ export default function EngagementPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+export default function EngagementPage() {
+  return (
+    <EngagementErrorBoundary>
+      <EngagementPageContent />
+    </EngagementErrorBoundary>
   )
 }
