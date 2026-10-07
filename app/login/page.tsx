@@ -4,7 +4,7 @@ import Logo from '@/components/ui/Logo'
 import { apiClient } from '@/lib/api'
 import { showToast } from '@/lib/toast'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, Eye, EyeOff, Lock, Mail, KeyRound } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Lock, Mail, KeyRound, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -27,25 +27,21 @@ export default function LoginPage() {
       showToast.error('Email obrigatório', 'Digite seu email para receber o código')
       return
     }
-
     setSendingCode(true)
     setError('')
-
     try {
       const { data, error: apiError } = await apiClient.sendLoginCode(email)
-
       if (data?.success) {
         setCodeSent(true)
-        showToast.success('Código enviado!', 'Verifique seu email para receber o código de acesso')
+        showToast.success('Código enviado!', 'Verifique seu email')
       } else {
         showToast.error('Erro ao enviar código', apiError || 'Não foi possível enviar o código')
         setError(apiError || 'Erro ao enviar código')
       }
     } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
-      setError('Erro de conexão. Verifique se a API está rodando.')
+      setError('Erro de conexão')
     }
-
     setSendingCode(false)
   }
 
@@ -53,36 +49,25 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     if (!code || code.length !== 6) {
       showToast.error('Código inválido', 'O código deve ter 6 dígitos')
       setLoading(false)
       return
     }
-
     try {
       const { data, error: apiError } = await apiClient.loginWithCode(email, code)
-
-      if (data?.success) {
-        if (data.data?.token) {
-          localStorage.setItem('meca_admin_token', data.data.token)
-          showToast.success('Login realizado!', 'Redirecionando...')
-          setTimeout(() => {
-            router.push('/dashboard')
-          }, 500)
-        } else {
-          showToast.error('Token não recebido', 'Tente novamente')
-          setError('Token não recebido. Tente novamente.')
-        }
+      if (data?.success && data.data?.token) {
+        localStorage.setItem('meca_admin_token', data.data.token)
+        showToast.success('Login realizado!', 'Redirecionando...')
+        setTimeout(() => router.push('/dashboard'), 500)
       } else {
-        showToast.error('Código inválido', apiError || 'O código informado está incorreto ou expirado')
+        showToast.error('Código inválido', apiError || 'Código incorreto ou expirado')
         setError(apiError || 'Código inválido ou expirado')
       }
     } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
-      setError('Erro de conexão. Verifique se a API está rodando.')
+      setError('Erro de conexão')
     }
-    
     setLoading(false)
   }
 
@@ -90,396 +75,321 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     try {
       const { data, error: apiError } = await apiClient.login(email, password)
-
-      if (data?.success) {
-        if (data.data?.token) {
-          localStorage.setItem('meca_admin_token', data.data.token)
-          showToast.success('Login realizado!', 'Redirecionando...')
-          setTimeout(() => {
-            router.push('/dashboard')
-          }, 500)
-        } else {
-          showToast.error('Token não recebido', 'Tente novamente')
-          setError('Token não recebido. Tente novamente.')
-        }
+      if (data?.success && data.data?.token) {
+        localStorage.setItem('meca_admin_token', data.data.token)
+        showToast.success('Login realizado!', 'Redirecionando...')
+        setTimeout(() => router.push('/dashboard'), 500)
+      } else if (data?.requires_setup) {
+        showToast.warning('Senha não configurada', 'Verifique seu email para criar sua senha')
+        setError('Sua senha ainda não foi configurada. Verifique seu email.')
       } else {
-        if (data?.requires_setup) {
-          showToast.warning('Senha não configurada', 'Verifique seu email para criar sua senha')
-          setError('Sua senha ainda não foi configurada. Verifique seu email para criar sua senha.')
-        } else {
-          showToast.error('Credenciais inválidas', apiError || 'Email ou senha incorretos')
-          setError(apiError || 'Credenciais inválidas')
-        }
+        showToast.error('Credenciais inválidas', apiError || 'Email ou senha incorretos')
+        setError(apiError || 'Credenciais inválidas')
       }
     } catch {
       showToast.error('Erro de conexão', 'Verifique se a API está rodando')
-      setError('Erro de conexão. Verifique se a API está rodando.')
+      setError('Erro de conexão')
     }
-    
     setLoading(false)
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5 }
-    }
-  }
+  const handleSubmit = mode === 'password' ? handleLoginWithPassword : handleLoginWithCode
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Clean gradient background */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#252940] via-[#1B1D2E] to-[#252940] items-center justify-center p-12 relative">
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="text-center"
-        >
-          <motion.div 
-            variants={itemVariants}
-            className="mb-12 flex justify-center"
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      style={{ background: '#0A0A0F' }}
+    >
+      {/* Subtle radial glow behind form */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 600px 400px at 50% 40%, rgba(0,201,119,0.06) 0%, transparent 70%)',
+        }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative w-full max-w-[400px]"
+      >
+        {/* Logo + heading */}
+        <div className="text-center mb-8">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="flex justify-center mb-5"
           >
-            <Logo variant="full" color="white" size="xl" animated />
+            <Logo variant="icon" color="green" size="lg" />
           </motion.div>
-          
-          <motion.p 
-            variants={itemVariants}
-            className="text-sm text-gray-400 max-w-md mx-auto leading-relaxed"
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            style={{ color: '#FFFFFF' }}
           >
-            Gerencie oficinas, serviços e monitore o marketplace automotivo com inteligência e eficiência
-          </motion.p>
-        </motion.div>
-      </div>
+            MECA Admin
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#6B7280' }}>
+            Faça login para acessar o painel
+          </p>
+        </div>
 
-      {/* Right side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="w-full max-w-md"
+        {/* Login card */}
+        <div
+          className="rounded-2xl p-7 sm:p-8"
+          style={{
+            background: '#111118',
+            border: '1px solid rgba(255,255,255,0.06)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          }}
         >
-          {/* Logo for small screens */}
-          <motion.div 
-            variants={itemVariants}
-            className="lg:hidden text-center mb-8"
+          {/* Mode toggle */}
+          <div
+            className="flex gap-1 p-1 rounded-xl mb-6"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <Logo variant="full" color="green" size="lg" animated />
-            <h1 className="text-3xl font-bold text-[#252940] mt-4">MECA Admin</h1>
-          </motion.div>
-
-          <motion.div 
-            variants={itemVariants}
-            className="bg-white rounded-3xl shadow-2xl p-10 border border-gray-100"
-          >
-            <motion.div 
-              variants={itemVariants}
-              className="mb-8 text-center"
-            >
-              <h2 className="text-3xl font-bold text-[#252940] mb-2">Bem-vindo!</h2>
-              <p className="text-gray-600">Faça login para acessar o painel</p>
-            </motion.div>
-
-            {/* Mode Toggle */}
-            <motion.div 
-              variants={itemVariants}
-              className="mb-6 flex gap-2 bg-gray-100 rounded-2xl p-1"
-            >
+            {(['password', 'code'] as LoginMode[]).map((m) => (
               <button
-                onClick={() => {
-                  setMode('password')
-                  setCodeSent(false)
-                  setError('')
+                key={m}
+                onClick={() => { setMode(m); setCodeSent(false); setError(''); }}
+                className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200"
+                style={{
+                  background: mode === m ? 'rgba(0,201,119,0.12)' : 'transparent',
+                  color: mode === m ? '#00C977' : '#6B7280',
+                  border: mode === m ? '1px solid rgba(0,201,119,0.20)' : '1px solid transparent',
                 }}
-                className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all duration-200 ${
-                  mode === 'password'
-                    ? 'bg-white text-[#00c977] shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
               >
-                Senha
+                {m === 'password' ? 'Senha' : 'Código'}
               </button>
-              <button
-                onClick={() => {
-                  setMode('code')
-                  setError('')
-                }}
-                className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all duration-200 ${
-                  mode === 'code'
-                    ? 'bg-white text-[#00c977] shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Código
-              </button>
-            </motion.div>
+            ))}
+          </div>
 
-            {/* Password Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email — shared between modes */}
+            <div>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#9CA3AF' }}>
+                Email
+              </label>
+              <div className="relative">
+                <Mail
+                  size={16}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ color: '#4B5563' }}
+                />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={mode === 'code' && codeSent}
+                  placeholder="admin@mecabr.com"
+                  required
+                  className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+                  style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    color: '#F3F4F6',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = 'rgba(0,201,119,0.40)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+                />
+              </div>
+            </div>
+
+            {/* Password mode fields */}
             <AnimatePresence mode="wait">
               {mode === 'password' && (
-                <motion.form 
-                  key="password-form"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  onSubmit={handleLoginWithPassword} 
-                  className="space-y-6"
-                >
-                {/* Email Input */}
                 <motion.div
-                  whileFocus={{ scale: 1.02 }}
+                  key="pw"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
+                  style={{ overflow: 'hidden' }}
                 >
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-400"
-                      placeholder="seu@email.com"
-                      required
-                    />
-                  </div>
-                </motion.div>
-
-                {/* Password Input */}
-                <motion.div
-                  whileFocus={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Senha
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-400"
-                      placeholder="••••••••"
-                      aria-label="Senha"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </motion.div>
-
-                {/* Error Message */}
-                <AnimatePresence>
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-medium"
-                    >
-                      {error}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Login Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 shadow-lg shadow-[#00c977]/25 hover:shadow-xl hover:shadow-[#00c977]/40 flex items-center justify-center gap-3"
-                >
-                  {loading ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    />
-                  ) : (
-                    <>
-                      Entrar
-                      <ArrowRight className="w-5 h-5" />
-                    </>
-                  )}
-                </motion.button>
-                </motion.form>
-              )}
-            </AnimatePresence>
-
-            {/* Code Login Form */}
-            <AnimatePresence mode="wait">
-              {mode === 'code' && (
-              <motion.form 
-                key="code-form"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                onSubmit={handleLoginWithCode} 
-                className="space-y-6"
-              >
-                {/* Email Input */}
-                <motion.div
-                  whileFocus={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-400"
-                      placeholder="seu@email.com"
-                      required
-                      disabled={codeSent}
-                    />
-                  </div>
-                </motion.div>
-
-                {/* Send Code Button */}
-                {!codeSent && (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="button"
-                    onClick={handleSendCode}
-                    disabled={sendingCode || !email}
-                    className="w-full bg-gradient-to-r from-[#252940] to-[#1B1D2E] hover:from-[#1B1D2E] hover:to-[#252940] text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 shadow-lg shadow-[#252940]/25 hover:shadow-xl hover:shadow-[#252940]/40 flex items-center justify-center gap-3"
-                  >
-                    {sendingCode ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                      />
-                    ) : (
-                      <>
-                        Enviar Código
-                        <KeyRound className="w-5 h-5" />
-                      </>
-                    )}
-                  </motion.button>
-                )}
-
-                {/* Code Input */}
-                {codeSent && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                      Código de Acesso (6 dígitos)
+                  <div>
+                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#9CA3AF' }}>
+                      Senha
                     </label>
                     <div className="relative">
-                      <KeyRound className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Lock
+                        size={16}
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: '#4B5563' }}
+                      />
                       <input
-                        type="text"
-                        value={code}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '').slice(0, 6)
-                          setCode(value)
-                        }}
-                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#00c977]/20 focus:border-[#00c977] outline-none transition-all duration-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-400 text-center text-2xl font-bold tracking-widest"
-                        placeholder="000000"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
                         required
-                        maxLength={6}
-                        autoFocus
+                        className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#F3F4F6',
+                        }}
+                        onFocus={(e) => { e.target.style.borderColor = 'rgba(0,201,119,0.40)'; }}
+                        onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.08)'; }}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2"
+                        style={{ color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                        aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2 text-center">
-                      Verifique seu email para o código de acesso
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCodeSent(false)
-                        setCode('')
-                        handleSendCode()
-                      }}
-                      className="text-sm text-[#00c977] hover:text-[#00b369] font-medium mt-2 w-full text-center"
-                    >
-                      Reenviar código
-                    </button>
-                  </motion.div>
-                )}
-
-                {/* Error Message */}
-                <AnimatePresence>
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-medium"
-                    >
-                      {error}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Login Button */}
-                {codeSent && (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    disabled={loading || code.length !== 6}
-                    className="w-full bg-gradient-to-r from-[#00c977] to-[#00b369] hover:from-[#00b369] hover:to-[#00a05a] text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 shadow-lg shadow-[#00c977]/25 hover:shadow-xl hover:shadow-[#00c977]/40 flex items-center justify-center gap-3"
-                  >
-                    {loading ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                      />
-                    ) : (
-                      <>
-                        Entrar com Código
-                        <ArrowRight className="w-5 h-5" />
-                      </>
-                    )}
-                  </motion.button>
-                )}
-              </motion.form>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
 
+            {/* Code mode fields */}
+            <AnimatePresence mode="wait">
+              {mode === 'code' && (
+                <motion.div
+                  key="code"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  {!codeSent ? (
+                    <button
+                      type="button"
+                      onClick={handleSendCode}
+                      disabled={sendingCode || !email}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
+                      style={{
+                        background: '#252940',
+                        color: '#E5E7EB',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        cursor: sendingCode || !email ? 'not-allowed' : 'pointer',
+                        opacity: sendingCode || !email ? 0.5 : 1,
+                      }}
+                    >
+                      {sendingCode ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <KeyRound size={16} />
+                      )}
+                      {sendingCode ? 'Enviando...' : 'Enviar código para email'}
+                    </button>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#9CA3AF' }}>
+                        Código de 6 dígitos
+                      </label>
+                      <div className="relative">
+                        <KeyRound
+                          size={16}
+                          className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                          style={{ color: '#4B5563' }}
+                        />
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={code}
+                          onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                          placeholder="000000"
+                          required
+                          maxLength={6}
+                          autoFocus
+                          className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-mono tracking-[0.3em] outline-none transition-all duration-200"
+                          style={{
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            color: '#F3F4F6',
+                            textAlign: 'center',
+                            fontSize: 18,
+                            letterSpacing: '0.3em',
+                          }}
+                          onFocus={(e) => { e.target.style.borderColor = 'rgba(0,201,119,0.40)'; }}
+                          onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-[11px]" style={{ color: '#6B7280' }}>
+                          Verifique seu email
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => { setCodeSent(false); setCode(''); handleSendCode(); }}
+                          className="text-[11px] font-medium"
+                          style={{ color: '#00C977', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                        >
+                          Reenviar código
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          </motion.div>
-        </motion.div>
-      </div>
+            {/* Error */}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="px-4 py-3 rounded-xl text-xs font-medium"
+                  style={{
+                    background: 'rgba(239,68,68,0.08)',
+                    border: '1px solid rgba(239,68,68,0.20)',
+                    color: '#F87171',
+                  }}
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Submit button */}
+            {(mode === 'password' || (mode === 'code' && codeSent)) && (
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                type="submit"
+                disabled={loading || (mode === 'code' && code.length !== 6)}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold transition-all duration-200"
+                style={{
+                  background: '#00C977',
+                  color: '#0A0A0F',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading || (mode === 'code' && code.length !== 6) ? 0.5 : 1,
+                }}
+              >
+                {loading ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <>
+                    {mode === 'password' ? 'Entrar' : 'Verificar código'}
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </motion.button>
+            )}
+          </form>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-[11px] mt-6" style={{ color: '#4B5563' }}>
+          Acesso restrito a administradores MECA
+        </p>
+      </motion.div>
     </div>
   )
 }
