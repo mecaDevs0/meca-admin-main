@@ -95,7 +95,14 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  const handleSubmit = mode === 'password' ? handleLoginWithPassword : handleLoginWithCode
+  const handleSubmit = (e: React.FormEvent) => {
+    if (mode === 'code' && !codeSent) {
+      e.preventDefault()
+      handleSendCode()
+      return
+    }
+    mode === 'password' ? handleLoginWithPassword(e) : handleLoginWithCode(e)
+  }
 
   return (
     <div
@@ -186,6 +193,7 @@ export default function LoginPage() {
                   disabled={mode === 'code' && codeSent}
                   placeholder="admin@mecabr.com"
                   required
+                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
                   style={{
                     background: 'rgba(255,255,255,0.04)',
@@ -225,6 +233,7 @@ export default function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         required
+                        autoComplete="current-password"
                         className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none transition-all duration-200"
                         style={{
                           background: 'rgba(255,255,255,0.04)',
@@ -305,7 +314,7 @@ export default function LoginPage() {
                           required
                           maxLength={6}
                           autoFocus
-                          className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-mono tracking-[0.3em] outline-none transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-mono outline-none transition-all duration-200"
                           style={{
                             background: 'rgba(255,255,255,0.04)',
                             border: '1px solid rgba(255,255,255,0.08)',
@@ -324,7 +333,7 @@ export default function LoginPage() {
                         </p>
                         <button
                           type="button"
-                          onClick={() => { setCodeSent(false); setCode(''); handleSendCode(); }}
+                          onClick={() => { setCode(''); handleSendCode(); }}
                           className="text-[11px] font-medium"
                           style={{ color: '#00C977', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                         >
