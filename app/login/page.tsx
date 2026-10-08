@@ -194,11 +194,13 @@ export default function LoginPage() {
                   placeholder="admin@mecabr.com"
                   required
                   autoComplete="email"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 placeholder:text-gray-500"
                   style={{
                     background: 'rgba(255,255,255,0.04)',
                     border: '1px solid rgba(255,255,255,0.08)',
                     color: '#F3F4F6',
+                    WebkitTextFillColor: '#F3F4F6',
+                    caretColor: '#F3F4F6',
                   }}
                   onFocus={(e) => { e.target.style.borderColor = 'rgba(0,201,119,0.40)'; }}
                   onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.08)'; }}
@@ -234,11 +236,13 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         required
                         autoComplete="current-password"
-                        className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none transition-all duration-200 placeholder:text-gray-500"
                         style={{
                           background: 'rgba(255,255,255,0.04)',
                           border: '1px solid rgba(255,255,255,0.08)',
                           color: '#F3F4F6',
+                          WebkitTextFillColor: '#F3F4F6',
+                          caretColor: '#F3F4F6',
                         }}
                         onFocus={(e) => { e.target.style.borderColor = 'rgba(0,201,119,0.40)'; }}
                         onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.08)'; }}
@@ -314,11 +318,13 @@ export default function LoginPage() {
                           required
                           maxLength={6}
                           autoFocus
-                          className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-mono outline-none transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-mono outline-none transition-all duration-200 placeholder:text-gray-500"
                           style={{
                             background: 'rgba(255,255,255,0.04)',
                             border: '1px solid rgba(255,255,255,0.08)',
                             color: '#F3F4F6',
+                            WebkitTextFillColor: '#F3F4F6',
+                            caretColor: '#F3F4F6',
                             textAlign: 'center',
                             fontSize: 18,
                             letterSpacing: '0.3em',
