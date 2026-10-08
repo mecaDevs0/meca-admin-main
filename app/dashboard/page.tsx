@@ -339,7 +339,7 @@ export default function DashboardPage() {
         {/* Financial Section */}
         <motion.div variants={itemVariants}>
           <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
-            Financeiro MECA — Período Selecionado
+            Financeiro MECA — {period === '7d' ? 'Últimos 7 dias' : period === '30d' ? 'Últimos 30 dias' : period === '90d' ? 'Últimos 90 dias' : period === '6m' ? 'Últimos 6 meses' : period === '1y' ? 'Último ano' : 'Período personalizado'}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-4 border border-white/20 dark:border-gray-700/50 shadow-sm">
@@ -367,7 +367,7 @@ export default function DashboardPage() {
                 <div className="w-8 h-8 bg-gradient-to-br from-[#252940] to-[#1B1D2E] rounded-lg flex items-center justify-center">
                   <CreditCard className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Custo Asaas (~3.4%)</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Custo Gateway</p>
               </div>
               <p className="text-xl font-bold text-[#252940] dark:text-white">{formatCurrency(metrics.gateway_fee)}</p>
             </div>
