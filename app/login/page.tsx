@@ -101,7 +101,11 @@ export default function LoginPage() {
       handleSendCode()
       return
     }
-    mode === 'password' ? handleLoginWithPassword(e) : handleLoginWithCode(e)
+    if (mode === 'password') {
+      handleLoginWithPassword(e)
+    } else {
+      handleLoginWithCode(e)
+    }
   }
 
   return (
